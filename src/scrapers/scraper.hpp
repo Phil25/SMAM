@@ -25,7 +25,7 @@ protected:
 
 public:
 	// return download url of a target
-	virtual std::string getFileUrl(const std::string& name, char tag) const = 0;
+	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
 
 	// is this scraper applicable for given url
 	bool match(const std::string& url) const{
