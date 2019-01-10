@@ -10,17 +10,12 @@ protected:
 	Plan* thriller;
 
 	void SetUp() override{
-		std::vector<std::string> strings{
+		std::vector<std::string> dataThriller{
 			"https://forums.alliedmods.net/showpost.php?p=1590169",
 			"p:thriller.sp",
 			"g:thriller.plugin.txt"
 		};
-
-		std::vector<char*> cstrings{};
-		for(auto& string : strings)
-			cstrings.push_back(&string.front());
-
-		thriller = new Plan(cstrings.data(), cstrings.size());
+		thriller = new Plan(dataThriller);
 	}
 
 	void TearDown() override{

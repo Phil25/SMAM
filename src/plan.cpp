@@ -22,20 +22,30 @@ std::string Plan::File::toDir(char tag){
 	return "tmp/";
 }
 
-Plan::Plan(char** data, int size):
-	url(data[0])//,
-	//files(size -1) // TODO: check this count thingy
-{
-	for(int i = 1; i < size; ++i)
-		files.push_back(File(data[i]));
+Plan::Plan() : url(""){}
+
+Plan::Plan(const std::vector<std::string>& data){
+	init(data);
 }
 
-const std::string& Plan::getUrl() const{
-	return url;
+void Plan::init(const std::vector<std::string>& data){
+	url = data.at(0);
+	int size = data.size();
+	for(int i = 1; i < size; ++i)
+		files.push_back(File(data.at(i)));
+}
+
+void Plan::fill(const Scraper& scraper){
+	for(File& file : files)
+		file.url = scraper.getFileUrl(file.name, file.tag);
 }
 
 int Plan::size() const{
 	return files.size();
+}
+
+const std::string& Plan::getUrl() const{
+	return url;
 }
 
 char Plan::getFileTag(int i) const{

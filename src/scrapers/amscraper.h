@@ -2,24 +2,15 @@
 
 #include "scraper.hpp"
 
-using StringVector = std::vector<std::string>;
-
 class AMScraper : Scraper{
 
 public:
-	AMScraper();
+	AMScraper(Downloader&);
 
-	void completePlan(Plan&) const;
+	std::string getFileUrl(const std::string& name, char tag) const override;
 
 private:
-	// split string to vector by newlines
-	StringVector toLines(const std::string&) const;
-
-
-	// get download url of attachment, using forum HTML data
-	std::string getUrl(const std::string&, char, const StringVector&) const;
-
-	// build url for attachment download
+	// build url for downloading attachment
 	std::string buildUrl(int attachmentId, bool forumCompilable) const;
 
 	// extract forum's attachment id from line

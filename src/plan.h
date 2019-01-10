@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "scrapers/scraper.hpp"
 
 class Plan{
 	struct File{
@@ -18,11 +19,14 @@ class Plan{
 	std::vector<File> files;
 
 public:
-	Plan(char** data, int size);
+	Plan();
+	Plan(const std::vector<std::string>& data);
 
-	const std::string& getUrl() const;
+	void init(const std::vector<std::string>& data);
+	void fill(const Scraper&);
 
 	int size() const;
+	const std::string& getUrl() const;
 
 	char getFileTag(int) const;
 	const std::string& getFileDir(int) const;

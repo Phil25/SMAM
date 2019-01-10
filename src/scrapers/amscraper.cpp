@@ -1,48 +1,17 @@
-#include <sstream>
 #include "amscraper.h"
 
-#if defined TEST_BUILD
-#include "../../test/mocks/mock-downloader.hpp"
-#else
 #include "../downloader.h"
-#endif
 
-AMScraper::AMScraper():
-	Scraper("https://forums.alliedmods.net")
+AMScraper::AMScraper(Downloader& downloader):
+	Scraper(downloader,
+		"https://forums.alliedmods.net",
+		"<!-- attachments -->",
+		"<!-- / attachments -->"
+	)
 {}
 
-void AMScraper::completePlan(Plan& plan) const{
-	std::string from = "<!-- attachments -->",
-				to = "<!-- / attachments -->",
-				data = Downloader::html(plan.getUrl(), from, to);
-
-	StringVector lines = toLines(data);
-	std::string destUrl;
-	int size = plan.size();
-
-	for(int i = 0; i < size; ++i){
-		destUrl = getUrl(plan.getFileName(i), plan.getFileTag(i), lines);
-		plan.setFileUrl(i, destUrl);
-	}
-}
-
-StringVector AMScraper::toLines(const std::string& data) const{
-	std::istringstream dataStream(data);
-	std::string line;
-	std::vector<std::string> lines;
-
-	while(std::getline(dataStream, line))
-		lines.push_back(line);
-
-	return lines;
-}
-
-std::string AMScraper::getUrl(
-	const std::string& name,
-	char tag,
-	const StringVector& lines) const
-{
-	for(auto& line : lines)
+std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
+	for(auto& line : contents)
 		if(line.find(name) != std::string::npos)
 			return buildUrl(getId(line), isForumCompilable(tag, name));
 
