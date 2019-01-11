@@ -4,26 +4,27 @@
 #include <string>
 #include <fstream>
 
-typedef const std::string cstr;
+using cstr = const std::string;
 
 class Downloader{
-	static std::string buffer;
-	static CURL* curl;
-	static CURLcode res;
-	static std::ofstream tempfile;
-
-	Downloader() = delete;
-	Downloader(const Downloader&) = delete;
+	std::string buffer;
+	CURL* curl;
+	CURLcode res;
+	std::ofstream tempfile;
 
 public:
-	static std::string html(cstr& url, cstr& from, cstr& to);
-	static void file(cstr& url);
+	Downloader();
+
+	virtual std::string html(cstr& url, cstr& from, cstr& to);
+	virtual void file(cstr& url);
 
 private:
-	static bool prepare();
-	static void set_opts(CURL*, cstr&);
-	static size_t read(const char* contents, size_t size, size_t nmemb);
-	static size_t write(const char* contents, size_t size, size_t nmemb);
+	bool prepare();
+	void set_opts(CURL*, cstr& url);
 
-	static std::string extract(cstr& from, cstr& to);
+	static size_t read(const char*, size_t size, size_t n, void*);
+	static size_t write(const char*, size_t size, size_t n, void*);
+
+protected:
+	static std::string extract(cstr& data, cstr& from, cstr& to);
 };

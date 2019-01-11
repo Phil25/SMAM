@@ -3,10 +3,12 @@
 #define AGENT "SourceMod Addon Manager"
 #define VERSION "1.0"
 
-std::string Downloader::buffer = "";
-CURL* Downloader::curl = NULL;
-CURLcode Downloader::res = CURLE_FAILED_INIT;
-std::ofstream Downloader::tempfile;
+Downloader::Downloader():
+	buffer(""),
+	curl(NULL),
+	res(CURLE_FAILED_INIT),
+	tempfile({})
+{}
 
 std::string Downloader::html(cstr& url, cstr& from, cstr& to){
 	if(!prepare()) return "";
@@ -18,7 +20,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to){
 		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
 
 	curl_easy_cleanup(curl);
-	return extract(from, to);
+	return extract(buffer, from, to);
 }
 
 void Downloader::file(cstr& url){
@@ -45,24 +47,27 @@ void Downloader::set_opts(CURL* curl, cstr& url){
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, AGENT "/" VERSION);
 
+	// pass pointer of the caller's class
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 4L);
 }
 
-size_t Downloader::read(const char *contents, size_t size, size_t nmemb){
-	size_t trueSize = size *nmemb;
-	buffer.append(contents, trueSize);
+size_t Downloader::read(const char* data, size_t size, size_t n, void* o){
+	size_t trueSize = size *n;
+	static_cast<Downloader*>(o)->buffer.append(data, trueSize);
 	return trueSize;
 }
 
-size_t Downloader::write(const char *contents, size_t size, size_t nmemb){
-	size_t trueSize = size *nmemb;
-	tempfile << std::string(contents, trueSize);
+size_t Downloader::write(const char* data, size_t size, size_t n, void* o){
+	size_t trueSize = size *n;
+	static_cast<Downloader*>(o)->tempfile << std::string(data, trueSize);
 	return trueSize;
 }
 
-std::string Downloader::extract(cstr& from, cstr& to){
-	size_t begin = buffer.find(from, 0) +from.size();
-	size_t end = buffer.find(to, begin);
-	return buffer.substr(begin, end -begin);
+std::string Downloader::extract(cstr& data, cstr& from, cstr& to){
+	size_t begin = data.find(from, 0) +from.size();
+	size_t end = data.find(to, begin);
+	return data.substr(begin, end -begin);
 }
