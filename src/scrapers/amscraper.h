@@ -2,10 +2,11 @@
 
 #include "scraper.hpp"
 
-class AMScraper : Scraper{
+class AMScraper : public Scraper{
 
 public:
 	AMScraper(Downloader&);
+	virtual ~AMScraper();
 
 	std::string getFileUrl(const std::string& name, char tag) const override;
 

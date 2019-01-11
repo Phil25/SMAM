@@ -10,6 +10,8 @@ AMScraper::AMScraper(Downloader& downloader):
 	)
 {}
 
+AMScraper::~AMScraper(){}
+
 std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
 	for(auto& line : contents)
 		if(line.find(name) != std::string::npos)

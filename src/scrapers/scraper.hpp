@@ -23,6 +23,8 @@ protected:
 		dataTo(to)
 	{}
 
+	virtual ~Scraper(){}
+
 public:
 	// return download url of a target
 	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
@@ -34,7 +36,7 @@ public:
 
 	// download page and parse relevant data
 	void getPage(const std::string& url){
-		contents = toLines(Downloader::html(url, dataFrom, dataTo));
+		contents = toLines(downloader.html(url, dataFrom, dataTo));
 	}
 
 	// split string to vector by newlines

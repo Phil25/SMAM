@@ -1,6 +1,6 @@
 project(SMAM_src_scrapers)
 
-add_library(amscraper STATIC amscraper.cpp amscraper.h scraper.hpp)
+add_library(amscraper)
 target_sources(amscraper
   PRIVATE amscraper.cpp
   PUBLIC
