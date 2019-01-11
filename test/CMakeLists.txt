@@ -1,9 +1,20 @@
-add_executable(tests
-  plantest.cpp
+set(CURL_LIBRARY "-lcurl")
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIR})
+
+add_executable(tests)
+
+target_sources(tests
+  PRIVATE
+    amscrapertest.cpp
+    plantest.cpp
 )
 
 target_link_libraries(tests
   gtest_main
+  ${CURL_LIBRARIES} # required for linkage, unused in mock
+  downloader
+  amscraper
   plan
 )
 

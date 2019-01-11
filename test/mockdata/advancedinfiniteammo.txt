@@ -1,0 +1,978 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="en">
+<head>
+<meta http-equiv="x-ua-compatible" content="IE=9" />
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="vBulletin" />
+
+	
+<meta name="keywords" content="AMX Mod X,AMX Mod,Metamod,Half-Life Plugins,AMXX,AMX,Plugins,Counter-Strike,CSDM,Deathmatch,Servers,C++" />
+<meta name="description" content="Half-Life/Counter-Strike Server-Side Modding (AMX Mod X, Metamod, and SourceMod), CSDM and SuperHero hosted" />
+	
+
+
+<!-- CSS Stylesheet -->
+<style type="text/css" id="vbulletin_css">
+/**
+* vBulletin 3.8.7 CSS
+* Style: 'phpBB'; Style ID: 5
+*/
+body
+{
+	background: #E5E5E5;
+	color: #000000;
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	margin: 10px;
+	padding: 0px;
+}
+a:link, body_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+a:visited, body_avisited
+{
+	color: #006699;
+}
+a:hover, a:active, body_ahover
+{
+	color: #DD6900;
+}
+.page
+{
+	background: #FFFFFF;
+	color: #000000;
+}
+td, th, p, li
+{
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.tborder
+{
+	background: #FFFFFF;
+	color: #000000;
+	border: 2px solid #006699;
+	
+}
+.tcat
+{
+	background: #C7D0D7 url(images/gradients/gradient_tcat.gif) repeat-x top left;
+	color: #000000;
+	font: bold 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.tcat a:link, .tcat_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.tcat a:visited, .tcat_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.tcat a:hover, .tcat a:active, .tcat_ahover
+{
+	color: #006699;
+	text-decoration: underline;
+}
+.thead
+{
+	background: #C7D0D7 url(images/gradients/gradient_thead.gif) repeat-x top left;
+	color: #FFFFFF;
+	font: bold 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.thead a:link, .thead_alink
+{
+	color: #EDE1DC;
+}
+.thead a:visited, .thead_avisited
+{
+	color: #EDE1DC;
+}
+.thead a:hover, .thead a:active, .thead_ahover
+{
+	color: #EDE1DC;
+	text-decoration: underline;
+}
+.tfoot
+{
+	background: #C7D0D7;
+	color: #000000;
+}
+.tfoot a:link, .tfoot_alink
+{
+	color: #006699;
+}
+.tfoot a:visited, .tfoot_avisited
+{
+	color: #006699;
+}
+.tfoot a:hover, .tfoot a:active, .tfoot_ahover
+{
+	color: #006699;
+}
+.alt1, .alt1Active
+{
+	background: #EFEFEF;
+	color: #000000;
+}
+.alt2, .alt2Active
+{
+	background: #EFEFEF;
+	color: #000000;
+}
+.inlinemod
+{
+	background: #D8D8D8;
+	color: #000000;
+}
+.wysiwyg
+{
+	background: #FFFFFF;
+	color: #000000;
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+textarea, .bginput
+{
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.bginput option, .bginput optgroup
+{
+	font-size: 10pt;
+	font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.button
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+select
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+option, optgroup
+{
+	font-size: 11px;
+	font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.smallfont
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.time
+{
+	color: #666686;
+}
+.navbar
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.highlight
+{
+	color: #FF0000;
+	font-weight: bold;
+}
+.fjsel
+{
+	background: #3E5C92;
+	color: #E0E0F6;
+}
+.fjdpth0
+{
+	background: #F7F7F7;
+	color: #000000;
+}
+.panel
+{
+	background: #EFEFEF url(images/gradients/gradient_panel.gif) repeat-x top left;
+	color: #000000;
+	padding: 10px;
+	border: 1px solid #b2b2b2;
+}
+.panelsurround
+{
+	background: #FFFFFF url(images/gradients/gradient_panelsurround.gif) repeat-x top left;
+	color: #000000;
+}
+legend
+{
+	color: #22229C;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.vbmenu_control
+{
+	background: #EFEFEF;
+	color: #006699;
+	font: bold 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 10px;
+	white-space: nowrap;
+}
+.vbmenu_control a:link, .vbmenu_control_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_control a:visited, .vbmenu_control_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_control a:hover, .vbmenu_control a:active, .vbmenu_control_ahover
+{
+	color: #006699;
+	text-decoration: underline;
+}
+.vbmenu_popup
+{
+	background: #FFFFFF;
+	color: #000000;
+	border: 1px solid #0B198C;
+}
+.vbmenu_option
+{
+	background: #BBC7CE;
+	color: #000000;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.vbmenu_option a:link, .vbmenu_option_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_option a:visited, .vbmenu_option_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_option a:hover, .vbmenu_option a:active, .vbmenu_option_ahover
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_hilite
+{
+	background: #8A949E;
+	color: #FFFFFF;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.vbmenu_hilite a:link, .vbmenu_hilite_alink
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.vbmenu_hilite a:visited, .vbmenu_hilite_avisited
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.vbmenu_hilite a:hover, .vbmenu_hilite a:active, .vbmenu_hilite_ahover
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+/* ***** styling for 'big' usernames on postbit etc. ***** */
+.bigusername { font-size: 10pt; font-weight: bold; }
+
+/* ***** small padding on 'thead' elements ***** */
+td.thead, div.thead { padding: 4px; }
+
+/* ***** basic styles for multi-page nav elements */
+.pagenav a { text-decoration: none; }
+.pagenav td { padding: 2px 4px 2px 4px; }
+
+/* ***** define margin and font-size for elements inside panels ***** */
+.fieldset { margin-bottom: 6px; }
+.fieldset, .fieldset td, .fieldset p, .fieldset li { font-size: 11px; }
+
+/* ***** don't change the following ***** */
+form { display: inline; }
+label { cursor: default; }
+.normal { font-weight: normal; }
+.inlineimg { vertical-align: middle; }
+.code 
+{
+ background-color: #DDDDDD;
+ color: #000000;
+}
+.main-page
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  border-left: 1px solid #98AAB1;
+  border-right: 1px solid #98AAB1;
+}
+
+.spacer-page
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  width: auto;
+  display: block;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+}
+
+.spacer-page-top
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  width: auto;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+  border-top: 1px solid #98AAB1;
+}
+
+.spacer-page-bottom
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+  border-bottom: 1px solid #98AAB1;
+}
+
+.bpost { background-color: #D1D7DC; border: 1px solid #FFFFFF; padding: 3px; }
+
+.ttop 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+  border-top: 2px solid #006699;
+}
+.tbottom 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+  border-bottom: 2px solid #006699;
+}
+.tinside 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+}
+
+.smalltext
+{
+  font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+  font-size: 11px;
+  height: 12px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.bcrumbs
+{
+  font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+  font-size: 11px;
+  height: 12px;
+  padding: 0px;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+.bcrumbs a
+{
+  text-decoration: none;
+}
+.approve
+{
+  background: url(images/buttons/approve.gif) no-repeat;
+  padding: 0px;
+  margin: 0px;
+  width: 75px;
+  height: 18px;
+  border: 0px;
+  cursor: pointer;
+  float: left;
+}
+.unapprove
+{
+  background: url(images/buttons/unapprove.gif) no-repeat;
+  padding: 0px;
+  margin: 0px;
+  margin-left: 2px;
+  width: 75px;
+  height: 18px;
+  border: 0px;
+  cursor: pointer;
+  float: right;
+}
+
+.home-links
+{
+  font-size: 10px;
+  text-decoration: none;
+  padding-right: 2px;
+}
+
+.home-links a
+{
+  font-size: 10px;
+  text-decoration: none;
+  padding-right: 2px;
+}
+
+
+.quote
+{
+  background-color: #FFF;
+  color: #000;
+}
+
+.alt3
+{
+  background-color: #DEE3E7;
+  color: #000;
+}
+.alt4
+{
+  background-color: #D1D7DC;
+  color: #000;
+}
+td, th, p, li, .smallfont { line-height: 1.2; }
+
+img.proxied-img { max-width: 100%; max-height: 400px; }
+</style>
+<link rel="stylesheet" type="text/css" href="clientscript/vbulletin_important.css?v=387" />
+
+
+<!-- / CSS Stylesheet -->
+
+<script type="text/javascript" src="clientscript/yui/yahoo-dom-event/yahoo-dom-event.js?v=387"></script>
+<script type="text/javascript" src="clientscript/yui/connection/connection-min.js?v=387"></script>
+<script type="text/javascript">
+<!--
+var SESSIONURL = "s=a59969c161c4e0ac23ef19c7cbb9ee5e&";
+var SECURITYTOKEN = "guest";
+var IMGDIR_MISC = "images/misc";
+var vb_disable_ajax = parseInt("0", 10);
+// -->
+</script>
+
+<script type="text/javascript" src="clientscript/vbulletin_global.js?v=387"></script>
+
+<script type="text/javascript" src="clientscript/am_plugin_sys.js"></script>
+
+<link rel="alternate" type="application/rss+xml" title="AlliedModders RSS Feed" href="external.php?type=RSS2" />
+
+
+<title>AlliedModders - View Single Post -  [TF2] Advanced Infinite Ammo</title>
+</head>
+<body style="margin:0px" onload="self.focus()">
+
+<form action="showpost.php">
+
+<table class="tborder" cellpadding="6" cellspacing="1" border="0" width="100%" style="border-bottom-width:0px">
+<tr>
+	<td class="tcat">
+		<div class="smallfont" style="float:right">
+			<strong>Thread</strong>:  <a style="text-decoration: underline" href="showthread.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;p=1754217#post1754217">[TF2] Advanced Infinite Ammo</a>
+		</div>
+		View Single Post
+	</td>
+</tr>
+</table>
+
+
+
+<!-- post #1754217 -->
+
+
+
+<!-- post #1754217 -->
+
+
+
+	<table id="post1754217" class="tinside"
+
+
+
+cellpadding="6" cellspacing="0" border="0" width="100%" align="center">
+	<tr>
+	    	
+	        	
+	        		<td class="bpost" colspan="2"  id="currentPost"><img src="images/misc/post_spacer.gif"></td>
+	        	
+	        
+	</tr>
+	<tr valign="top">
+	
+        
+        	<td class="alt3" style="width: 175px; border-right: 1px solid #FFFFFF;" valign="top" >
+        
+			
+			<div id="postmenu_1754217">
+	                        
+				
+					<a class="bigusername" href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=94325">Tylerst</a>
+					<script type="text/javascript"> vbmenu_register("postmenu_1754217", true); </script>
+				
+			</div>
+				
+			
+				<div class="smallfont">
+					Veteran Member
+				</div>
+			
+			
+			
+
+			
+			
+			
+	
+			<div class="smallfont">
+					
+				<div>Join Date: Oct 2010</div>
+
+
+
+				
+				
+				
+				<div>
+				<!--Posts: 635 -->
+				</div>
+				
+					
+			</div>
+			
+			<img src="images/misc/post_spacer.gif" border="0" height="1" valign="top">
+		
+		</td>
+
+        
+		<td class="alt3" style="margin-left: 175px;" id="td_post_1754217">
+        
+			<!-- icon and title -->
+			<table width="100%" height="5" style="table-layout: fixed;">
+				<tr>
+					<td align="left">
+						<div class="smalltext" style="height: 15px; margin: 0px; padding-bottom: 3px; overflow: hidden; vertical-align: top; ">
+
+								
+								<!-- status icon and date -->
+								<a name="post1754217"> </a> <a href="showthread.php?p=1754217#post1754217"> <img class="inlineimg" src="images/statusicon/post_old.svg" alt="Old" border="0" /></a>
+								 
+								07-20-2012
+								
+								
+									, 02:45
+								
+								
+								
+                        					&nbsp;
+                        					
+								
+									 [TF2] Advanced Infinite Ammo
+								
+							
+						</div>
+					</td>
+					<td align="right">
+						<!-- controls -->
+						
+						
+						
+							<a href="newreply.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newreply&amp;p=1754217" rel="nofollow"><img src="images/buttons/quote.gif" alt="Reply With Quote" border="0" /></a>
+						
+						
+						
+						
+		
+						
+						
+							
+						
+						
+						
+
+						
+						<!-- / controls -->
+					</td>
+				</tr>
+				<tr>
+					<td align="left" colspan="2"> 
+						<hr size="1" style="color:#D1D7DC; background-color:#D1D7DC;" color="#D1D7DC"/>
+						<!-- / icon and title -->
+
+						
+						
+						<!-- message -->
+                					<div id="post_message_1754217" style="width: 100%; display: block;">
+                				<b><font size="4">Advanced Infinite Ammo</font></b><br />
+ <br />
+<b>Description: </b>Give Infinite Ammo/Clip/and more to everyone in game or on a specific target(s)<br />
+ <br />
+<b>List of features:</b><br />
+<b>* Infinite Ammo/Clip</b><br />
+<b>* Infinite Crit-a-cola/Bonk!</b> Note: Right-click(alt-fire) to manually remove bonk!<br />
+<b>* Infinite Hype</b><br />
+<b>* Infinite usage for Rage based weapons(Banners, Phlog, etc)</b><br />
+<b>* Beggar's Bazooka - Hold right-click(alt-fire) to fire infinite rockets</b><br />
+<b>* Infinite Manmelter/Frontier Justice/Diamondback Crits (Shoot once to activate)</b><br />
+<b>* Infinite Shield Charge</b><br />
+<b>* Infinite Ullapool Caber</b><br />
+<b>* Infinite Metal/Sentrygun Ammo</b><br />
+<b>* Infinite usage for Uber/Kritz/QuickFix</b><br />
+<b>* Infinite Jarate/Sandman Balls/Sandviches/Madmilk/etc</b><br />
+<b>* Infinite Cloak/Dead Ringer/Instant Recharge Spy-cicle</b><br />
+<b>* Infinite Heads/Decapitations</b><br />
+<b>* Infinite Spell Uses(Press reload to remove current spell)</b><br />
+ <br />
+ <br />
+<b>CVARs(Default Values Shown: 1 = Enabled, 0 = Disabled):</b><br />
+<b>Note: The plugin automatically creates AdvancedInfiniteAmmo.cfg at tf/cfg/sourcemod<br />
+Change the default values there.</b><br />
+sm_aia_version &quot;1.5.3&quot;<br />
+<br />
+sm_aia_all &quot;0&quot; - Advanced Infinite Ammo for everyone(and will automatically give it to anyone who connects)<br />
+sm_aia_adminonly &quot;0&quot; - Advanced Infinite Ammo will work for admins only, 1 = Completely admin only, 2 = Admin only but the commands will work on non-admins<br />
+     -Default &quot;b&quot; flag - Can be overridden with sm_aia_adminflag<br />
+sm_aia_bots &quot;1&quot; - Advanced Infinite Ammo will work for bots<br />
+sm_aia_roundwin &quot;1&quot; - Advanced Infinite Ammo for everyone on round win<br />
+sm_aia_waitingforplayers &quot;1&quot; - Advanced Infinite Ammo for everyone during waiting for players phase<br />
+sm_aia_chat &quot;1&quot; - Show Advanced Infinite Ammo changes in chat<br />
+sm_aia_log &quot;1&quot; - Log Advanced Infinite Ammo commands<br />
+sm_aia_disabledweapons &quot;&quot; - Weapons indexes to not give infinite ammo, separated by semicolons(<b>Do not add spaces</b>) --eg. sm_aia_disabledweapons &quot;44;58;222&quot; would disable sandman, jarate and mad milk<br />
+<br />
+sm_aia_clip &quot;1&quot; - Infinite Clip will be globally disabled<br />
+sm_aia_ammo &quot;1&quot; - Infinite Ammo will be globally disabled<br />
+sm_aia_extrastuff &quot;1&quot; - Infinite Extra Stuff will be globally disabled<br />
+sm_aia_metal &quot;1&quot; - Infinite Metal will be globally disabled<br />
+sm_aia_sentryammo &quot;1&quot; - Infinite Sentry Ammo will be globally disabled<br />
+sm_aia_cloak &quot;1&quot; - Infinite Cloak will be globally disabled<br />
+sm_aia_spells &quot;1&quot; - Infinite Spells will be globally disabled<br />
+ <br />
+<b>Commands:</b><br />
+sm_aia &quot;target&quot; &quot;1/0&quot; - Give Advanced Infinite Ammo to the target(s) (Can auto-target self with just sm_fia)<br />
+sm_aia2 &quot;target&quot; &quot;time(in seconds)&quot; - Give Advanced Infinite Ammo to the target(s) for a limited time<br />
+sm_advanced_infinite_ammo &quot;target&quot; &quot;1/0&quot; - Same as sm_aia<br />
+sm_advanced_infinite_ammo_timed &quot;target&quot; &quot;time(in seconds)&quot; - Same as sm_aia2<br />
+sm_aiamenu - Open menu to choose target's AIA capabilities(flags globally disabled by the cvars cannot be changed)<br />
+<b>Note</b>: Can override sm_aia_targetflag to control which admins can target others<br />
+<br />
+<b>Command Usage Examples:</b><br />
+sm_aia              -Toggle AIA on yourself<br />
+sm_aia Bob 1      -Enable AIA on Bob<br />
+sm_aia @all 1     -Enable AIA on everyone<br />
+sm_aia @red 1    -Enable AIA on red team<br />
+sm_aia @!me 0   -Disable AIA for everyone except yourself<br />
+(sm_advanced_infinite_ammo can be used in place of sm_aia)<br />
+<br />
+sm_aia2 @me 10 - Give yourself AIA for 10 seconds<br />
+sm_aia2 Bob 30 - Give Bob AIA for 30 seconds<br />
+sm_aia2 @all 300 - Give everyone AIA for 5 minutes<br />
+(sm_advanced_infinite_ammo_timed can be used in place of sm_aia2)<br />
+ <br />
+<b>Changelog</b><br />
+<!-- Code block -->
+<div style="margin:20px; margin-top:5px">
+	<div class="smallfont" style="margin-bottom:2px">Code:</div>
+	<pre class="alt2" dir="ltr" style="margin: 0px;padding: 6px;border: 1px inset;width: auto; height: 499px; text-align: left; overflow: auto"><b>Version 1.0.0 - July 20, 2012</b>
+* Initial Release
+
+<b>Version 1.0.1 - July 20, 2012</b>
+* Added sm_aia_targetflag override to set which admins can target others
+* Fixed a typo in the self target part
+
+<b>Version 1.0.2 - July 27, 2012</b>
+* Beggar's Bazooka now has a hold right-click(alt-fire) option for firing infinite rockets
+* Reverted Bonk!/Crit-A-Cola to old plugin behavior(Infinite duration+right click[alt-fire] to remove Bonk!)
+* Moved the Sandman/Wrap Assassin to their own case to make it a bit simpler to enable the admin check, or disable them altogether
+* August 1, 2012 Fixed sm_aia_adminonly being 1 by default, No version change
+
+<b>Version 1.1.0 - August 4, 2012</b>
+* Plugin now uses SDKHooks
+* Added weapon indexes from The Triad Pack
+* Fixed plugin not detecting arena round start
+
+<b>Version 1.1.1 - August 7, 2012</b>
+* Added sm_aia_bots cvar to control whether bots can receive Advanced Infinite Ammo
+* Changed validation code a bit to fix errors
+
+<b>Version 1.1.2 - August 16, 2012</b>
+* Fixed plugin not detecting mvm wave start
+
+<b>Version 1.2.0 - December 13, 2012</b>
+*Code cleanup in a few areas(Such as caching cvars instead of using GetConVar* in a for loop)
+*Updated item indexes
+*Can now set sm_aia_ammoonly to set ammo instead of clip(Must still reload weapon)
+*Can now set sm_aia_extrastuff to allow/disallow extra things such as ubercharge/rage/hype/etc off to only have ammo related things
+*Can now set sm_aia_adminonly to 2 to allow the admin command to work on non-admins
+
+<b>Version 1.2.1 - December 13, 2012</b>
+*Small update, I forgot to add silver/gold botkiller weapons in 1.2.0(Thanks to raygius for messaging me)
+
+<b>Version 1.2.2 - December 21, 2012</b>
+*Updated for new item indexes
+
+<b>Version 1.2.3 - January 6, 2013</b>
+*Sappers now infinite in MvM
+
+<b>Version 1.2.4 - January 7, 2013</b>
+*Added infinite sniper rifle charge meter(with extrastuff enabled)
+
+<b>Version 1.2.5 - January 9, 2013</b>
+*Added better late load support
+
+<b>Version 1.2.6 - January 21, 2013</b>
+*Added infinite rage for Heavy Miniguns in MvM(with extrastuff enabled)
+*Added Festive Minigun index(No idea why, but I found out it was missing when adding the above code)
+
+<b>Version 1.2.7 - January 24, 2013</b>
+*Added Infinite Razorback(Thanks to FlaminSarge for the method idea)
+
+<b>Version 1.2.8 - March 01, 2013</b>
+*Fixed Festive Ambassador and Festive Grenade launcher being in ammo section instead of clip section(Thanks to rayguis for pointing it out)
+
+<b>Version 1.2.9 - May 27, 2013</b>
+*Added Ap-Sap and Ham Shank indexes
+*Moved Flamethrowers into the Only Ammo category(They no longer need clip set for airblast ammo)
+
+<b>Version 1.3.0 - October 13, 2013</b>
+*Fixed waitingforplayers cvar not removing infinite ammo if it was changed during waitingforplayers
+*Changed Crusader's Crossbow to ammo mode until Valve decides to fix it's rapid fire with a clip size higher than 1
+*Changed Event hooks to EventHookMode_PostNoCopy since the plugin doesn't need to retrieve any values from them
+*Non-plugin related, removed SDKhooks link and compiled plugin since sdkhooks now comes with sourcemod as of 1.5 and will compile on the forum
+
+<b>Version 1.3.1 - November 3, 2013</b>
+*Added Infinite Spell Uses(Press reload to remove current spell)
+*Added Automatic config creation(AdvancedInfiniteAmmo.cfg in tf/cfg/sourcemod/)
+
+<b>Version 1.3.3 - November 5, 2013</b>
+*Fixed an error that would occur if no players had a spellbook equipped
+
+<b>Version 1.3.4 - December 3, 2013</b>
+*Fixed AutoExecConfig creating AdvancedInfiniteAmmo.cfg.cfg
+*Added Infinite Medic Shield(MvM) with extra stuff cvar enabled
+*Changed SetAmmo from 999 to 500 to fix a console spam error related to the heal target ammo counter
+
+<b>Version 1.3.5 - December 14, 2013</b>
+*Added cvar sm_aia_disabledweapons to control which weapon indexes should not get infinite ammo
+*Added Golden Frying Pan index to melee case
+
+<b>Version 1.3.6 - December 19, 2013</b>
+*Fixed disabled weapons cvar not working for spellbooks
+
+<b>Version 1.3.7 - June 19, 2014</b>
+*Added newer Item Indexes
+
+<b>Version 1.3.8 - June 28, 2014</b>
+*Slight code change to check for Valid Weapon
+
+<b>Version 1.3.9 - June 29, 2014</b>
+*Updated game check code
+*Fixed Hitman's Heatmaker and Bazaar Bargain not getting full charge damage
+
+<b>Version 1.4.0 - July 17, 2015</b>
+*Revamp of plugin to 1.7 syntax
+*Sorted wepaon index section by class and slot and updated indexes
+*Changed Sentry Infinite Ammo to use the games built in Infinite ammo flag rather than forcing it in OnPreThink(should improved performance)
+
+<b>Version 1.4.1 - July 17, 2015</b>
+*Changed OnClientPutInServer to OnClientPostAdminCheck
+
+<b>Version 1.4.2 - July 17, 2015</b>
+*Added item indexes 15000-15059(Thanks to xXDeathreusXx and abrandnewday for notifying me)
+
+<b>Version 1.4.3 - July 19, 2015</b>
+*Changed Sentry ammo code to use OnEntityCreated Instead of the build event 
+*Sentry code now adds/removes the ammo flag with the current flags taken into account instead of overwriting them.
+
+<b>Version 1.4.4 - July 19, 2015</b>
+*Fixed a few bugs with new sentry code
+
+<b>Version 1.4.5 - July 28, 2015</b>
+*Fixed sniper bow indexes(separated them from rifles)
+
+<b>Version 1.4.6 - July 29, 2015</b>
+*Fixed LochNLoad/AliBaba'sWeeBooties indexes being switched.
+
+<b>Version 1.5.0 - August 2, 2015</b>
+*New command sm_aiamenu to control target's AIA capabilities and Cvars to allow global disabling
+*Removed curent sm_aia_extrastuff and sm_aia_ammonly due to above change
+*Added new natives for use in other plugins(see include file)
+
+<b>Version 1.5.1 - September 14, 2015</b>
+* Small bit of code change to fix errors in 1.8 compiler(No functional difference from 1.5.0)
+
+<b>Version 1.5.2 - October 3, 2015</b>
+*Fixed global ammoflags not properly being enabled/disabled properly if plugin/config file matched.
+
+<b>Version 1.5.3 - October 7, 2015</b>
+*Added the 4 Invasion weapon indexes</pre>
+</div>
+<!-- /Code block -->
+                				</div>
+						<!-- / message -->
+	
+						
+						<!-- attachments -->
+							<div style="padding:6px">
+							
+							
+						
+							
+							
+							
+							
+							
+								<fieldset class="fieldset">
+									<legend>Attached Files</legend>
+									<table cellpadding="0" cellspacing="3" border="0">
+									<tr>
+	<td><img class="inlineimg" src="images/attach/inc.gif" alt="File Type: inc" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=147135&amp;d=1438556651">advancedinfiniteammo.inc</a> (2.0 KB, 3193 views)
+			
+		
+	</td>
+</tr><tr>
+	<td><img class="inlineimg" src="images/attach/sp.gif" alt="File Type: sp" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="http://www.sourcemod.net/vbcompiler.php?file_id=148649"><strong>Get Plugin</strong></a> or
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=148649&amp;d=1444226746">Get Source</a> (AdvancedInfiniteAmmo.sp - 7571 views - 41.1 KB)
+			
+		
+	</td>
+</tr>
+									</table>
+								</fieldset>
+							
+							
+							
+							
+							</div>
+						<!-- / attachments -->
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						<!-- edit note -->
+							<div class="smallfont">			<hr size="1" style="color:#FFFFFF" />
+								<em>
+								
+									Last edited by Tylerst; 10-07-2015 at <span class="time">11:05</span>.
+								
+								
+								</em>
+							</div>
+						<!-- / edit note -->
+						
+	
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+        
+        	<td class="alt3" style="border-right: 1px solid #FFFFFF; border-top: 1px solid #FFFFFF;">
+        
+			<img class="inlineimg" src="images/statusicon/user_offline.svg" alt="Tylerst is offline" border="0" />
+
+
+			
+			
+				
+				
+				
+			
+			
+			
+
+                        
+                        
+                         
+		</td>
+	
+        	<td class="alt3" align="left" style="border-top: 1px solid #FFFFFF;">
+	
+        		<table>
+        			<tr>
+        				<td>
+        					    
+        				</td>
+        				<td align="right">
+        					
+                                                
+        				</td>
+        			</tr>
+        		</table>
+		</td>
+	</tr>
+</table>
+
+
+<!-- post 1754217 popup menu -->
+<div class="vbmenu_popup" id="postmenu_1754217_menu" style="display:none">
+	<table cellpadding="4" cellspacing="1" border="0">
+	<tr>
+		<td class="thead">Tylerst</td>
+	</tr>
+	
+		<tr><td class="vbmenu_option"><a href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=94325">View Public Profile</a></td></tr>
+	
+	
+		<tr><td class="vbmenu_option"><a href="private.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newpm&amp;u=94325" rel="nofollow">Send a private message to Tylerst</a></td></tr>
+	
+	
+	
+	
+		<tr><td class="vbmenu_option"><a href="search.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=finduser&amp;u=94325" rel="nofollow">Find More Posts by Tylerst</a></td></tr>
+	
+	
+	
+	</table>
+</div>
+<!-- / post 1754217 popup menu -->
+
+
+
+
+<!-- / post #1754217 -->
+
+<table class="tborder" cellpadding="6" cellspacing="1" border="0" width="100%" style="border-top-width:0px">
+<tr>
+	<td class="tfoot" align="center">
+		<input type="button" class="button" value="Close this window" id="close_button" style="display: none;" />
+		&nbsp;
+		<script type="text/javascript">
+		<!--
+		if (self.opener)
+		{
+			var close_button = fetch_object('close_button');
+			close_button.style.display = '';
+			close_button.onclick = function() { self.close(); };
+		}
+		//-->
+		</script>
+	</td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+<!--
+	// Main vBulletin Javascript Initialization
+	vBulletin_init();
+//-->
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1043 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="en">
+<head>
+<meta http-equiv="x-ua-compatible" content="IE=9" />
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="vBulletin" />
+
+	
+<meta name="keywords" content="AMX Mod X,AMX Mod,Metamod,Half-Life Plugins,AMXX,AMX,Plugins,Counter-Strike,CSDM,Deathmatch,Servers,C++" />
+<meta name="description" content="Half-Life/Counter-Strike Server-Side Modding (AMX Mod X, Metamod, and SourceMod), CSDM and SuperHero hosted" />
+	
+
+
+<!-- CSS Stylesheet -->
+<style type="text/css" id="vbulletin_css">
+/**
+* vBulletin 3.8.7 CSS
+* Style: 'phpBB'; Style ID: 5
+*/
+body
+{
+	background: #E5E5E5;
+	color: #000000;
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	margin: 10px;
+	padding: 0px;
+}
+a:link, body_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+a:visited, body_avisited
+{
+	color: #006699;
+}
+a:hover, a:active, body_ahover
+{
+	color: #DD6900;
+}
+.page
+{
+	background: #FFFFFF;
+	color: #000000;
+}
+td, th, p, li
+{
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.tborder
+{
+	background: #FFFFFF;
+	color: #000000;
+	border: 2px solid #006699;
+	
+}
+.tcat
+{
+	background: #C7D0D7 url(images/gradients/gradient_tcat.gif) repeat-x top left;
+	color: #000000;
+	font: bold 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.tcat a:link, .tcat_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.tcat a:visited, .tcat_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.tcat a:hover, .tcat a:active, .tcat_ahover
+{
+	color: #006699;
+	text-decoration: underline;
+}
+.thead
+{
+	background: #C7D0D7 url(images/gradients/gradient_thead.gif) repeat-x top left;
+	color: #FFFFFF;
+	font: bold 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.thead a:link, .thead_alink
+{
+	color: #EDE1DC;
+}
+.thead a:visited, .thead_avisited
+{
+	color: #EDE1DC;
+}
+.thead a:hover, .thead a:active, .thead_ahover
+{
+	color: #EDE1DC;
+	text-decoration: underline;
+}
+.tfoot
+{
+	background: #C7D0D7;
+	color: #000000;
+}
+.tfoot a:link, .tfoot_alink
+{
+	color: #006699;
+}
+.tfoot a:visited, .tfoot_avisited
+{
+	color: #006699;
+}
+.tfoot a:hover, .tfoot a:active, .tfoot_ahover
+{
+	color: #006699;
+}
+.alt1, .alt1Active
+{
+	background: #EFEFEF;
+	color: #000000;
+}
+.alt2, .alt2Active
+{
+	background: #EFEFEF;
+	color: #000000;
+}
+.inlinemod
+{
+	background: #D8D8D8;
+	color: #000000;
+}
+.wysiwyg
+{
+	background: #FFFFFF;
+	color: #000000;
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+textarea, .bginput
+{
+	font: 10pt verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.bginput option, .bginput optgroup
+{
+	font-size: 10pt;
+	font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.button
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+select
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+option, optgroup
+{
+	font-size: 11px;
+	font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.smallfont
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.time
+{
+	color: #666686;
+}
+.navbar
+{
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.highlight
+{
+	color: #FF0000;
+	font-weight: bold;
+}
+.fjsel
+{
+	background: #3E5C92;
+	color: #E0E0F6;
+}
+.fjdpth0
+{
+	background: #F7F7F7;
+	color: #000000;
+}
+.panel
+{
+	background: #EFEFEF url(images/gradients/gradient_panel.gif) repeat-x top left;
+	color: #000000;
+	padding: 10px;
+	border: 1px solid #b2b2b2;
+}
+.panelsurround
+{
+	background: #FFFFFF url(images/gradients/gradient_panelsurround.gif) repeat-x top left;
+	color: #000000;
+}
+legend
+{
+	color: #22229C;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+}
+.vbmenu_control
+{
+	background: #EFEFEF;
+	color: #006699;
+	font: bold 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 10px;
+	white-space: nowrap;
+}
+.vbmenu_control a:link, .vbmenu_control_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_control a:visited, .vbmenu_control_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_control a:hover, .vbmenu_control a:active, .vbmenu_control_ahover
+{
+	color: #006699;
+	text-decoration: underline;
+}
+.vbmenu_popup
+{
+	background: #FFFFFF;
+	color: #000000;
+	border: 1px solid #0B198C;
+}
+.vbmenu_option
+{
+	background: #BBC7CE;
+	color: #000000;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.vbmenu_option a:link, .vbmenu_option_alink
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_option a:visited, .vbmenu_option_avisited
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_option a:hover, .vbmenu_option a:active, .vbmenu_option_ahover
+{
+	color: #006699;
+	text-decoration: none;
+}
+.vbmenu_hilite
+{
+	background: #8A949E;
+	color: #FFFFFF;
+	font: 11px verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.vbmenu_hilite a:link, .vbmenu_hilite_alink
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.vbmenu_hilite a:visited, .vbmenu_hilite_avisited
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.vbmenu_hilite a:hover, .vbmenu_hilite a:active, .vbmenu_hilite_ahover
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+/* ***** styling for 'big' usernames on postbit etc. ***** */
+.bigusername { font-size: 10pt; font-weight: bold; }
+
+/* ***** small padding on 'thead' elements ***** */
+td.thead, div.thead { padding: 4px; }
+
+/* ***** basic styles for multi-page nav elements */
+.pagenav a { text-decoration: none; }
+.pagenav td { padding: 2px 4px 2px 4px; }
+
+/* ***** define margin and font-size for elements inside panels ***** */
+.fieldset { margin-bottom: 6px; }
+.fieldset, .fieldset td, .fieldset p, .fieldset li { font-size: 11px; }
+
+/* ***** don't change the following ***** */
+form { display: inline; }
+label { cursor: default; }
+.normal { font-weight: normal; }
+.inlineimg { vertical-align: middle; }
+.code 
+{
+ background-color: #DDDDDD;
+ color: #000000;
+}
+.main-page
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  border-left: 1px solid #98AAB1;
+  border-right: 1px solid #98AAB1;
+}
+
+.spacer-page
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  width: auto;
+  display: block;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+}
+
+.spacer-page-top
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  width: auto;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+  border-top: 1px solid #98AAB1;
+}
+
+.spacer-page-bottom
+{
+  background-color: #FFFFFF;
+  color: #000000;
+  border-right: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+  border-bottom: 1px solid #98AAB1;
+}
+
+.bpost { background-color: #D1D7DC; border: 1px solid #FFFFFF; padding: 3px; }
+
+.ttop 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+  border-top: 2px solid #006699;
+}
+.tbottom 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+  border-bottom: 2px solid #006699;
+}
+.tinside 
+{ 
+  border-left: 2px solid #006699;
+  border-right: 2px solid #006699;
+}
+
+.smalltext
+{
+  font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+  font-size: 11px;
+  height: 12px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.bcrumbs
+{
+  font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif;
+  font-size: 11px;
+  height: 12px;
+  padding: 0px;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+.bcrumbs a
+{
+  text-decoration: none;
+}
+.approve
+{
+  background: url(images/buttons/approve.gif) no-repeat;
+  padding: 0px;
+  margin: 0px;
+  width: 75px;
+  height: 18px;
+  border: 0px;
+  cursor: pointer;
+  float: left;
+}
+.unapprove
+{
+  background: url(images/buttons/unapprove.gif) no-repeat;
+  padding: 0px;
+  margin: 0px;
+  margin-left: 2px;
+  width: 75px;
+  height: 18px;
+  border: 0px;
+  cursor: pointer;
+  float: right;
+}
+
+.home-links
+{
+  font-size: 10px;
+  text-decoration: none;
+  padding-right: 2px;
+}
+
+.home-links a
+{
+  font-size: 10px;
+  text-decoration: none;
+  padding-right: 2px;
+}
+
+
+.quote
+{
+  background-color: #FFF;
+  color: #000;
+}
+
+.alt3
+{
+  background-color: #DEE3E7;
+  color: #000;
+}
+.alt4
+{
+  background-color: #D1D7DC;
+  color: #000;
+}
+td, th, p, li, .smallfont { line-height: 1.2; }
+
+img.proxied-img { max-width: 100%; max-height: 400px; }
+</style>
+<link rel="stylesheet" type="text/css" href="clientscript/vbulletin_important.css?v=387" />
+
+
+<!-- / CSS Stylesheet -->
+
+<script type="text/javascript" src="clientscript/yui/yahoo-dom-event/yahoo-dom-event.js?v=387"></script>
+<script type="text/javascript" src="clientscript/yui/connection/connection-min.js?v=387"></script>
+<script type="text/javascript">
+<!--
+var SESSIONURL = "s=a59969c161c4e0ac23ef19c7cbb9ee5e&";
+var SECURITYTOKEN = "guest";
+var IMGDIR_MISC = "images/misc";
+var vb_disable_ajax = parseInt("0", 10);
+// -->
+</script>
+
+<script type="text/javascript" src="clientscript/vbulletin_global.js?v=387"></script>
+
+<script type="text/javascript" src="clientscript/am_plugin_sys.js"></script>
+
+<link rel="alternate" type="application/rss+xml" title="AlliedModders RSS Feed" href="external.php?type=RSS2" />
+
+
+<title>AlliedModders - View Single Post -  [ANY] AFK Manager (Version 4.3.0 / Updated July 2nd 2018)</title>
+</head>
+<body style="margin:0px" onload="self.focus()">
+
+<form action="showpost.php">
+
+<table class="tborder" cellpadding="6" cellspacing="1" border="0" width="100%" style="border-bottom-width:0px">
+<tr>
+	<td class="tcat">
+		<div class="smallfont" style="float:right">
+			<strong>Thread</strong>:  <a style="text-decoration: underline" href="showthread.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;p=708265#post708265">[ANY] AFK Manager (Version 4.3.0 / Updated July 2nd 2018)</a>
+		</div>
+		View Single Post
+	</td>
+</tr>
+</table>
+
+
+
+<!-- post #708265 -->
+
+
+
+<!-- post #708265 -->
+
+
+
+	<table id="post708265" class="tinside"
+
+
+
+cellpadding="6" cellspacing="0" border="0" width="100%" align="center">
+	<tr>
+	    	
+	        	
+	        		<td class="bpost" colspan="2"  id="currentPost"><img src="images/misc/post_spacer.gif"></td>
+	        	
+	        
+	</tr>
+	<tr valign="top">
+	
+        
+        	<td class="alt3" style="width: 175px; border-right: 1px solid #FFFFFF;" valign="top" >
+        
+			
+			<div id="postmenu_708265">
+	                        
+				
+					<a class="bigusername" href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">Rothgar</a>
+					<script type="text/javascript"> vbmenu_register("postmenu_708265", true); </script>
+				
+			</div>
+				
+			
+				<div class="smallfont">
+					Veteran Member
+				</div>
+			
+			
+			
+
+			
+			
+			
+				<div class="smallfont" style="margin: 0.5em;"><a href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">
+					
+						<img src="customavatars/avatar32091_1.gif" alt="Rothgar's Avatar" border="0" /></a>
+					
+				</div>
+			
+	
+			<div class="smallfont">
+					
+				<div>Join Date: Nov 2007</div>
+
+
+
+				
+				
+				
+				<div>
+				<!--Posts: 1,244 -->
+				</div>
+				
+					
+			</div>
+			
+			<img src="images/misc/post_spacer.gif" border="0" height="1" valign="top">
+		
+		</td>
+
+        
+		<td class="alt3" style="margin-left: 175px;" id="td_post_708265">
+        
+			<!-- icon and title -->
+			<table width="100%" height="5" style="table-layout: fixed;">
+				<tr>
+					<td align="left">
+						<div class="smalltext" style="height: 15px; margin: 0px; padding-bottom: 3px; overflow: hidden; vertical-align: top; ">
+
+								
+								<!-- status icon and date -->
+								<a name="post708265"> </a> <a href="showthread.php?p=708265#post708265"> <img class="inlineimg" src="images/statusicon/post_old.svg" alt="Old" border="0" /></a>
+								 
+								11-01-2008
+								
+								
+									, 03:59
+								
+								
+								
+                        					&nbsp;
+                        					
+								
+									 [ANY] AFK Manager (Version 4.3.0 / Updated July 2nd 2018)
+								
+							
+						</div>
+					</td>
+					<td align="right">
+						<!-- controls -->
+						
+						
+						
+							<a href="newreply.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newreply&amp;p=708265" rel="nofollow"><img src="images/buttons/quote.gif" alt="Reply With Quote" border="0" /></a>
+						
+						
+						
+						
+		
+						
+						
+							
+						
+						
+						
+
+						
+						<!-- / controls -->
+					</td>
+				</tr>
+				<tr>
+					<td align="left" colspan="2"> 
+						<hr size="1" style="color:#D1D7DC; background-color:#D1D7DC;" color="#D1D7DC"/>
+						<!-- / icon and title -->
+
+						
+						
+						<!-- message -->
+                					<div id="post_message_708265" style="width: 100%; display: block;">
+                				<font size="6">AFK Manager</font><br />
+<br />
+<font size="4">Table of Contents</font><ul><li><a href="#Information">Information</a></li>
+<li><a href="#Requirements">Requirements</a></li>
+<li><a href="#Installation Details">Installation Details</a></li>
+<li><a href="#Server Console Variables">Server Console Variables (ConVars)</a></li>
+<li><a href="#Server Commands">Server Commands</a></li>
+<li><a href="#Plugin Developers">Plugin Developer Information &amp; Examples</a></li>
+<li><a href="#Change Log">Change Log</a></li>
+<li><a href="#Credits">Credits</a></li>
+<li><a href="#Language Translations">Completed Language Translations</a></li>
+<li><a href="#File Information">File Information</a></li>
+<li><a href="#Compiled Download">Compiled Download with Multi Colors and Updater</a></li>
+</ul><br />
+<a name="Information"></a><font size="4">Information</font><br />
+<br />
+This plugin has been designed to manage AFK players, it has a General AFK check along with a Spawn AFK check. It checks player commands for button changes and mouse movements to determine if a player is &quot;AFK&quot;. If the player is not &quot;typing/chatting&quot;, pressing any buttons or performing any movements of their mouse, they are deemed &quot;AFK&quot; and the plugin can move and/or kick them after a specified amount of time. It will warn players who are detected as &quot;AFK&quot; before being moved or kicked based on specific variables in 5 second intervals.<br />
+<br />
+This plugin has been designed to utilize a translation file for use of other languages.<br />
+<br />
+<br />
+<a name="Requirements"></a><font size="4">Requirements</font><br />
+<a href="http://www.sourcemod.net/downloads.php" target="_blank" rel="nofollow noopener">SourceMod v1.4.0+</a> (Previous version 3 branch)<br />
+<a href="http://www.sourcemod.net/downloads.php" target="_blank" rel="nofollow noopener">SourceMod v1.7.0+</a> (Latest version 4 branch)<br />
+<br />
+<i><b>For Automatic Update support you need to do the following:</b></i><br />
+You need to compile the plugin manually with the &quot;updater.inc&quot; as per the compile instructions below.<br />
+<br />
+You can download the latest version of the SourceMod &quot;Updater&quot; include file and plugin from:<br />
+<br />
+<a href="http://forums.alliedmods.net/showthread.php?t=169095" target="_blank" rel="nofollow noopener">http://forums.alliedmods.net/showthread.php?t=169095</a><br />
+<br />
+<i><b>For Color support you need to do the following:</b></i><br />
+You need to compile the plugin manually either with &quot;Multi Colors&quot; (preferred), &quot;morecolors.inc&quot;  or &quot;colors.inc&quot; as per the compile instructions below.<br />
+<br />
+<b>Multi Colors:</b><br />
+<font color="red"><i><b>Note: Latest &quot;Multi Colors&quot; version requires SourceMod 1.7.0+</b></i></font><br />
+<b>Old Release Commit (Working with SourceMod 1.5.0 if you are using version 3)</b>: <a href="https://github.com/Bara20/Multi-Colors/tree/8c5d6a9327c86e9b5a9d2c6b59cafb33c95aabe2/addons/sourcemod/scripting" target="_blank" rel="nofollow noopener">https://git.tf/Bara/Multi-Colors/tree/89cdb804ffc6544b72ec239ea4c507af68de14c8/addons/sourcemod/scripting/include</a><br />
+<br />
+You can download the latest version of the SourceMod &quot;Multi Colors&quot; include file(s) from:<br />
+<br />
+<u><a href="https://forums.alliedmods.net/showthread.php?t=247770" target="_blank" rel="noopener">https://forums.alliedmods.net/showthread.php?t=247770</a></u><br />
+<br />
+<br />
+<b>More Colors (morecolors.inc):</b><br />
+<font color="red"><i><b>Note: Latest &quot;More Colors&quot; version now requires compiling with SourceMod 1.5.0+ and does not work properly for at least CS:GO</b></i></font><br />
+<br />
+You can download the latest version of the SourceMod &quot;More Colors&quot; include file from:<br />
+<br />
+<u><a href="https://forums.alliedmods.net/showthread.php?t=185016" target="_blank" rel="noopener">https://forums.alliedmods.net/showthread.php?t=185016</a></u><br />
+<br />
+<b>Colors (colors.inc):</b><br />
+<font color="red"><i><b>Note: This include is no longer supported and fails on some newer mods/servers</b></i></font><br />
+<br />
+You can download the latest version of the SourceMod &quot;Colors&quot; include file from:<br />
+<br />
+<a href="https://forums.alliedmods.net/showthread.php?t=96831" target="_blank" rel="noopener">https://forums.alliedmods.net/showthread.php?t=96831</a><br />
+<br />
+<a name="Installation Details"></a><font size="4">Installation Details</font><br />
+<br />
+Download the &quot;afk_manager.phrases.txt&quot; and save to your <b>addons\sourcemod\translations</b> directory.<br />
+<br />
+<b>Pre-compiled:</b><br />
+Download using the &quot;Get Plugin&quot; link and save to your <b>addons\sourcemod\plugins</b> directory.<br />
+<br />
+<b>Self-Compile:</b><br />
+Download the &quot;afk_manager4.sp&quot; using the &quot;Get Source&quot; link and save to your <b>addons\sourcemod\scripting</b> directory.<br />
+<br />
+<div style="margin:20px; margin-top:5px; ">
+	<div class="smallfont" style="margin-bottom:2px">Quote:</div>
+	<table cellpadding="6" cellspacing="0" border="0" width="100%" style="table-layout: fixed;">
+	<tr>
+		<td class="quote" style="border:1px inset">
+			
+				If you want Automatic Update support you need to:<br />
+<br />
+A) Have the &quot;Updater&quot; plugin already loaded/running<br />
+B) Compile the AFK Manager with the corresponding &quot;updater.inc&quot; include file. *<br />
+<b><i>* The &quot;updater.inc&quot; file should be saved in the addons\sourcemod\scripting\include directory before compile.</i></b><br />
+<br />
+Please read the requirements section for more details.
+			
+		</td>
+	</tr>
+	</table>
+</div><div style="margin:20px; margin-top:5px; ">
+	<div class="smallfont" style="margin-bottom:2px">Quote:</div>
+	<table cellpadding="6" cellspacing="0" border="0" width="100%" style="table-layout: fixed;">
+	<tr>
+		<td class="quote" style="border:1px inset">
+			
+				If you want Color support you need to compile with the color include file(s), please read the requirements section for more details.<br />
+<br />
+For &quot;Multi Colors&quot; there are currently 3 include files that need to be used:<br />
+&quot;multicolors.inc&quot; should be installed to <b>addons\sourcemod\scripting\include</b> directory.<br />
+&quot;colors.inc&quot; (From Multi Colors) should be saved to <b>addons\sourcemod\scripting\include\multicolor  s</b> directory.<br />
+&quot;morecolors.inc&quot; (From Multi Colors) should be saved to <b>addons\sourcemod\scripting\include\multicolor  s</b> directory.<br />
+<br />
+Otherwise for &quot;More Colors&quot; or &quot;Colors&quot;, download the corresponding include file and save to <b>addons\sourcemod\scripting\include</b> directory.
+			
+		</td>
+	</tr>
+	</table>
+</div><div style="margin:20px; margin-top:5px; ">
+	<div class="smallfont" style="margin-bottom:2px">Quote:</div>
+	<table cellpadding="6" cellspacing="0" border="0" width="100%" style="table-layout: fixed;">
+	<tr>
+		<td class="quote" style="border:1px inset">
+			
+				To Compile with Debug Enabled:<br />
+<br />
+Open the &quot;afk_manager(3 or 4).sp&quot; in a text editor and set &quot;_DEBUG&quot; to 1
+			
+		</td>
+	</tr>
+	</table>
+</div>Compile the plugin and install as per normal.<br />
+<br />
+<b>NOTE:</b> If you get an error I would first recommend updating your SourceMod.<br />
+<br />
+<br />
+<a name="Server Console Variables"></a><font size="4">Server Console Variables (ConVars)</font><ul><li>sm_afkm_version - Current version of the AFK Manager. (No edit)</li>
+<li>sm_afk_enable - Is the AFK Manager enabled or disabled? [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_autoupdate - Is the AFK Manager automatic plugin update enabled or disabled? (Requires SourceMod Autoupdate plugin) [0 = FALSE, 1 = TRUE]</li>
+<li>sm_afk_prefix_short - Should the AFK Manager use a short prefix? [0 = FALSE, 1 = TRUE, DEFAULT: 0]</li>
+<li>sm_afk_prefix_color - Should the AFK Manager use color for the prefix tag? [0 = DISABLED, 1 = ENABLED, DEFAULT: 1] (Requires compiling with SourceMod Colors include)</li>
+<li>sm_afk_force_language - Should the AFK Manager force all message language to the server default? [0 = DISABLED, 1 = ENABLED, DEFAULT: 0]</li>
+<li>sm_afk_log_warnings - Should the AFK Manager log plugin warning messages. [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_log_moves - Should the AFK Manager log client moves. [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_log_kicks - Should the AFK Manager log client kicks. [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_log_days - How many days should we keep AFK Manager log files. [0 = INFINITE, DEFAULT: 0]</li>
+<li>sm_afk_move_min_players - Minimum number of connected clients required for AFK move to be enabled. [DEFAULT: 4]</li>
+<li>sm_afk_kick_min_players - Minimum number of connected clients required for AFK kick to be enabled. [DEFAULT: 6]</li>
+<li>sm_afk_admins_immune - Should admins be immune to the AFK Manager? [0 = DISABLED, 1 = COMPLETE IMMUNITY, 2 = KICK IMMUNITY, 3 = MOVE IMMUNITY]</li>
+<li>sm_afk_admins_flag - Admin Flag for immunity? Leave Blank for any flag.</li>
+<li>sm_afk_move_spec - Should the AFK Manager move AFK clients to spectator team? [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_move_announce - Should the AFK Manager announce AFK moves to the server? [0 = DISABLED, 1 = EVERYONE, 2 = ADMINS ONLY, DEFAULT: 1]</li>
+<li>sm_afk_move_time - Time in seconds (total) client must be AFK before being moved to spectator. [0 = DISABLED, DEFAULT: 60.0 seconds]</li>
+<li>sm_afk_move_warn_time - Time in seconds remaining, player should be warned before being moved for AFK. [DEFAULT: 30.0 seconds]</li>
+<li>sm_afk_kick_players - Should the AFK Manager kick AFK clients? [0 =  DISABLED, 1 = KICK ALL, 2 = ALL EXCEPT SPECTATORS, 3 = SPECTATORS ONLY]</li>
+<li>sm_afk_kick_announce - Should the AFK Manager announce AFK kicks to the server? [0 = DISABLED, 1 = EVERYONE, 2 = ADMINS ONLY, DEFAULT: 1]</li>
+<li>sm_afk_kick_time - Time in seconds (total) client must be AFK before being kicked. [0 = DISABLED, DEFAULT: 120.0 seconds]</li>
+<li>sm_afk_kick_warn_time - Time in seconds remaining, player should be warned before being kicked for AFK. [DEFAULT: 30.0 seconds]</li>
+<li>sm_afk_spawn_time - Time in seconds (total) that player should have moved from their spawn position. [0 = DISABLED, DEFAULT: 20.0 seconds]</li>
+<li>sm_afk_spawn_warn_time - Time in seconds remaining, player should be warned for being AFK in spawn. [DEFAULT: 15.0 seconds]</li>
+<li>sm_afk_exclude_dead - Should the AFK Manager exclude checking dead players? [0 = FALSE, 1 = TRUE, DEFAULT: 0]</li>
+<li>sm_afk_move_warn_unassigned - Should the AFK Manager warn team 0 (Usually unassigned) players? (Disabling may not work for some games) [0 = FALSE, 1 = TRUE, DEFAULT: 1]</li>
+<li>sm_afk_buttons - How many button changes should the AFK Manager track before resetting AFK status? [0 = DISABLED, DEFAULT: 5]</li>
+</ul><font color="red"><i><b>* Note: The cfg file should be automatically created when the plugin is first loaded in cfg\sourcemod\afk_manager.cfg. If you delete this file it will re-create with the correct (default) cvars on plugin start/map change.</b></i></font><br />
+<br />
+<a name="Server Commands"></a><font size="4">Server Commands</font><br />
+<ul><li>sm_afk_spec - Usage: sm_afk_spec &lt;#userid|name&gt;</li>
+</ul><a name="Plugin Developers"></a><font size="4">Plugin Developer Information &amp; Examples</font><br />
+<br />
+If you are a plugin developer who wants to add mod specific or server specific functionality to the AFK Manager or to be able to detect AFK status in your own plugin you can now use the Native and Forwards I have created to do so. If you want a generic AFK feature to be added which would be beneficial to any mod, post in the thread so I can review.<br />
+<br />
+Information can be found in the afk_manager.inc and the features are currently implemented in the latest release, I believe the functions are about 80% complete, so be aware they could change in the future. I am open to any feedback on whether you want to get more information from the AFK Manager or whether you think any of the current functions should change.<br />
+<br />
+<font size="2"><b>Example Plugins for Developers</b></font><br />
+<br />
+I have written a couple of small example plugins for Counter-Strike/CS:GO to show a few methods of how you can use the AFK Manager natives and forwards:<br />
+<br />
+<b>Example Plugin #1</b><br />
+<br />
+This plugin does not use any of the forwards: <a href="http://afkmanager.dawgclan.net/scripting/afk_manager_cstrike.sp" target="_blank" rel="nofollow noopener">http://afkmanager.dawgclan.net/scrip...ger_cstrike.sp</a><br />
+<br />
+The plugin was based off RedSwords original AFK Bomb plugin (<a href="https://forums.alliedmods.net/showthread.php?t=152329" target="_blank" rel="noopener">https://forums.alliedmods.net/showthread.php?t=152329</a>).<br />
+<br />
+In the example you can see how I check for &quot;Active&quot; Terrorist players (Not marked as AFK for even 1 second) in the AFK_RandomBomb() function using AFKM_IsClientAFK().<br />
+<br />
+You can also see how I have created a timer for any players with the Bomb and take action after a certain amount of AFK time in the Timer_CheckPlayer() function using AFKM_GetClientAFKTime().<br />
+<br />
+Please note while I was making this I found there was a bug in the CS_DropWeapon() function for CS:GO where the toss was not working which has been fixed in release 1.8.0.6009 and 1.9.0.6101, thanks to the #SourceMod guys for their input help and fixes.<br />
+<br />
+<b>Example Plugin #2</b><br />
+<br />
+This plugin is more specific to CS:GO around Team Swapping Issues/Modifications: <a href="http://afkmanager.dawgclan.net/scripting/afk_manager_csgo_teamchange.sp" target="_blank" rel="nofollow noopener">http://afkmanager.dawgclan.net/scrip..._teamchange.sp</a><br />
+<br />
+In this example you can see how I use the &quot;AFK&quot; forward events for &quot;afk_move&quot; and &quot;afk_kick&quot; to mark the player as &quot;Moved&quot; so that we can allow them to join a team again straight away by bypassing the &quot;Pending&quot; team change mode that Valve has implemented.<br />
+<br />
+I have also on request added a couple of additional options to:<br />
+<br />
+Provided a variable to override the pending team change for all players irrespective of whether they were moved by the AFK manager.<br />
+<br />
+Provided a variable to block players from changing directly between Terrorist and Counter-Terrorist Teams.<br />
+<br />
+Again these plugin are examples, there are no current translations or anything to notify players about the actions taken in these plugins.<br />
+<br />
+If people are interested in me enhancing these to actually be a full blown sister plugin with certain features or want to take the projects on yourself let me know.<br />
+<br />
+<a name="Change Log"></a><font size="4">Change Log</font><br />
+<br />
+<font color="red"><i><b>* See the afk_manager.changelog.txt for old version information.</b></i></font><ul><li>4.3.0</li>
+</ul>Added:<br />
+- Added new AFK buttons variable which will allow you to disable button change detection completely (Would rely on mouse movements only) or track a certain number of unique buttons.<br />
+<br />
+Please let me know if you experience any issues or problems.<br />
+<br />
+<a name="Credits"></a><b><font size="3">Credits</font></b><br />
+<ul><li>Asherkin - For finding the CSGO team change limit offset.</li>
+<li>Psychonic &amp; Asherkin - For fixing mouse detection functionality in the SourceMod core.</li>
+</ul><br />
+<a name="Language Translations"></a><b><font size="3">Completed Language Translations</font></b><br />
+<ul><li>English (By Rothgar)</li>
+<li>French (By Cadav0r)</li>
+<li>Russian (By Snake60 &amp; SelaX)</li>
+<li>Spanish (By eradeejay)</li>
+<li>German (By Guggie &amp; Spawn86)</li>
+<li>Portuguese (By away000 &amp; paulo_crash)</li>
+<li>Hungarian (By KhyrOO &amp; blue zebra)</li>
+<li>Polish (By Zuko &amp; Arcy)</li>
+<li>Turkish (By ZuCChiNi)</li>
+<li>Norwegian (By checkster)</li>
+<li>Norwegian (By checkster)</li>
+<li>Italian (By Obyboby)</li>
+<li>Czech (By Wooky_)</li>
+</ul> <br />
+<b><font size="2">Other plugins made by me:</font></b><br />
+<br />
+<b>Anti-TK Manager:</b> <a href="http://forums.alliedmods.net/showthread.php?t=80554" target="_blank" rel="nofollow noopener">http://forums.alliedmods.net/showthread.php?t=80554</a><br />
+<br />
+<br />
+<a name="File Information"></a><font size="4">File Information</font><br />
+<br />
+<font color="red"><b>afk_manager-compat</b></font> - <b>This is an old release which is no longer kept up-to-date and only available for older SourceMod releases. It can be found in the afk_manager_old.zip</b><br />
+<font color="red"><b>afk_manager3</b></font> - <i><b>This was the previous version. </b></i><b>It can be found in the afk_manager_old.zip</b><br />
+<font color="red"><b>afk_manager4</b></font> - <i><b>This is the current version.</b></i><br />
+<br />
+<u><i><font color="red"><b>Most people should use the new version that is NOT in the zip file.<br />
+</b></font></i></u><br />
+<a name="Compiled Download"></a><font size="4"><font color="Red">Compiled Download with Multi Colors and Updater</font><br />
+</font>If you are looking for a compiled download of the latest version of the AFK Manager which includes both &quot;Multi Colors&quot; and &quot;Updater&quot; include files, you can use the Updater download URL <a href="http://afkmanager.dawgclan.net/plugins/afk_manager4.smx" target="_blank" rel="nofollow noopener">http://afkmanager.dawgclan.net/plugins/afk_manager4.smx</a><br />
+<br />
+The compiled download URL should be static and contain the latest version of the plugin if you for example want to add to server provisioning scripts or similar, please also make sure you get the translation file either through the forum or via the Updater download URL <a href="http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt" target="_blank" rel="nofollow noopener">http://afkmanager.dawgclan.net/trans...er.phrases.txt</a>
+                				</div>
+						<!-- / message -->
+	
+						
+						<!-- attachments -->
+							<div style="padding:6px">
+							
+							
+						
+							
+							
+							
+							
+							
+								<fieldset class="fieldset">
+									<legend>Attached Files</legend>
+									<table cellpadding="0" cellspacing="3" border="0">
+									<tr>
+	<td><img class="inlineimg" src="images/attach/zip.gif" alt="File Type: zip" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=160240&amp;d=1484963606">afk_manager_old.zip</a> (37.0 KB, 2134 views)
+			
+		
+	</td>
+</tr><tr>
+	<td><img class="inlineimg" src="images/attach/txt.gif" alt="File Type: txt" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=166646&amp;d=1510967008">afk_manager.phrases.txt</a> (14.3 KB, 2616 views)
+			
+		
+	</td>
+</tr><tr>
+	<td><img class="inlineimg" src="images/attach/inc.gif" alt="File Type: inc" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=168028&amp;d=1516358726">afk_manager.inc</a> (3.2 KB, 1366 views)
+			
+		
+	</td>
+</tr><tr>
+	<td><img class="inlineimg" src="images/attach/sp.gif" alt="File Type: sp" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="http://www.sourcemod.net/vbcompiler.php?file_id=170330"><strong>Get Plugin</strong></a> or
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=170330&amp;d=1530622367">Get Source</a> (afk_manager4.sp - 1816 views - 79.5 KB)
+			
+		
+	</td>
+</tr><tr>
+	<td><img class="inlineimg" src="images/attach/txt.gif" alt="File Type: txt" width="16" height="16" border="0" style="vertical-align:baseline" /></td>
+		<td>
+		
+			
+				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=170331&amp;d=1530622381">afk_manager.changelog.txt</a> (24.2 KB, 403 views)
+			
+		
+	</td>
+</tr>
+									</table>
+								</fieldset>
+							
+							
+							
+							
+							</div>
+						<!-- / attachments -->
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						<!-- edit note -->
+							<div class="smallfont">			<hr size="1" style="color:#FFFFFF" />
+								<em>
+								
+									Last edited by Rothgar; 07-03-2018 at <span class="time">09:57</span>.
+								
+								Reason: New Version
+								</em>
+							</div>
+						<!-- / edit note -->
+						
+	
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+        
+        	<td class="alt3" style="border-right: 1px solid #FFFFFF; border-top: 1px solid #FFFFFF;">
+        
+			<img class="inlineimg" src="images/statusicon/user_offline.svg" alt="Rothgar is offline" border="0" />
+
+
+			
+			
+				
+				
+				
+			
+			
+			
+
+                        
+                        
+                         
+		</td>
+	
+        	<td class="alt3" align="left" style="border-top: 1px solid #FFFFFF;">
+	
+        		<table>
+        			<tr>
+        				<td>
+        					<a href="#" onclick="imwindow('icq', '32091', 500, 450); return false;"><img src="images/misc/im_icq.gif" alt="Send a message via ICQ to Rothgar" border="0" /></a> <a href="#" onclick="imwindow('aim', '32091', 400, 200); return false;"><img src="images/misc/im_aim.gif" alt="Send a message via AIM to Rothgar" border="0" /></a> <a href="#" onclick="imwindow('msn', '32091', 400, 200); return false;"><img src="images/misc/im_msn.gif" alt="Send a message via MSN to Rothgar" border="0" /></a>  
+        				</td>
+        				<td align="right">
+        					
+                                                
+        				</td>
+        			</tr>
+        		</table>
+		</td>
+	</tr>
+</table>
+
+
+<!-- post 708265 popup menu -->
+<div class="vbmenu_popup" id="postmenu_708265_menu" style="display:none">
+	<table cellpadding="4" cellspacing="1" border="0">
+	<tr>
+		<td class="thead">Rothgar</td>
+	</tr>
+	
+		<tr><td class="vbmenu_option"><a href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">View Public Profile</a></td></tr>
+	
+	
+		<tr><td class="vbmenu_option"><a href="private.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newpm&amp;u=32091" rel="nofollow">Send a private message to Rothgar</a></td></tr>
+	
+	
+	
+		<tr><td class="vbmenu_option"><a href="http://www.dawgclan.net" rel="nofollow noopener" target="_blank">Visit Rothgar's homepage!</a></td></tr>
+	
+	
+		<tr><td class="vbmenu_option"><a href="search.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=finduser&amp;u=32091" rel="nofollow">Find More Posts by Rothgar</a></td></tr>
+	
+	
+	
+	</table>
+</div>
+<!-- / post 708265 popup menu -->
+
+
+
+
+<!-- / post #708265 -->
+
+<table class="tborder" cellpadding="6" cellspacing="1" border="0" width="100%" style="border-top-width:0px">
+<tr>
+	<td class="tfoot" align="center">
+		<input type="button" class="button" value="Close this window" id="close_button" style="display: none;" />
+		&nbsp;
+		<script type="text/javascript">
+		<!--
+		if (self.opener)
+		{
+			var close_button = fetch_object('close_button');
+			close_button.style.display = '';
+			close_button.onclick = function() { self.close(); };
+		}
+		//-->
+		</script>
+	</td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+<!--
+	// Main vBulletin Javascript Initialization
+	vBulletin_init();
+//-->
+</script>
+
+</body>
+</html>
