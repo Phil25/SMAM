@@ -6,6 +6,7 @@ add_executable(tests)
 
 target_sources(tests
   PRIVATE
+    scrapertest.cpp
     amscrapertest.cpp
     plantest.cpp
 )
