@@ -71,7 +71,7 @@ TEST_F(AMScraperTest, AdvancedInfiniteAmmo){
 	);
 }
 
-/*TEST_F(AMScraperTest, AFKManager){ // TODO: return links straight away
+TEST_F(AMScraperTest, AFKManager){
 	int i = getPluinOffset("afk_manager");
 	EXPECT_EQ(
 		"http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
@@ -81,7 +81,7 @@ TEST_F(AMScraperTest, AdvancedInfiniteAmmo){
 		"http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt",
 		scrapers[i]->getFileUrl("http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt", 't')
 	);
-}*/
+}
 
 TEST_F(AMScraperTest, DynamicMotd){
 	int i = getPluinOffset("dynamic_motd");

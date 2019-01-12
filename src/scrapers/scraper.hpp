@@ -29,7 +29,7 @@ public:
 	// return download url of a target
 	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
 
-	// is this scraper applicable for given url
+	// returns whether this scraper is applicable for given url
 	bool match(const std::string& url) const{
 		return url.compare(0, aptUrl.size(), aptUrl) == 0;
 	}
@@ -49,5 +49,11 @@ public:
 			lines.push_back(line);
 
 		return lines;
+	}
+
+	// returns whether given string is a link
+	static bool isLink(const std::string& str){
+		return str.compare(0, 8, "https://") == 0
+			|| str.compare(0, 7, "http://") == 0;
 	}
 };
