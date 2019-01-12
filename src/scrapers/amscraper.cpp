@@ -13,10 +13,9 @@ AMScraper::AMScraper(Downloader& downloader):
 AMScraper::~AMScraper(){}
 
 std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
-	for(auto& line : contents)
+	for(const std::string& line : contents)
 		if(line.find(name) != std::string::npos)
 			return buildUrl(getId(line), isForumCompilable(tag, name));
-
 	return "";
 }
 
