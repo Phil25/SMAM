@@ -12,15 +12,14 @@ public:
 
 private:
 	// build url for downloading attachment
-	std::string buildUrl(int attachmentId, bool forumCompilable) const;
+	static std::string buildUrl(int attachmentId, bool forumCompilable);
 
 	// extract forum's attachment id from line
-	int getId(const std::string& line) const;
-
+	static int getId(const std::string& line);
 
 	// check if the file is a forum-compilable source
-	bool isForumCompilable(char tag, const std::string& name) const;
+	static bool isForumCompilable(char tag, const std::string& name);
 
 	// check if name ends with ".sp"
-	bool isFileSource(const std::string& name) const;
+	static bool isFileSource(const std::string& name);
 };

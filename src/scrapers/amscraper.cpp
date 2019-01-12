@@ -20,7 +20,7 @@ std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
 	return "";
 }
 
-std::string AMScraper::buildUrl(int id, bool forumCompilable) const{
+std::string AMScraper::buildUrl(int id, bool forumCompilable){
 	std::string sId = std::to_string(id);
 	return std::string(forumCompilable // is forum-compilable plugin
 		? "http://www.sourcemod.net/vbcompiler.php?file_id=" + sId
@@ -28,7 +28,7 @@ std::string AMScraper::buildUrl(int id, bool forumCompilable) const{
 	);
 }
 
-int AMScraper::getId(const std::string& line) const{
+int AMScraper::getId(const std::string& line){
 	// ...c&amp;attachmentid=116848&amp;d=1435897597\">Get...
 	int pos = line.find("attachmentid=");
 		pos = line.find('&', pos);
@@ -42,11 +42,11 @@ int AMScraper::getId(const std::string& line) const{
 	return id;
 }
 
-bool AMScraper::isForumCompilable(char tag, const std::string& name) const{
+bool AMScraper::isForumCompilable(char tag, const std::string& name){
 	return tag == 'p' && isFileSource(name);
 }
 
-bool AMScraper::isFileSource(const std::string& name) const{
+bool AMScraper::isFileSource(const std::string& name){
 	int size = name.size();
 	if(size < 3) return false;
 	return name[size -3] == '.'
