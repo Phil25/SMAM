@@ -11,6 +11,9 @@ public:
 	std::string getFileUrl(const std::string& name, char tag) const override;
 
 private:
+	// return name with the highest version number based on contents
+	std::string getWildcard(const std::string& name, int at) const;
+
 	// build url for downloading attachment
 	static std::string buildUrl(int attachmentId, bool forumCompilable);
 

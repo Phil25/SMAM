@@ -1,4 +1,5 @@
 #include "amscraper.h"
+#include "../utils.h"
 
 #include "../downloader.h"
 
@@ -14,17 +15,37 @@ AMScraper::~AMScraper(){}
 
 std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
 	if(isLink(name)) return name;
+
+	int wcPos = name.find('*');
+	if(wcPos != (int)std::string::npos)
+		return getFileUrl(getWildcard(name, wcPos), tag);
+
 	for(const std::string& line : contents)
 		if(line.find(name) != std::string::npos)
 			return buildUrl(getId(line), isForumCompilable(tag, name));
+
 	return "";
+}
+
+std::string AMScraper::getWildcard(const std::string& name, int at) const{
+	std::string start = name.substr(0, at),
+				end = name.substr(at+1, name.size());
+	std::vector<std::string> versions;
+
+	for(const std::string& line : contents){
+		std::string version = Utils::extract(line, start, end);
+		if(!version.empty())
+			versions.push_back(version);
+	}
+
+	return std::string(start + Utils::biggestVer(versions) + end);
 }
 
 std::string AMScraper::buildUrl(int id, bool forumCompilable){
 	std::string sId = std::to_string(id);
 	return std::string(forumCompilable // is forum-compilable plugin
-		? "http://www.sourcemod.net/vbcompiler.php?file_id=" + sId
-		: "https://forums.alliedmods.net/attachment.php?attachmentid=" + sId
+		? "http://www.sourcemod.net/vbcompiler.php?file_id=" +sId
+		: "https://forums.alliedmods.net/attachment.php?attachmentid=" +sId
 	);
 }
 

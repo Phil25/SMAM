@@ -4,13 +4,14 @@
 
 #include "gtest/gtest.h"
 #include "../src/scrapers/amscraper.h"
+#include "../src/utils.h"
 
 class DownloaderMock : public Downloader{
 public:
 	static std::map<std::string, std::string> dataLink;
 
 	std::string html(cstr& url, cstr& from, cstr& to) override{
-		return extract(getData(url), from, to);
+		return Utils::extract(getData(url), from, to);
 	}
 
 	static std::string getData(std::string url){
@@ -91,13 +92,13 @@ TEST_F(AMScraperTest, DynamicMotd){
 	);
 }
 
-/*TEST_F(AMScraperTest, FuncommandsX){ TODO: version wildcard functionality
+TEST_F(AMScraperTest, FuncommandsX){
 	int i = getPluinOffset("funcommandsx");
 	EXPECT_EQ(
-		"https://forums.alliedmods.net/attachment.php?attachmentid=159900",
+		"https://forums.alliedmods.net/attachment.php?attachmentid=159903",
 		scrapers[i]->getFileUrl("funcommandsX_*.zip", 'a')
 	);
-}*/
+}
 
 TEST_F(AMScraperTest, Thriller){
 	int i = getPluinOffset("thriller");

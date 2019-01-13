@@ -1,4 +1,5 @@
 #include "downloader.h"
+#include "utils.h"
 
 #define AGENT "SourceMod Addon Manager"
 #define VERSION "1.0"
@@ -20,7 +21,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to){
 		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
 
 	curl_easy_cleanup(curl);
-	return extract(buffer, from, to);
+	return Utils::extract(buffer, from, to);
 }
 
 void Downloader::file(cstr& url){
@@ -64,10 +65,4 @@ size_t Downloader::write(const char* data, size_t size, size_t n, void* o){
 	size_t trueSize = size *n;
 	static_cast<Downloader*>(o)->tempfile << std::string(data, trueSize);
 	return trueSize;
-}
-
-std::string Downloader::extract(cstr& data, cstr& from, cstr& to){
-	size_t begin = data.find(from, 0) +from.size();
-	size_t end = data.find(to, begin);
-	return data.substr(begin, end -begin);
 }

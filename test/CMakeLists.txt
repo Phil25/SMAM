@@ -6,6 +6,7 @@ add_executable(tests)
 
 target_sources(tests
   PRIVATE
+    utilstest.cpp
     scrapertest.cpp
     amscrapertest.cpp
     plantest.cpp
@@ -14,6 +15,7 @@ target_sources(tests
 target_link_libraries(tests
   gtest_main
   ${CURL_LIBRARIES} # required for linkage, unused in mock
+  utils
   downloader
   amscraper
   plan

@@ -24,7 +24,4 @@ private:
 
 	static size_t read(const char*, size_t size, size_t n, void*);
 	static size_t write(const char*, size_t size, size_t n, void*);
-
-protected:
-	static std::string extract(cstr& data, cstr& from, cstr& to);
 };
