@@ -4,9 +4,9 @@
 #include <string>
 #include <fstream>
 
-using cstr = const std::string;
-
 class Downloader{
+	using cstr = const std::string;
+
 	std::string buffer;
 	CURL* curl;
 	CURLcode res;

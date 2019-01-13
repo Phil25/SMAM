@@ -14,7 +14,7 @@ AMScraper::AMScraper(Downloader& downloader):
 AMScraper::~AMScraper(){}
 
 std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
-	if(isLink(name)) return name;
+	if(Utils::isLink(name)) return name;
 
 	int wcPos = name.find('*');
 	if(wcPos != (int)std::string::npos)

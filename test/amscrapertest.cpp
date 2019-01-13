@@ -7,6 +7,8 @@
 #include "../src/utils.h"
 
 class DownloaderMock : public Downloader{
+	using cstr = const std::string;
+
 public:
 	static std::map<std::string, std::string> dataLink;
 

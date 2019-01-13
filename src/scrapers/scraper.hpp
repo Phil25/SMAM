@@ -4,17 +4,17 @@
 #include <string>
 #include <vector>
 
+#include "../utils.h"
 #include "../downloader.h"
 
 class Scraper{
 	using cstr = const std::string;
-	using StringVector = std::vector<std::string>;
 
 protected:
 	Downloader& downloader;
 	cstr aptUrl, dataFrom, dataTo;
 
-	StringVector contents;
+	Utils::StringVector contents;
 
 	Scraper(Downloader& downloader, cstr& url="", cstr& from="", cstr& to=""):
 		downloader(downloader),
@@ -36,24 +36,6 @@ public:
 
 	// download page and parse relevant data
 	void getPage(const std::string& url){
-		contents = toLines(downloader.html(url, dataFrom, dataTo));
-	}
-
-	// split string to vector by newlines
-	static StringVector toLines(const std::string& data){
-		std::istringstream dataStream(data);
-		std::string line;
-		std::vector<std::string> lines;
-
-		while(std::getline(dataStream, line))
-			lines.push_back(line);
-
-		return lines;
-	}
-
-	// returns whether given string is a link
-	static bool isLink(const std::string& str){
-		return str.compare(0, 8, "https://") == 0
-			|| str.compare(0, 7, "http://") == 0;
+		contents = Utils::toLines(downloader.html(url, dataFrom, dataTo));
 	}
 };
