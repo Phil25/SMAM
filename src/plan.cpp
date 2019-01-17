@@ -9,17 +9,17 @@ Plan::File::File(const std::string& entry):
 
 std::string Plan::File::toDir(char tag){
 	switch(tag){
-		//case 'a': return "tmp/";
-		case 'c': return "tmp/configs/";
-		case 'd': return "tmp/data/";
-		case 'e': return "tmp/extensions/";
-		case 'g': return "tmp/gamedata/";
-		case 'p': return "tmp/plugins/";
-		case 's': return "tmp/scripting/";
-		case 't': return "tmp/translations/";
-		//case 'u': return "tmp/";
+		//case 'a': return "";
+		case 'c': return "configs";
+		case 'd': return "data";
+		case 'e': return "extensions";
+		case 'g': return "gamedata";
+		case 'p': return "plugins";
+		case 's': return "scripting";
+		case 't': return "translations";
+		//case 'u': return "";
 	}
-	return "tmp/";
+	return "";
 }
 
 Plan::Plan() : url(""){}
