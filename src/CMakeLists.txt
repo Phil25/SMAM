@@ -36,5 +36,5 @@ target_sources(utils
 target_include_directories(utils PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # Main
-add_executable(main main.cpp)
-target_link_libraries(main PRIVATE utils plan downloader installer amscraper)
+add_executable(smam main.cpp)
+target_link_libraries(smam PRIVATE utils plan downloader installer amscraper)
