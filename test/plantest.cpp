@@ -31,12 +31,3 @@ TEST(PlanTest, ExtensionTest){
 	EXPECT_EQ("extensions", plan.getFileDir(2));
 	EXPECT_EQ('e', plan.getFileTag(2));
 }
-
-TEST(PlanTest, SetUrlTest){
-	plan.setFileUrl(0, "https://link.net/config.cfg");
-	plan.setFileUrl(1, "https://link.net/binary.smx");
-	plan.setFileUrl(2, "https://link.net/extension.so");
-	EXPECT_EQ("https://link.net/config.cfg", plan.getFileUrl(0));
-	EXPECT_EQ("https://link.net/binary.smx", plan.getFileUrl(1));
-	EXPECT_EQ("https://link.net/extension.so", plan.getFileUrl(2));
-}
