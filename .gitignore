@@ -1,1 +1,6 @@
+# ignore build
 build*/
+
+# ignore everything in thirdparty
+thirdparty/*
+!thirparty/CMakeLists.txt
