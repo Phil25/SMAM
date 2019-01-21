@@ -26,5 +26,3 @@ add_subdirectory("${CMAKE_BINARY_DIR}/googletest-src"
 
 enable_testing()
 add_subdirectory(test)
-
-add_subdirectory(thirdparty)

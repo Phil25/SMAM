@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "../thirdparty/cxxopts.hpp"
 #include "argparser.hpp"
 
 int main(int argc, char* argv[]){
