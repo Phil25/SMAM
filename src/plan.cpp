@@ -3,8 +3,7 @@
 Plan::File::File(const std::string& entry):
 	tag(entry[0]),
 	dir(toDir(entry[0])),
-	name(entry.substr(2)),
-	url("about:blank")
+	name(entry.substr(2))
 {}
 
 std::string Plan::File::toDir(char tag){
@@ -22,20 +21,22 @@ std::string Plan::File::toDir(char tag){
 	return "";
 }
 
-Plan::Plan() : url(""){}
+Plan::Plan(const std::string& id):
+	id(id)
+{}
 
-Plan::Plan(const std::vector<std::string>& data){
-	init(data);
-}
+void Plan::init(const Database& db){
+	auto data = db.fetch(id); // str vector
 
-void Plan::init(const std::vector<std::string>& data){
-	url = data.at(0);
 	int size = data.size();
+	if(!size) return;
+
+	url = data.at(0);
 	for(int i = 1; i < size; ++i)
 		files.push_back(File(data.at(i)));
 }
 
-void Plan::fill(const Scraper& scraper){
+void Plan::fetch(const Scraper& scraper){
 	for(File& file : files)
 		file.url = scraper.getFileUrl(file.name, file.tag);
 }

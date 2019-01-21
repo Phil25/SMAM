@@ -3,27 +3,28 @@
 #include <string>
 #include <vector>
 #include "scrapers/scraper.hpp"
+#include "database.h"
 
 class Plan{
 	struct File{
 		char tag;
 		std::string dir,  // SM directory destination
 					name, // name or relative path
-					url;  // url to download from
+					url = "";  // url to download from
 
 		File(const std::string& data);
 		static std::string toDir(char);
 	};
 
-	std::string url; // main url of the plan
-	std::vector<File> files;
+	std::string id; // addon identifier
+	std::string url = ""; // main url of the plan
+	std::vector<File> files{};
 
 public:
-	Plan();
-	Plan(const std::vector<std::string>& data);
+	Plan(const std::string&);
 
-	void init(const std::vector<std::string>& data);
-	void fill(const Scraper&);
+	void init(const Database&);
+	void fetch(const Scraper&);
 
 	int size() const;
 	const std::string& getUrl() const;

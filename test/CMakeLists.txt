@@ -8,7 +8,6 @@ target_sources(tests
   PRIVATE
     utilstest.cpp
     amscrapertest.cpp
-    plantest.cpp
 )
 
 target_link_libraries(tests
@@ -17,7 +16,6 @@ target_link_libraries(tests
   utils
   downloader
   amscraper
-  plan
 )
 
 add_test(
