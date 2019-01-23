@@ -3,38 +3,11 @@
 #include <fstream>
 
 #include "gtest/gtest.h"
+
 #include "../src/scrapers/amscraper.h"
 #include "../src/utils.h"
 
-class DownloaderMock : public Downloader{
-	using cstr = const std::string;
-
-public:
-	static std::map<std::string, std::string> dataLink;
-
-	std::string html(cstr& url, cstr& from, cstr& to) override{
-		return Utils::extract(getData(url), from, to);
-	}
-
-	static std::string getData(std::string url){
-		auto it = dataLink.find(url);
-		return it == dataLink.end() ? "" : readFile(it->second);
-	}
-
-	static std::string readFile(std::string name){
-		std::ifstream ifs("../test/mockdata/" + name + ".txt");
-		std::istreambuf_iterator<char> start(ifs);
-		return std::string(start, std::istreambuf_iterator<char>());
-	}
-};
-
-std::map<std::string, std::string> DownloaderMock::dataLink = {
-	{"https://forums.alliedmods.net/showpost.php?p=1754217", "advancedinfiniteammo"},
-	{"https://forums.alliedmods.net/showpost.php?p=708265", "afk_manager"},
-	{"https://forums.alliedmods.net/showpost.php?p=1387386", "dynamic_motd"},
-	{"https://forums.alliedmods.net/showpost.php?p=665771", "funcommandsx"},
-	{"https://forums.alliedmods.net/showpost.php?p=1590169", "thriller"},
-};
+#include "downloadermock.h"
 
 class AMScraperTest : public ::testing::Test{
 protected:

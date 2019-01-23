@@ -6,6 +6,7 @@ add_executable(tests)
 
 target_sources(tests
   PRIVATE
+    downloadermock.cpp
     utilstest.cpp
     amscrapertest.cpp
 )
