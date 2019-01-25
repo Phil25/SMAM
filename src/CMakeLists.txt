@@ -8,6 +8,14 @@ target_sources(downloader
 )
 target_include_directories(downloader PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
+# Database
+add_library(database)
+target_sources(database
+  PRIVATE database.cpp
+  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/database.h
+)
+target_include_directories(database PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 # Scrapers
 add_subdirectory(scrapers)
 

@@ -7,6 +7,7 @@ add_executable(tests)
 target_sources(tests
   PRIVATE
     downloadermock.cpp
+    databasemock.cpp
     utilstest.cpp
     amscrapertest.cpp
 )
@@ -16,6 +17,10 @@ target_link_libraries(tests
   ${CURL_LIBRARIES} # required for linkage, unused in mock
   utils
   downloader
+  database
+  plan
+  installer
+  scraper
   amscraper
 )
 

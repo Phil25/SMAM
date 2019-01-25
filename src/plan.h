@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "scrapers/scraper.hpp"
+#include "scrapers/scraper.h"
 #include "database.h"
 
 class Plan{
