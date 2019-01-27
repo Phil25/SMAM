@@ -21,10 +21,9 @@ class Plan{
 	std::vector<File> files{};
 
 public:
-	Plan(const std::string&);
-
+	void setId(const std::string&);
 	void init(const Database&);
-	void fetch(const Scraper&);
+	void fetch(Scraper&);
 
 	int size() const;
 	const std::string& getUrl() const;

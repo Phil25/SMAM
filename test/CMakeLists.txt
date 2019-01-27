@@ -10,6 +10,7 @@ target_sources(tests
     databasemock.cpp
     utilstest.cpp
     amscrapertest.cpp
+    plantest.cpp
 )
 
 target_link_libraries(tests
@@ -19,7 +20,6 @@ target_link_libraries(tests
   downloader
   database
   plan
-  installer
   scraper
   amscraper
 )

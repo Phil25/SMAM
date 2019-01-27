@@ -30,7 +30,7 @@ target_include_directories(plan PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 # Installer
 add_library(installer)
 target_sources(installer
-  PRIVATE installer.cpp
+  PRIVATE installer.cpp plan.cpp
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/installer.h
 )
 target_include_directories(installer PUBLIC ${CMAKE_CURRENT_LIST_DIR})

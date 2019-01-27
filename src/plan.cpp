@@ -21,12 +21,12 @@ std::string Plan::File::toDir(char tag){
 	return "";
 }
 
-Plan::Plan(const std::string& id):
-	id(id)
-{}
+void Plan::setId(const std::string& id){
+	this->id = id;
+}
 
 void Plan::init(const Database& db){
-	auto data = db.fetch(id); // str vector
+	std::vector<std::string> data = db.fetch(id);
 
 	int size = data.size();
 	if(!size) return;
@@ -36,7 +36,8 @@ void Plan::init(const Database& db){
 		files.push_back(File(data.at(i)));
 }
 
-void Plan::fetch(const Scraper& scraper){
+void Plan::fetch(Scraper& scraper){
+	scraper.getPage(getUrl());
 	for(File& file : files)
 		file.url = scraper.getFileUrl(file.name, file.tag);
 }
