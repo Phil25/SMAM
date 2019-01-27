@@ -13,12 +13,16 @@ AMScraper::AMScraper(Downloader& downloader):
 
 AMScraper::~AMScraper(){}
 
+std::string AMScraper::getFileName(const std::string& name) const{
+	int wcPos = name.find('*');
+	if(wcPos == (int)std::string::npos)
+		return name;
+
+	return getWildcard(name, wcPos);
+}
+
 std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
 	if(Utils::isLink(name)) return name;
-
-	int wcPos = name.find('*');
-	if(wcPos != (int)std::string::npos)
-		return getFileUrl(getWildcard(name, wcPos), tag);
 
 	for(const std::string& line : contents)
 		if(line.find(name) != std::string::npos)
@@ -51,6 +55,7 @@ std::string AMScraper::buildUrl(int id, bool forumCompilable){
 
 int AMScraper::getId(const std::string& line){
 	// ...c&amp;attachmentid=116848&amp;d=1435897597\">Get...
+	//                       ^^^^^^
 	int pos = line.find("attachmentid=");
 		pos = line.find('&', pos);
 

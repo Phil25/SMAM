@@ -16,6 +16,9 @@ protected:
 	virtual ~Scraper();
 
 public:
+	// return proper name of target (resolve version wildcard)
+	virtual std::string getFileName(cstr& name) const = 0;
+
 	// return download url of a target
 	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
 

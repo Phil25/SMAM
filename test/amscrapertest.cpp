@@ -69,9 +69,10 @@ TEST_F(AMScraperTest, DynamicMotd){
 
 TEST_F(AMScraperTest, FuncommandsX){
 	int i = getPluinOffset("funcommandsx");
+	std::string name = scrapers[i]->getFileName("funcommandsX_*.zip");
 	EXPECT_EQ(
 		"https://forums.alliedmods.net/attachment.php?attachmentid=159903",
-		scrapers[i]->getFileUrl("funcommandsX_*.zip", 'a')
+		scrapers[i]->getFileUrl(name, 'a')
 	);
 }
 

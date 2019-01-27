@@ -38,8 +38,10 @@ void Plan::init(const Database& db){
 
 void Plan::fetch(Scraper& scraper){
 	scraper.getPage(getUrl());
-	for(File& file : files)
+	for(File& file : files){
+		file.name = scraper.getFileName(file.name);
 		file.url = scraper.getFileUrl(file.name, file.tag);
+	}
 }
 
 int Plan::size() const{

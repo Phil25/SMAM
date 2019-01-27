@@ -8,6 +8,7 @@ public:
 	AMScraper(Downloader&);
 	virtual ~AMScraper();
 
+	std::string getFileName(const std::string& name) const override;
 	std::string getFileUrl(const std::string& name, char tag) const override;
 
 private:
