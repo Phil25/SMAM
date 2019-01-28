@@ -58,7 +58,7 @@ inline size_t Utils::min(size_t a, size_t b){
 Utils::Version::Version(std::string version):
 	nums({})
 {
-	// turn every non-digit word to a space
+	// turn every non-digit character to a space
 	for(char& c : version)
 		if(!std::isdigit(c))
 			c = ' ';
