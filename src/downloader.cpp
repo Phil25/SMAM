@@ -4,19 +4,16 @@
 #define AGENT "SourceMod Addon Manager"
 #define VERSION "1.0"
 
-Downloader::Downloader():
-	buffer(""),
-	curl(NULL),
-	res(CURLE_FAILED_INIT),
-	tempfile({})
-{}
+Downloader::Downloader() : curl(NULL){}
 
 std::string Downloader::html(cstr& url, cstr& from, cstr& to){
-	if(!prepare()) return "";
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, read);
-	set_opts(curl, url);
+	if((curl = curl_easy_init()) == NULL)
+		return "";
 
-	res = curl_easy_perform(curl);
+	std::string buffer;
+	set_opts(url, read, &buffer);
+
+	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
 
@@ -24,45 +21,44 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to){
 	return Utils::extract(buffer, from, to);
 }
 
-void Downloader::file(cstr& url){
-	if(!prepare()) return;
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write);
-	set_opts(curl, url);
+bool Downloader::file(cstr& url, cstr& dest){
+	if((curl = curl_easy_init()) == NULL)
+		return false;
 
-	tempfile.open("test.txt"); // TODO: get from URL
-	res = curl_easy_perform(curl);
-	if(res != CURLE_OK)
+	std::ofstream tempfile(dest);
+	set_opts(url, write, &tempfile);
+
+	CURLcode res = curl_easy_perform(curl);
+	bool success = res != CURLE_OK;
+	if(!success)
 		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
 
 	tempfile.close();
 	curl_easy_cleanup(curl);
+	return success;
 }
 
-bool Downloader::prepare(){
-	buffer.clear();
-	curl = curl_easy_init();
-	return curl != NULL;
-}
-
-void Downloader::set_opts(CURL* curl, cstr& url){
+void Downloader::set_opts(cstr& url, curlcb callback, void* data){
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, AGENT "/" VERSION);
 
-	// pass pointer of the caller's class
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);
 
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 4L);
 }
 
-size_t Downloader::read(const char* data, size_t size, size_t n, void* o){
+size_t Downloader::read(const char* data, size_t size, size_t n, void* b){
 	size_t trueSize = size *n;
-	static_cast<Downloader*>(o)->buffer.append(data, trueSize);
+	std::string* pbuffer = static_cast<std::string*>(b);
+	pbuffer->append(data, trueSize);
 	return trueSize;
 }
 
-size_t Downloader::write(const char* data, size_t size, size_t n, void* o){
+size_t Downloader::write(const char* data, size_t size, size_t n, void* f){
 	size_t trueSize = size *n;
-	static_cast<Downloader*>(o)->tempfile << std::string(data, trueSize);
+	std::ofstream* pfile = static_cast<std::ofstream*>(f);
+	*pfile << std::string(data, trueSize);
 	return trueSize;
 }
