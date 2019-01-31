@@ -4,6 +4,9 @@ sudo: require
 language: cpp
 compiler: gcc
 
+before_install:
+    - sudo apt-get install -y curl
+
 addons:
     apt:
         sources:
@@ -12,6 +15,7 @@ addons:
             - gcc-6
             - g++-6
             - cmake
+        update: true
 
 script:
     - sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
