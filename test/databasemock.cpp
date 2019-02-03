@@ -11,6 +11,9 @@ std::vector<std::string> DatabaseMock::fetch(const std::string& id) const{
 }
 
 std::map<std::string, std::vector<std::string>> dataLink = {
+	{"accelerator", {
+		"https://builds.limetech.io/?p=accelerator",
+	}},
 	{"advancedinfiniteammo", {
 		"https://forums.alliedmods.net/showpost.php?p=1754217",
 		"p:AdvancedInfiniteAmmo.sp",
@@ -20,6 +23,9 @@ std::map<std::string, std::vector<std::string>> dataLink = {
 		"p:http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
 		"t:http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt",
 	}},
+	{"connect", {
+		"https://builds.limetech.io/?p=connect",
+	}},
 	{"dynamic_motd", {
 		"https://forums.alliedmods.net/showpost.php?p=1387386",
 		"p:dynamic_motd.smx",
@@ -28,14 +34,16 @@ std::map<std::string, std::vector<std::string>> dataLink = {
 		"https://forums.alliedmods.net/showpost.php?p=665771",
 		"a:funcommandsX_*.zip",
 	}},
+	{"steamtools", {
+		"https://builds.limetech.io/?p=steamtools",
+	}},
 	{"tf2attributes", {
-"https://github.com/FlaminSarge/tf2attributes/",
-"p:tf2attributes.smx",
-"g:https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt",
+		"https://github.com/FlaminSarge/tf2attributes/",
+		"p:tf2attributes.smx",
+		"g:https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt",
 	}},
 	{"tf2items", {
 		"https://builds.limetech.io/?p=tf2items",
-		"a:*",
 	}},
 	{"thriller", {
 		"https://forums.alliedmods.net/showpost.php?p=1590169",
