@@ -12,7 +12,3 @@ Scraper::~Scraper(){}
 bool Scraper::match(const std::string& url) const{
 	return url.compare(0, aptUrl.size(), aptUrl) == 0;
 }
-
-void Scraper::getPage(const std::string& url){
-	contents = Utils::toLines(downloader.html(url, dataFrom, dataTo));
-}

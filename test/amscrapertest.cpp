@@ -9,81 +9,54 @@
 
 #include "downloadermock.h"
 
-class AMScraperTest : public ::testing::Test{
-protected:
-	std::vector<AMScraper*> scrapers;
-	std::vector<std::string> pluginName;
-	DownloaderMock dmock;
+DownloaderMock dmock;
+AMScraper scraper(dmock);
 
-	void SetUp() override{
-		for(auto& entry : DownloaderMock::dataLink){
-			AMScraper* scraper = new AMScraper(dmock);
-			scraper->getPage(entry.first);
-
-			scrapers.push_back(scraper);
-			pluginName.push_back(entry.second);
-		}
-	}
-
-	void TearDown() override{
-		for(AMScraper* scraper : scrapers)
-			delete scraper;
-	}
-
-	int getPluinOffset(const std::string& name){
-		int size = pluginName.size();
-		for(int i = 0; i < size; ++i)
-			if(name == pluginName.at(i))
-				return i;
-		return 0;
-	}
-};
-
-TEST_F(AMScraperTest, AdvancedInfiniteAmmo){
-	int i = getPluinOffset("advancedinfiniteammo");
+TEST(AMScraperTest, AdvancedInfiniteAmmo){
+	scraper.fetch("https://forums.alliedmods.net/showpost.php?p=1754217");
 	EXPECT_EQ(
 		"http://www.sourcemod.net/vbcompiler.php?file_id=148649",
-		scrapers[i]->getFileUrl("AdvancedInfiniteAmmo.sp", 'p')
+		scraper.getFileUrl("AdvancedInfiniteAmmo.sp", 'p')
 	);
 }
 
-TEST_F(AMScraperTest, AFKManager){
-	int i = getPluinOffset("afk_manager");
+TEST(AMScraperTest, AFKManager){
+	scraper.fetch("https://forums.alliedmods.net/showpost.php?p=708265");
 	EXPECT_EQ(
 		"http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
-		scrapers[i]->getFileUrl("http://afkmanager.dawgclan.net/plugins/afk_manager4.smx", 'p')
+		scraper.getFileUrl("http://afkmanager.dawgclan.net/plugins/afk_manager4.smx", 'p')
 	);
 	EXPECT_EQ(
 		"http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt",
-		scrapers[i]->getFileUrl("http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt", 't')
+		scraper.getFileUrl("http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt", 't')
 	);
 }
 
-TEST_F(AMScraperTest, DynamicMotd){
-	int i = getPluinOffset("dynamic_motd");
+TEST(AMScraperTest, DynamicMotd){
+	scraper.fetch("https://forums.alliedmods.net/showpost.php?p=1387386");
 	EXPECT_EQ(
 		"https://forums.alliedmods.net/attachment.php?attachmentid=160284",
-		scrapers[i]->getFileUrl("dynamic_motd.smx", 'p')
+		scraper.getFileUrl("dynamic_motd.smx", 'p')
 	);
 }
 
-TEST_F(AMScraperTest, FuncommandsX){
-	int i = getPluinOffset("funcommandsx");
-	std::string name = scrapers[i]->getFileName("funcommandsX_*.zip");
+TEST(AMScraperTest, FuncommandsX){
+	scraper.fetch("https://forums.alliedmods.net/showpost.php?p=665771");
+	std::string name = scraper.getFileName("funcommandsX_*.zip");
 	EXPECT_EQ(
 		"https://forums.alliedmods.net/attachment.php?attachmentid=159903",
-		scrapers[i]->getFileUrl(name, 'a')
+		scraper.getFileUrl(name, 'a')
 	);
 }
 
-TEST_F(AMScraperTest, Thriller){
-	int i = getPluinOffset("thriller");
+TEST(AMScraperTest, Thriller){
+	scraper.fetch("https://forums.alliedmods.net/showpost.php?p=1590169");
 	EXPECT_EQ(
 		"http://www.sourcemod.net/vbcompiler.php?file_id=128466",
-		scrapers[i]->getFileUrl("thriller.sp", 'p')
+		scraper.getFileUrl("thriller.sp", 'p')
 	);
 	EXPECT_EQ(
 		"https://forums.alliedmods.net/attachment.php?attachmentid=133555",
-		scrapers[i]->getFileUrl("thriller.plugin.txt", 'g')
+		scraper.getFileUrl("thriller.plugin.txt", 'g')
 	);
 }

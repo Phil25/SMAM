@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../utils.h"
 #include "../downloader.h"
 
 class Scraper{
@@ -9,8 +8,6 @@ class Scraper{
 protected:
 	Downloader& downloader;
 	cstr aptUrl, dataFrom, dataTo;
-
-	Utils::StringVector contents;
 
 	Scraper(Downloader& downloader, cstr& url="", cstr& from="", cstr& to="");
 	virtual ~Scraper();
@@ -22,9 +19,9 @@ public:
 	// return download url of a target
 	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
 
-	// returns whether this scraper is applicable for given url
-	inline bool match(const std::string& url) const;
+	// fetch url contents
+	virtual void fetch(const std::string& url) = 0;
 
-	// download page and parse relevant data
-	void getPage(const std::string& url);
+	// returns whether this scraper is applicable for given url
+	bool match(const std::string& url) const;
 };
