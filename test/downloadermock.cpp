@@ -1,6 +1,6 @@
 #include "downloadermock.h"
 
-#include "../src/utils.h"
+#include "../src/utils/misc.h"
 
 using cstr = const std::string;
 

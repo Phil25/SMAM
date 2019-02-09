@@ -11,12 +11,18 @@ target_sources(tests
 
 target_link_libraries(tests
   gtest_main
-  utils
   downloader
   database
   plan
   scraper
   amscraper
+
+# Utilities
+  utilsmisc
+  utilsversion
+  utilsamnode
+
+# Thrid party
   -lcurl
 )
 

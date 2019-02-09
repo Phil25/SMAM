@@ -19,6 +19,9 @@ target_include_directories(database PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 # Scrapers
 add_subdirectory(scrapers)
 
+# Utilities
+add_subdirectory(utils)
+
 # Plan
 add_library(plan)
 target_sources(plan
@@ -35,14 +38,6 @@ target_sources(installer
 )
 target_include_directories(installer PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-# Utils
-add_library(utils)
-target_sources(utils
-  PRIVATE utils.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/utils.h
-)
-target_include_directories(utils PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-
 # Main
 add_executable(smam main.cpp)
-target_link_libraries(smam PRIVATE utils plan downloader installer amscraper)
+target_link_libraries(smam PRIVATE plan downloader installer amscraper)

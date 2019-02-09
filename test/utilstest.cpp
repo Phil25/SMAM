@@ -3,7 +3,8 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "../src/utils.h"
+#include "../src/utils/misc.h"
+#include "../src/utils/version.h"
 
 TEST(UtilsTest, ToLines){
 	std::vector<std::string> vec = Utils::toLines("Line1\nLine2\nLine3");

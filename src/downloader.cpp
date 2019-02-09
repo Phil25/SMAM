@@ -1,5 +1,5 @@
 #include "downloader.h"
-#include "utils.h"
+#include "utils/misc.h"
 
 #define AGENT "SourceMod Addon Manager"
 #define VERSION "1.0"

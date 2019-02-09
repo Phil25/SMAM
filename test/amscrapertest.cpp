@@ -5,7 +5,6 @@
 #include "gtest/gtest.h"
 
 #include "../src/scrapers/amscraper.h"
-#include "../src/utils.h"
 
 #include "downloadermock.h"
 
