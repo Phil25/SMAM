@@ -4,26 +4,21 @@ sudo: require
 language: cpp
 compiler: gcc
 
-before_install:
-    - sudo apt-get install -y libcurl4-gnutls-dev
-    - sudo apt-get install -y libxml++2.6-dev
-
 addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
         packages:
+            - libcurl4-gnutls-dev
+            - libxml++2.6-dev
             - gcc-6
             - g++-6
             - cmake
         update: true
 
+install:
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+
 script:
-    - sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
-    - sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
-    - mkdir build
-    - cd build
-    - cmake ..
-    - cmake --build .
-    - ./bin/tests
+    - mkdir build && cd build && cmake .. && cmake --build . && ./bin/tests
