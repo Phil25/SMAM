@@ -10,6 +10,7 @@ target_sources(tests
 # Tests
   utilstest.cpp
   amscrapertest.cpp
+  ltscrapertest.cpp
   installertest.cpp
 )
 
@@ -23,6 +24,7 @@ target_link_libraries(tests
 
 # Scrapers
   amscraper
+  ltscraper
 
 # Utilities
   utils_misc

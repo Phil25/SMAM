@@ -20,3 +20,11 @@ target_sources(amscraper
 )
 target_link_libraries(amscraper scraper ${LIBXML++_LIBRARIES})
 target_include_directories(amscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})
+
+add_library(ltscraper)
+target_sources(ltscraper
+  PRIVATE ltscraper.cpp
+  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ltscraper.h
+)
+target_link_libraries(ltscraper scraper ${LIBXML++_LIBRARIES})
+target_include_directories(ltscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})

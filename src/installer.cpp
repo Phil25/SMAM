@@ -5,6 +5,9 @@
 #include "utils/file.hpp"
 #include "utils/version.h"
 
+#include "scrapers/amscraper.h"
+#include "scrapers/ltscraper.h"
+
 static std::vector<std::string> findMatches(
 	const std::string base,
 	const Attachments& attachments
@@ -80,6 +83,7 @@ Installer::ScraperArray Installer::scrapers;
 void Installer::initScrapers(Downloader& d)
 {
 	scrapers[0] = std::make_shared<AMScraper>(d);
+	scrapers[1] = std::make_shared<LTScraper>(d);
 }
 
 auto Installer::install(const std::string& id, Database& db) -> FileVector

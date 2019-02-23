@@ -1,7 +1,3 @@
-#include <string>
-#include <vector>
-#include <fstream>
-
 #include "gtest/gtest.h"
 
 #include "../src/scrapers/amscraper.h"

@@ -1,7 +1,3 @@
-#include <string>
-#include <vector>
-#include <fstream>
-
 #include "gtest/gtest.h"
 
 #include "databasemock.h"
@@ -43,7 +39,7 @@ protected:
 TEST_F(InstallerTest, Accelerator)
 {
 	std::vector<File> expected = {
-		File("a:2.4.3-git127-b302f00-linux.zip", "https://builds.limetech.io/files/accelerator-2.4.3-git127-b302f00-linux.zip"),
+		File("a:accelerator-2.4.3-git127-b302f00-linux.zip", "https://builds.limetech.io/files/accelerator-2.4.3-git127-b302f00-linux.zip"),
 	};
 
 	compare(expected, Installer::install("accelerator", db));

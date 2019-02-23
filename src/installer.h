@@ -7,12 +7,11 @@
 #include "downloader.h"
 
 #include "scrapers/scraper.h"
-#include "scrapers/amscraper.h"
 
 namespace Installer
 {
 	using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
-	using ScraperArray = std::array<std::shared_ptr<Scraper>, 1>;
+	using ScraperArray = std::array<std::shared_ptr<Scraper>, 2>;
 	using FileVector = std::vector<File>;
 
 	extern ScraperArray scrapers;
