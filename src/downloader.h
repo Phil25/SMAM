@@ -4,7 +4,8 @@
 #include <string>
 #include <fstream>
 
-class Downloader{
+class Downloader
+{
 	using cstr = const std::string;
 	typedef size_t (*curlcb)(const char*, size_t, size_t, void*);
 

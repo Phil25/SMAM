@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-namespace Utils{
+namespace Utils
+{
 	using cstr = const std::string;
 	using StringVector = std::vector<std::string>;
 
@@ -15,6 +16,4 @@ namespace Utils{
 
 	// extract string from data between `from` and `to`
 	std::string extract(cstr& data, cstr& from, cstr& to);
-
-	size_t min(size_t, size_t);
 }

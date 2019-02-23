@@ -1,26 +1,28 @@
 #pragma once
 
+#include <map>
+#include <memory>
+#include <vector>
+
 #include "../downloader.h"
 
-class Scraper{
+using Attachments = std::map<std::string, std::string>;
+
+class Scraper
+{
 	using cstr = const std::string;
+	using strv = const std::string_view;
 
 protected:
 	Downloader& downloader;
 	cstr aptUrl, dataFrom, dataTo;
 
-	Scraper(Downloader& downloader, cstr& url="", cstr& from="", cstr& to="");
+	Scraper(Downloader& downloader, strv url, cstr& from="", cstr& to="");
 	virtual ~Scraper();
 
 public:
-	// return proper name of target (resolve version wildcard)
-	virtual std::string getFileName(cstr& name) const = 0;
-
-	// return download url of a target
-	virtual std::string getFileUrl(cstr& name, char tag) const = 0;
-
-	// fetch url contents
-	virtual void fetch(const std::string& url) = 0;
+	// fetch file download urls
+	virtual Attachments fetch(const std::string& url) = 0;
 
 	// returns whether this scraper is applicable for given url
 	bool match(const std::string& url) const;

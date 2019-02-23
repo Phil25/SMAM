@@ -1,9 +1,12 @@
+#pragma once
+
 #include <map>
 #include <string>
 
 #include "../src/downloader.h"
 
-class DownloaderMock : public Downloader{
+class DownloaderMock : public Downloader
+{
 	using cstr = const std::string;
 
 public:

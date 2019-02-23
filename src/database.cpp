@@ -1,8 +1,11 @@
 #include "database.h"
 
-Database::Database(){}
+Database::Database()
+{
+}
 
-std::vector<std::string> Database::fetch(const std::string& id) const{
+Plan Database::fetch(const std::string& id) const
+{
 	(void)id;
 	return {};
 }

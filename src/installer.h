@@ -1,20 +1,31 @@
 #pragma once
 
-#include "plan.h"
+#include <string>
+#include <vector>
+
 #include "database.h"
 #include "downloader.h"
 
-class Installer{
-	const Database database;
-	Plan plan;
+#include "scrapers/scraper.h"
+#include "scrapers/amscraper.h"
 
-public:
-	// Instantiate all scrapers in static vector of scraper.hpp
-	Installer(const Database&, Downloader&);
+namespace Installer
+{
+	using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
+	using ScraperArray = std::array<std::shared_ptr<Scraper>, 1>;
+	using FileVector = std::vector<File>;
+
+	extern ScraperArray scrapers;
+
+	// Initialize scrapers with appropriate Downloader
+	void initScrapers(Downloader&);
 
 	// Install addon of the specified id
-	void install(const std::string& id);
+	auto install(const std::string& id, Database&) -> FileVector;
 
-	// get the current plan of the installation
-	const Plan& getPlan() const;
+	// Install addons of the specified ids
+	void install(const std::vector<std::string>& ids, Database&);
+
+	// Get std::optional of a scraper
+	auto getScraper(const std::string& url) -> MaybeScraper;
 };

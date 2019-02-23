@@ -18,5 +18,5 @@ target_sources(amscraper
   PRIVATE amscraper.cpp
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/amscraper.h
 )
-target_link_libraries(amscraper utilsamnode scraper ${LIBXML++_LIBRARIES})
+target_link_libraries(amscraper scraper ${LIBXML++_LIBRARIES})
 target_include_directories(amscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})

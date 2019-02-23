@@ -446,7 +446,7 @@ img.proxied-img { max-width: 100%; max-height: 400px; }
 <script type="text/javascript" src="clientscript/yui/connection/connection-min.js?v=387"></script>
 <script type="text/javascript">
 <!--
-var SESSIONURL = "s=a59969c161c4e0ac23ef19c7cbb9ee5e&";
+var SESSIONURL = "s=dc5547938c38333b03dff89b0ac17723&";
 var SECURITYTOKEN = "guest";
 var IMGDIR_MISC = "images/misc";
 var vb_disable_ajax = parseInt("0", 10);
@@ -470,7 +470,7 @@ var vb_disable_ajax = parseInt("0", 10);
 <tr>
 	<td class="tcat">
 		<div class="smallfont" style="float:right">
-			<strong>Thread</strong>:  <a style="text-decoration: underline" href="showthread.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;p=708265#post708265">[ANY] AFK Manager (Version 4.3.0 / Updated July 2nd 2018)</a>
+			<strong>Thread</strong>:  <a style="text-decoration: underline" href="showthread.php?s=dc5547938c38333b03dff89b0ac17723&amp;p=708265#post708265">[ANY] AFK Manager (Version 4.3.0 / Updated July 2nd 2018)</a>
 		</div>
 		View Single Post
 	</td>
@@ -508,7 +508,7 @@ cellpadding="6" cellspacing="0" border="0" width="100%" align="center">
 			<div id="postmenu_708265">
 	                        
 				
-					<a class="bigusername" href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">Rothgar</a>
+					<a class="bigusername" href="member.php?s=dc5547938c38333b03dff89b0ac17723&amp;u=32091">Rothgar</a>
 					<script type="text/javascript"> vbmenu_register("postmenu_708265", true); </script>
 				
 			</div>
@@ -524,7 +524,7 @@ cellpadding="6" cellspacing="0" border="0" width="100%" align="center">
 			
 			
 			
-				<div class="smallfont" style="margin: 0.5em;"><a href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">
+				<div class="smallfont" style="margin: 0.5em;"><a href="member.php?s=dc5547938c38333b03dff89b0ac17723&amp;u=32091">
 					
 						<img src="customavatars/avatar32091_1.gif" alt="Rothgar's Avatar" border="0" /></a>
 					
@@ -584,7 +584,7 @@ cellpadding="6" cellspacing="0" border="0" width="100%" align="center">
 						
 						
 						
-							<a href="newreply.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newreply&amp;p=708265" rel="nofollow"><img src="images/buttons/quote.gif" alt="Reply With Quote" border="0" /></a>
+							<a href="newreply.php?s=dc5547938c38333b03dff89b0ac17723&amp;do=newreply&amp;p=708265" rel="nofollow"><img src="images/buttons/quote.gif" alt="Reply With Quote" border="0" /></a>
 						
 						
 						
@@ -866,7 +866,7 @@ The compiled download URL should be static and contain the latest version of the
 		<td>
 		
 			
-				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=160240&amp;d=1484963606">afk_manager_old.zip</a> (37.0 KB, 2134 views)
+				<a href="attachment.php?s=dc5547938c38333b03dff89b0ac17723&amp;attachmentid=160240&amp;d=1484963606">afk_manager_old.zip</a> (37.0 KB, 2290 views)
 			
 		
 	</td>
@@ -875,7 +875,7 @@ The compiled download URL should be static and contain the latest version of the
 		<td>
 		
 			
-				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=166646&amp;d=1510967008">afk_manager.phrases.txt</a> (14.3 KB, 2616 views)
+				<a href="attachment.php?s=dc5547938c38333b03dff89b0ac17723&amp;attachmentid=166646&amp;d=1510967008">afk_manager.phrases.txt</a> (14.3 KB, 2876 views)
 			
 		
 	</td>
@@ -884,7 +884,7 @@ The compiled download URL should be static and contain the latest version of the
 		<td>
 		
 			
-				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=168028&amp;d=1516358726">afk_manager.inc</a> (3.2 KB, 1366 views)
+				<a href="attachment.php?s=dc5547938c38333b03dff89b0ac17723&amp;attachmentid=168028&amp;d=1516358726">afk_manager.inc</a> (3.2 KB, 1524 views)
 			
 		
 	</td>
@@ -894,7 +894,7 @@ The compiled download URL should be static and contain the latest version of the
 		
 			
 				<a href="http://www.sourcemod.net/vbcompiler.php?file_id=170330"><strong>Get Plugin</strong></a> or
-				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=170330&amp;d=1530622367">Get Source</a> (afk_manager4.sp - 1816 views - 79.5 KB)
+				<a href="attachment.php?s=dc5547938c38333b03dff89b0ac17723&amp;attachmentid=170330&amp;d=1530622367">Get Source</a> (afk_manager4.sp - 2248 views - 79.5 KB)
 			
 		
 	</td>
@@ -903,7 +903,7 @@ The compiled download URL should be static and contain the latest version of the
 		<td>
 		
 			
-				<a href="attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;attachmentid=170331&amp;d=1530622381">afk_manager.changelog.txt</a> (24.2 KB, 403 views)
+				<a href="attachment.php?s=dc5547938c38333b03dff89b0ac17723&amp;attachmentid=170331&amp;d=1530622381">afk_manager.changelog.txt</a> (24.2 KB, 494 views)
 			
 		
 	</td>
@@ -988,17 +988,17 @@ The compiled download URL should be static and contain the latest version of the
 		<td class="thead">Rothgar</td>
 	</tr>
 	
-		<tr><td class="vbmenu_option"><a href="member.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;u=32091">View Public Profile</a></td></tr>
+		<tr><td class="vbmenu_option"><a href="member.php?s=dc5547938c38333b03dff89b0ac17723&amp;u=32091">View Public Profile</a></td></tr>
 	
 	
-		<tr><td class="vbmenu_option"><a href="private.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=newpm&amp;u=32091" rel="nofollow">Send a private message to Rothgar</a></td></tr>
+		<tr><td class="vbmenu_option"><a href="private.php?s=dc5547938c38333b03dff89b0ac17723&amp;do=newpm&amp;u=32091" rel="nofollow">Send a private message to Rothgar</a></td></tr>
 	
 	
 	
 		<tr><td class="vbmenu_option"><a href="http://www.dawgclan.net" rel="nofollow noopener" target="_blank">Visit Rothgar's homepage!</a></td></tr>
 	
 	
-		<tr><td class="vbmenu_option"><a href="search.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&amp;do=finduser&amp;u=32091" rel="nofollow">Find More Posts by Rothgar</a></td></tr>
+		<tr><td class="vbmenu_option"><a href="search.php?s=dc5547938c38333b03dff89b0ac17723&amp;do=finduser&amp;u=32091" rel="nofollow">Find More Posts by Rothgar</a></td></tr>
 	
 	
 	

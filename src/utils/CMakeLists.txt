@@ -1,30 +1,16 @@
 project(SMAM_src_utils)
 
-include(FindPkgConfig)
-pkg_check_modules(LIBXML++ libxml++-3.0)
-if(NOT DEFINED LIBXML++_LIBRARIES)
-  pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
-endif()
-
 # Utils
-add_library(utilsmisc)
-target_sources(utilsmisc
+add_library(utils_misc)
+target_sources(utils_misc
   PRIVATE misc.cpp
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/misc.h
 )
-target_include_directories(utilsmisc PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(utils_misc PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-add_library(utilsversion)
-target_sources(utilsversion
+add_library(utils_version)
+target_sources(utils_version
   PRIVATE version.cpp
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/version.h
 )
-target_include_directories(utilsversion PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-
-add_library(utilsamnode)
-target_sources(utilsamnode
-  PRIVATE amnode.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/amnode.h
-)
-target_link_libraries(utilsamnode ${LIBXML++_LIBRARIES})
-target_include_directories(utilsamnode PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})
+target_include_directories(utils_version PUBLIC ${CMAKE_CURRENT_LIST_DIR})

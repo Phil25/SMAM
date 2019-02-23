@@ -2,15 +2,19 @@
 
 #include "misc.h"
 
-namespace Utils{
-	// return const reference to string representing biggest version value
-	cstr& biggestVer(const StringVector& versions);
+namespace Utils
+{
 
-	class Version{
+	class Version
+	{
 		std::vector<int> nums;
 
 	public:
 		Version(std::string version);
 		int compare(const Version& other) const;
+
+		// return string representing biggest version value
+		static const std::string& biggest(const StringVector& versions);
 	};
+
 }

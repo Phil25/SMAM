@@ -1,97 +1,175 @@
+#include <iostream>
+#include <libxml++/libxml++.h>
+
 #include "amscraper.h"
 #include "../utils/version.h"
-#include "../utils/amnode.h"
 
-// build url for downloading attachment
-static std::string buildUrl(const std::string& id, bool forumCompilable);
+constexpr std::string_view URL = "https://forums.alliedmods.net/";
+constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
 
-// check if the file is a forum-compilable source
-static bool isForumCompilable(char tag, const std::string& name);
+class AMNode
+{
+	const xmlpp::Node* node;
+	const std::vector<AMNode> children;
+	const std::string url;
 
-// check if name ends with ".sp"
-static bool isFileSource(const std::string& name);
-
-// parse attachments from the part of retreived AlliedMods thread
-static Attachments parseAttachments(const xmlpp::DomParser&);
-
-// populate vector of attachments with children of root recursively
-static void populateAttachments(const AMNode& root, Attachments&);
-
-AMScraper::AMScraper(Downloader& downloader):
-	Scraper(downloader,
-		"https://forums.alliedmods.net",
-		"<!-- attachments -->",
-		"<!-- / attachments -->"
-	)
-{}
-
-AMScraper::~AMScraper(){}
-
-void AMScraper::fetch(const std::string& url){
-	xmlpp::DomParser contents;
-	try{
-		contents.parse_memory(downloader.html(url, dataFrom, dataTo));
-		if(contents) attachments = parseAttachments(contents);
-	}catch(const std::exception& e){}
-}
-
-std::string AMScraper::getFileName(const std::string& name) const{
-	int wcPos = name.find('*');
-	return wcPos == (int)std::string::npos
-		? name : getWildcard(name, wcPos);
-}
-
-std::string AMScraper::getFileUrl(const std::string& name, char tag) const{
-	if(Utils::isLink(name)) return name;
-
-	auto it = attachments.find(name);
-	if(it == attachments.end()) return "";
-
-	return buildUrl(it->second, isForumCompilable(tag, name));
-}
-
-std::string AMScraper::getWildcard(const std::string& name, int at) const{
-	std::string start = name.substr(0, at),
-				end = name.substr(at+1, name.size());
-	std::vector<std::string> versions;
-
-	for(const auto& entry : attachments){
-		std::string version = Utils::extract(entry.first, start, end);
-		if(!version.empty())
-			versions.push_back(version);
+public:
+	AMNode(const xmlpp::Node* node):
+		node(node),
+		children(fetchChildren()),
+		url(fetchUrl())
+	{
 	}
 
-	return std::string(start + Utils::biggestVer(versions) + end);
+private:
+	const std::vector<AMNode> fetchChildren() const
+	{
+		std::vector<AMNode> nodes;
+
+		for(const auto child : node->get_children())
+		{
+			nodes.push_back(AMNode(child));
+		}
+
+		return nodes;
+	}
+
+public:
+	bool isAnchor() const
+	{
+		return node->get_name() == "a";
+	}
+
+	std::string getName() const
+	{
+		std::string name;
+		auto sourceNode = node->get_first_child();
+		auto t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+
+		if(!t) // t->get_content() is "<strong>Get Plugin</strong>"
+		{
+			sourceNode = node // hop over to TextNode containing filename
+				->get_next_sibling()
+				->get_next_sibling()
+				->get_next_sibling();
+
+			t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+
+			if(t) // should always be true
+			{
+				name = Utils::extract(t->get_content(), " (", ".sp - ");
+				name.append(".smx");
+			}
+		}
+		else if(t->get_content() == "Get Source")
+		{
+			sourceNode = node->get_next_sibling();
+			t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+
+			if(t) // should always be true
+			{
+				name = Utils::extract(t->get_content(), " (", " - ");
+			}
+		}
+		else // t->get_content() is actual name of attachment
+		{
+			name = t->get_content();
+		}
+
+		return name;
+	}
+
+	std::string fetchUrl() const
+	{
+		auto e = dynamic_cast<const xmlpp::Element*>(node);
+		if(!e) return "";
+
+		std::string url = e->get_attribute_value("href");
+
+		if(!Utils::isLink(url))
+		{
+			url.insert(0, URL);
+		}
+
+		return url;
+	}
+
+	const std::string& getUrl() const
+	{
+		return url;
+	}
+
+	const std::vector<AMNode>& getChildren() const
+	{
+		return children;
+	}
+};
+
+static bool isUrlReplaceable(const std::string& url)
+{
+	return url.compare(0, URL_ALT.size(), URL_ALT) == 0;
 }
 
-std::string buildUrl(const std::string& id, bool forumCompilable){
-	return forumCompilable ? // source code that compiles on forums
-		"http://www.sourcemod.net/vbcompiler.php?file_id=" +id :
-		"https://forums.alliedmods.net/attachment.php?attachmentid=" +id;
+static void populateAttachments(const AMNode& node, Attachments& map)
+{
+	if(node.isAnchor())
+	{
+		std::string name = node.getName();
+		auto entry = map.find(name);
+
+		if(entry == map.end()) // not found
+		{
+			map.insert(std::make_pair(name, node.getUrl()));
+		}
+		else if(isUrlReplaceable(entry->second))
+		{
+			entry->second = node.getUrl();
+		}
+	}
+	else
+	{
+		for(const auto& child : node.getChildren())
+		{
+			populateAttachments(child, map);
+		}
+	}
 }
 
-bool isForumCompilable(char tag, const std::string& name){
-	return tag == 'p' && isFileSource(name);
-}
-
-bool isFileSource(const std::string& name){
-	int size = name.size();
-	if(size < 3) return false;
-	return name[size -3] == '.'
-		&& name[size -2] == 's'
-		&& name[size -1] == 'p';
-}
-
-Attachments parseAttachments(const xmlpp::DomParser& parser){
+static Attachments fetchAttachments(const xmlpp::DomParser& parser)
+{
 	const AMNode root = AMNode(parser.get_document()->get_root_node());
+
 	Attachments attachments;
 	populateAttachments(root, attachments); // recursive
+
 	return attachments;
 }
 
-void populateAttachments(const AMNode& node, Attachments& map){
-	if(node.isValidAnchor())
-		map.insert(std::make_pair(node.getName(), node.getId()));
-	else for(const auto& child : node.getChildren())
-		populateAttachments(child, map);
+AMScraper::AMScraper(Downloader& downloader):
+	Scraper(downloader,
+		URL,
+		"<!-- attachments -->",
+		"<!-- / attachments -->"
+	)
+{
+}
+
+AMScraper::~AMScraper()
+{
+}
+
+Attachments AMScraper::fetch(const std::string& url)
+{
+	xmlpp::DomParser contents;
+
+	try
+	{
+		contents.parse_memory(downloader.html(url, dataFrom, dataTo));
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Exception: " << e.what() << std::endl;
+	}
+
+	return fetchAttachments(contents);
 }

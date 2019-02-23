@@ -2,25 +2,31 @@ add_executable(tests)
 
 target_sources(tests
   PRIVATE
-    downloadermock.cpp
-    databasemock.cpp
-    utilstest.cpp
-    amscrapertest.cpp
-    plantest.cpp
+
+# Mocks
+  downloadermock.cpp
+  databasemock.cpp
+
+# Tests
+  utilstest.cpp
+  amscrapertest.cpp
+  installertest.cpp
 )
 
 target_link_libraries(tests
   gtest_main
+
+# General
   downloader
   database
-  plan
-  scraper
+  installer
+
+# Scrapers
   amscraper
 
 # Utilities
-  utilsmisc
-  utilsversion
-  utilsamnode
+  utils_misc
+  utils_version
 
 # Thrid party
   -lcurl
