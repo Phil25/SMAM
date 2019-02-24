@@ -119,7 +119,7 @@ static void populateAttachments(const AMNode& node, Attachments& map)
 
 		if(entry == map.end()) // not found
 		{
-			map.insert(std::make_pair(name, node.getUrl()));
+			map[name] = node.getUrl();
 		}
 		else if(isUrlReplaceable(entry->second))
 		{
