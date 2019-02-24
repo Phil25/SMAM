@@ -27,6 +27,11 @@ bool Utils::isLink(const std::string& str)
 
 std::string Utils::extract(cstr& data, cstr& from, cstr& to)
 {
+	if(!from.size())
+	{
+		return data;
+	}
+
 	size_t begin = data.find(from, 0);
 	if(begin == (size_t)std::string::npos)
 	{

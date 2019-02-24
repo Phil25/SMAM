@@ -1,10 +1,13 @@
 project(SMAM_src_scrapers)
 
 include(FindPkgConfig)
+
 pkg_check_modules(LIBXML++ libxml++-3.0)
 if(NOT DEFINED LIBXML++_LIBRARIES)
   pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
 endif()
+
+pkg_check_modules(JSONCPP jsoncpp)
 
 add_library(scraper)
 target_sources(scraper
@@ -28,3 +31,11 @@ target_sources(ltscraper
 )
 target_link_libraries(ltscraper scraper ${LIBXML++_LIBRARIES})
 target_include_directories(ltscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})
+
+add_library(ghscraper)
+target_sources(ghscraper
+  PRIVATE ghscraper.cpp
+  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ghscraper.h
+)
+target_link_libraries(ghscraper scraper ${JSONCPP_LIBRARIES})
+target_include_directories(ghscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${JSONCPP_INCLUDE_DIRS})

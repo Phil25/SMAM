@@ -33,5 +33,6 @@ std::map<std::string, std::string> DownloaderMock::dataLink
 	{"https://forums.alliedmods.net/showpost.php?p=665771", "funcommandsx"},
 	{"https://builds.limetech.io/?p=steamtools", "steamtools"},
 	{"https://builds.limetech.io/?p=tf2items", "tf2items"},
+	{"https://api.github.com/repos/FlaminSarge/tf2attributes/releases/latest", "tf2attributes"},
 	{"https://forums.alliedmods.net/showpost.php?p=1590169", "thriller"},
 };

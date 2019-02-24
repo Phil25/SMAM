@@ -14,7 +14,7 @@ class Downloader
 public:
 	Downloader();
 
-	virtual std::string html(cstr& url, cstr& from, cstr& to);
+	virtual std::string html(cstr& url, cstr& from="", cstr& to="");
 	virtual bool file(cstr& url, cstr& dest);
 
 private:

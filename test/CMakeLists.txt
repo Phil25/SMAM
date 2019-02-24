@@ -11,6 +11,7 @@ target_sources(tests
   utilstest.cpp
   amscrapertest.cpp
   ltscrapertest.cpp
+  ghscrapertest.cpp
   installertest.cpp
 )
 
@@ -25,6 +26,7 @@ target_link_libraries(tests
 # Scrapers
   amscraper
   ltscraper
+  ghscraper
 
 # Utilities
   utils_misc
