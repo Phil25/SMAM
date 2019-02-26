@@ -18,8 +18,8 @@ Utils::StringVector Utils::toLines(const std::string& data)
 
 bool Utils::isLink(const std::string& str)
 {
-	constexpr std::string_view https = "https://";
-	constexpr std::string_view http = "http://";
+	static constexpr std::string_view https = "https://";
+	static constexpr std::string_view http = "http://";
 
 	return str.compare(0, https.size(), https) == 0
 		|| str.compare(0, http.size(), http) == 0;
