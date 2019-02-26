@@ -25,26 +25,12 @@ bool Utils::isLink(const std::string& str)
 		|| str.compare(0, http.size(), http) == 0;
 }
 
-std::string Utils::extract(cstr& data, cstr& from, cstr& to)
+std::string Utils::extract(cstr& s, cstr& from, cstr& to)
 {
-	if(!from.size())
-	{
-		return data;
-	}
+	if(from.empty() || to.empty()) return s;
 
-	size_t begin = data.find(from, 0);
-	if(begin == (size_t)std::string::npos)
-	{
-		return "";
-	}
+	size_t start = s.find(from) + from.size();
+	size_t end = s.find(to, start);
 
-	begin += from.size();
-
-	size_t end = data.find(to, begin);
-	if(end == (size_t)std::string::npos)
-	{
-		return "";
-	}
-
-	return data.substr(begin, end -begin);
+	return s.substr(start, end -start);
 }

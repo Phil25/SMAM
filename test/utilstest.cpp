@@ -44,6 +44,15 @@ TEST(UtilsTest, Extract)
 
 	std::string ln2 = Utils::extract("ln1\nln2\nln3", "ln1", "ln3");
 	EXPECT_EQ("\nln2\n", ln2);
+
+	std::string noextract1 = Utils::extract("No extract", "", "");
+	EXPECT_EQ("No extract", noextract1);
+
+	std::string noextract2 = Utils::extract("No extract", "No", "");
+	EXPECT_EQ("No extract", noextract2);
+
+	std::string noextract3 = Utils::extract("No extract", "", "extract");
+	EXPECT_EQ("No extract", noextract3);
 }
 
 TEST(UtilsTest, VersionBiggest)
