@@ -5,10 +5,10 @@ target_sources(tests
 
 # Mocks
   downloadermock.cpp
-  databasemock.cpp
 
 # Tests
   utilstest.cpp
+  databasetest.cpp
   amscrapertest.cpp
   ltscrapertest.cpp
   ghscrapertest.cpp

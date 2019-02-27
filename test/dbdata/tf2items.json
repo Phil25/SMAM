@@ -1,0 +1,7 @@
+{
+	"id": "tf2items",
+	"url": "https://builds.limetech.io/?p=tf2items",
+	"files": [
+		"a:.*"
+	]
+}

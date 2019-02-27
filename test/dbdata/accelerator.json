@@ -1,0 +1,7 @@
+{
+	"id": "accelerator",
+	"url": "https://builds.limetech.io/?p=accelerator",
+	"files": [
+		"a:.*"
+	]
+}

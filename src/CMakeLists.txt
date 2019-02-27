@@ -1,5 +1,8 @@
 project(SMAM_src)
 
+include(FindPkgConfig)
+pkg_check_modules(JSONCPP jsoncpp)
+
 # Downloader
 add_library(downloader)
 target_sources(downloader
@@ -14,7 +17,8 @@ target_sources(database
   PRIVATE database.cpp
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/database.h
 )
-target_include_directories(database PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_link_libraries(database ${JSONCPP_LIBRARIES})
+target_include_directories(database PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${JSONCPP_INCLUDE_DIRS})
 
 # Installer
 add_library(installer)

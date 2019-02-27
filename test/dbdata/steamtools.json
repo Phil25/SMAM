@@ -1,0 +1,7 @@
+{
+	"id": "steamtools",
+	"url": "https://builds.limetech.io/?p=steamtools",
+	"files": [
+		"a:.*"
+	]
+}

@@ -90,9 +90,9 @@ void Installer::initScrapers(Downloader& d)
 
 auto Installer::install(const std::string& id, Database& db) -> FileVector
 {
-	auto [url, files] = db.fetch(id);
+	auto [url, files] = db.get(id);
 
-	if(url.size())
+	if(!url.empty())
 	{
 		Attachments attachments;
 
@@ -105,17 +105,6 @@ auto Installer::install(const std::string& id, Database& db) -> FileVector
 	}
 
 	return files;
-}
-
-void Installer::install(const std::vector<std::string>& ids, Database& db)
-{
-	for(const std::string& id : ids)
-	{
-		if(!install(id, db).size())
-		{
-			std::cerr << "Could not find addon: " << id << std::endl;
-		}
-	}
 }
 
 auto Installer::getScraper(const std::string& url) -> MaybeScraper
