@@ -4,8 +4,8 @@
 #include "amscraper.h"
 #include "../utils/version.h"
 
-constexpr std::string_view URL = "https://forums.alliedmods.net/";
-constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
+static constexpr std::string_view URL = "https://forums.alliedmods.net/";
+static constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
 
 /*
  * Wrapper around xmlpp::Node* for dealing with dynamic_casting
