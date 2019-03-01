@@ -118,7 +118,6 @@ static void processFiles(
 
 Installer::ScraperArray Installer::scrapers;
 
-
 /*
  * Initialize std::array<Scraper, 3> of usable Scraper instances.
  */
@@ -132,7 +131,7 @@ void Installer::initScrapers(Downloader& d)
 /*
  * Return vector of fully processed File instances.
  */
-auto Installer::install(const std::string& id, Database& db) -> FileVector
+auto Installer::getFiles(Utils::cstr& id, const Database& db) -> FileVector
 {
 	auto [url, files] = db.get(id);
 

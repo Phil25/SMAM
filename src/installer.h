@@ -18,7 +18,7 @@ namespace Installer
 
 	void initScrapers(Downloader&);
 
-	auto install(const std::string& id, Database&) -> FileVector;
+	auto getFiles(const std::string& id, const Database&) -> FileVector;
 
 	auto getScraper(const std::string& url) -> MaybeScraper;
 };
