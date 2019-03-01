@@ -3,7 +3,7 @@
 
 #include "database.h"
 
-static std::string URL = "https://smamdb.net/";
+static const std::string URL = "https://smamdb.net/";
 
 /*
  * Construct a URL passing requested IDs of addons as an `ids` GET
