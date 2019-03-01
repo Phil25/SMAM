@@ -8,7 +8,9 @@
 #include "downloader.h"
 #include "utils/file.hpp"
 
-// general url & vector of file names
+/*
+ * Addon's URL & vector of assoiated Files.
+ */
 using Plan = std::tuple<std::string, std::vector<File>>;
 
 class Database
@@ -21,9 +23,7 @@ class Database
 public:
 	Database(Downloader&);
 
-	// precache data for multiple potential requests
 	void precache(const std::vector<std::string>& ids);
 
-	// return plan for particular addon id
 	const Plan& get(const std::string& id) const;
 };

@@ -7,6 +7,10 @@
 constexpr std::string_view URL = "https://forums.alliedmods.net/";
 constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
 
+/*
+ * Wrapper around xmlpp::Node* for dealing with dynamic_casting
+ * and validating relevant nodes, namely anchor nodes.
+ */
 class AMNode
 {
 	const xmlpp::Node* node;
@@ -105,11 +109,26 @@ public:
 	}
 };
 
+/*
+ * Is the URL replacable (URL_ALT).
+ * URL_ALT specifies a URL for a source file (.sp) that is expected
+ * to be compilible with the forum compiler upon downloading. Not all
+ * plugins can be compiled with the forum compiler, which is why
+ * a precompiled plugin file (.smx) is usually uploaded alongside.
+ *
+ * If two of the same file names (example.smx) are found, it is assumed
+ * that the one with NONREPLACABLE URL is the precompiled one, taking
+ * priority over the REPLACABLE one.
+ */
 static bool isUrlReplaceable(const std::string& url)
 {
 	return url.compare(0, URL_ALT.size(), URL_ALT) == 0;
 }
 
+/*
+ * Recursively iterate all the nodes to get to anchor <a> nodes.
+ * Fill the `map` paramater with file names, and file download URLs.
+ */
 static void populateAttachments(const AMNode& node, Attachments& map)
 {
 	if(node.isAnchor())

@@ -12,6 +12,10 @@ Scraper::~Scraper()
 {
 }
 
+/*
+ * Is this Scraper appropriate for given URL.
+ * Used in `installer` when searching for a valid Scraper.
+ */
 bool Scraper::match(const std::string& url) const
 {
 	return url.compare(0, aptUrl.size(), aptUrl) == 0;

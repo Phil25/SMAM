@@ -7,6 +7,17 @@ static constexpr std::string_view URL = "https://builds.limetech.io/";
 static int tdCount = 0;
 static bool found = false;
 
+/*
+ * Is the <td> table node valid:
+ *
+ * - Is actually a <td>
+ *
+ * - Is it every 3rd node when iterating, starting from second;
+ *   From a table of 3 columns, Linux versions are in the second one.
+ *
+ * - Does it contain an anchor <a> node as a child.
+ *   Otherwise, it is assumed the contents are `none.`
+ */
 bool isValidTd(const xmlpp::Node* node)
 {
 	if(node->get_name() != "td")
@@ -23,6 +34,9 @@ bool isValidTd(const xmlpp::Node* node)
 	return child ? child->get_name() == "a" : false;
 }
 
+/*
+ * If a valid <td> node is found, save its name and download URL.
+ */
 void setValidTd(xmlpp::Node* node, std::string& name, std::string& url)
 {
 	auto e = dynamic_cast<const xmlpp::Element*>(node->get_first_child());
@@ -40,6 +54,10 @@ void setValidTd(xmlpp::Node* node, std::string& name, std::string& url)
 	}
 }
 
+/*
+ * Recursively iterate nodes to find a valid <td> node.
+ * Stop iterating after the first valid one is found.
+ */
 void findValidTd(xmlpp::Node* node, std::string& name, std::string& url)
 {
 	if(found) return;

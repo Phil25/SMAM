@@ -9,6 +9,9 @@
 #include "scrapers/ltscraper.h"
 #include "scrapers/ghscraper.h"
 
+/*
+ * Return vector of Attachment names matched against `base` regex.
+ */
 static std::vector<std::string> findMatches(
 	const std::string base,
 	const Attachments& attachments
@@ -35,7 +38,41 @@ static std::vector<std::string> findMatches(
 	return filtered;
 }
 
-static void parse(
+/*
+ * Process File vector altering its instances based on addon's URL
+ * and Attachments (map of file names from addon's URL to their
+ * individual download URLs; ./scrapers/scraper.h).
+ * Attachments are received from a Scraper and can be an empty object.
+ *
+ * The purpose is to obtain a File vector, each instance having appropriate
+ * File::name (instead of ex. a link or regex string), and
+ * File::url (URL from which the file can be downloaded).
+ *
+ * In most situations only File::url gets altered. In case of
+ * File::name's containing a link or regex, both fields are altered.
+ *
+ * This function will do the following for each File instance:
+ *
+ * - Check if File also appears in Attachments.
+ *   If so, it is assumed that the name is correct. URL is set.
+ *
+ * - Check if File::name is a link.
+ *   If so, it is assumed that it ends in the actual file name.
+ *   Name and URL are set.
+ *
+ * - Check if matches in Attachments can be found when File
+ *   name is treated as a regex string.
+ *   If multiple matches are found, it is assumed that Attachments
+ *   consist of similar files with a version number in the name of each.
+ *   (file-2.3.txt, file-2.4.txt, file-2.4.1.txt, etc...)
+ *   File name is set to the one containing the largest version number.
+ *   File URL is set to the Attachment URL.
+ *
+ * - Otherwise (the general case) it is assumed that the File download
+ *   URL can be obtained by combining the addon's base URL and the File
+ *   name. URL is set.
+ */
+static void processFiles(
 	const std::string& url,
 	std::vector<File>& files,
 	const Attachments& attachments // map<string, string>
@@ -62,7 +99,7 @@ static void parse(
 		}
 
 		auto names = findMatches(file.name, attachments);
-		if(names.size())
+		if(!names.empty())
 		{
 			std::string name = Utils::Version::biggest(names);
 			attachment = attachments.find(name);
@@ -81,6 +118,10 @@ static void parse(
 
 Installer::ScraperArray Installer::scrapers;
 
+
+/*
+ * Initialize std::array<Scraper, 3> of usable Scraper instances.
+ */
 void Installer::initScrapers(Downloader& d)
 {
 	scrapers[0] = std::make_shared<AMScraper>(d);
@@ -88,6 +129,9 @@ void Installer::initScrapers(Downloader& d)
 	scrapers[2] = std::make_shared<GHScraper>(d);
 }
 
+/*
+ * Return vector of fully processed File instances.
+ */
 auto Installer::install(const std::string& id, Database& db) -> FileVector
 {
 	auto [url, files] = db.get(id);
@@ -101,12 +145,15 @@ auto Installer::install(const std::string& id, Database& db) -> FileVector
 			attachments = scraper->get()->fetch(url);
 		}
 
-		parse(url, files, attachments);
+		processFiles(url, files, attachments);
 	}
 
 	return files;
 }
 
+/*
+ * Return appropriate Scraper for given URL or null.
+ */
 auto Installer::getScraper(const std::string& url) -> MaybeScraper
 {
 	for(const auto& scraper : scrapers)

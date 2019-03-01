@@ -16,12 +16,9 @@ namespace Installer
 
 	extern ScraperArray scrapers;
 
-	// Initialize scrapers with appropriate Downloader
 	void initScrapers(Downloader&);
 
-	// Install addon of the specified id
 	auto install(const std::string& id, Database&) -> FileVector;
 
-	// Get std::optional of a scraper
 	auto getScraper(const std::string& url) -> MaybeScraper;
 };

@@ -8,6 +8,10 @@ static constexpr std::string_view URL = "https://github.com/";
 static constexpr std::string_view URL_API = "https://api.github.com/repos/";
 static constexpr std::string_view RELEASES = "releases/latest";
 
+/*
+ * Get GitHub repository address from a full link.
+ * https://github.com/user/repo/ -> user/repo/
+ */
 static std::string getRepoUrl(const std::string& url)
 {
 	std::string repoUrl = url.substr(URL.size());
@@ -20,6 +24,11 @@ static std::string getRepoUrl(const std::string& url)
 	return repoUrl;
 }
 
+/*
+ * Get API URL to the latest releases from a particular GitHub
+ * repository address.
+ * user/repo -> https://api.github.com/repos/user/repo/releases/latest
+ */
 static std::string getReleasesUrl(const std::string& repoUrl)
 {
 	return std::string(URL_API).append(repoUrl).append(RELEASES);

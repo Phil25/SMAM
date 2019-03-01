@@ -2,6 +2,10 @@
 
 #include <string>
 
+/*
+ * Defines a filename, tag and the URL from which the file
+ * can be downloaded.
+ */
 struct File
 {
 	const char tag;
