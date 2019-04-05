@@ -12,6 +12,7 @@ addons:
             - libcurl4-gnutls-dev
             - libxml++2.6-dev
             - libjsoncpp-dev
+            - libboost-program-options-dev
             - gcc-7
             - g++-7
             - cmake

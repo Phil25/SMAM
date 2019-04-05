@@ -3,6 +3,8 @@ project(SMAM_src)
 include(FindPkgConfig)
 pkg_check_modules(JSONCPP jsoncpp)
 
+find_package(Boost 1.69 COMPONENTS program_options REQUIRED)
+
 # Downloader
 add_library(downloader)
 target_sources(downloader
@@ -35,5 +37,5 @@ add_subdirectory(utils)
 add_subdirectory(scrapers)
 
 # Main
-#add_executable(smam main.cpp)
-#target_link_libraries(smam PRIVATE downloader installer amscraper)
+add_executable(smam main.cpp)
+target_link_libraries(smam Boost::program_options)

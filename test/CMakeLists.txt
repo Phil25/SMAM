@@ -7,6 +7,7 @@ target_sources(tests
   downloadermock.cpp
 
 # Tests
+  optstest.cpp
   utilstest.cpp
   databasetest.cpp
   amscrapertest.cpp
@@ -34,6 +35,7 @@ target_link_libraries(tests
 
 # Thrid party
   -lcurl
+  -lboost_program_options
 )
 
 add_test(
