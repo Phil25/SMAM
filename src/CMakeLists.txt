@@ -3,7 +3,7 @@ project(SMAM_src)
 include(FindPkgConfig)
 pkg_check_modules(JSONCPP jsoncpp)
 
-find_package(Boost 1.69 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 
 # Downloader
 add_library(downloader)
