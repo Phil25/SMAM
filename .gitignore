@@ -1,5 +1,7 @@
 # ignore build
 build*/
+release*/
+debug*/
 
 # ignore everything in thirdparty
 thirdparty/*
