@@ -38,6 +38,11 @@ add_subdirectory(scrapers)
 
 # Main
 add_executable(smam main.cpp)
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  target_sources(smam PRIVATE ../test/downloadermock.cpp)
+endif()
+
 target_link_libraries(smam
 # General
   downloader

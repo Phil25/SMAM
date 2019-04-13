@@ -2,14 +2,25 @@
 
 #include "opts.hpp"
 #include "installer.h"
+
+#ifdef NDEBUG
 #include "downloader.h"
+#else
+#include "../test/downloadermock.h"
+#endif
 
 constexpr char cr = '\n';
 constexpr char tab = '\t';
 
 void install(const Opts& opts)
 {
+
+#ifdef NDEBUG
 	Downloader down;
+#else
+	DownloaderMock down;
+#endif
+
 	Database db(down);
 	Installer::initScrapers(down);
 
