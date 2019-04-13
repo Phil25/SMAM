@@ -1,9 +1,30 @@
 #include <iostream>
 
 #include "opts.hpp"
+#include "installer.h"
+#include "downloader.h"
 
-void install(const Opts&)
+constexpr char cr = '\n';
+constexpr char tab = '\t';
+
+void install(const Opts& opts)
 {
+	Downloader down;
+	Database db(down);
+	Installer::initScrapers(down);
+
+	const auto& addons = opts.getAddons();
+	db.precache(addons);
+
+	for(const auto& addon : addons)
+	{
+		std::cout << "Installing " << addon << "..." << cr;
+		for(const auto& file : Installer::getFiles(addon, db))
+		{
+			std::cout << tab << "    file : " << file.name << cr;
+			std::cout << tab << "get from : " << file.url << cr;
+		}
+	}
 }
 
 void remove(const Opts&)
@@ -29,6 +50,11 @@ int main(int argc, const char* argv[])
 	else
 	{
 		const auto& command = opts.getCommand();
+
+		if(opts.quiet())
+		{
+			std::cout.rdbuf(nullptr); // mute std::cout
+		}
 
 		try
 		{

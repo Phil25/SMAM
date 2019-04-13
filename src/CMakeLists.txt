@@ -38,4 +38,22 @@ add_subdirectory(scrapers)
 
 # Main
 add_executable(smam main.cpp)
-target_link_libraries(smam Boost::program_options)
+target_link_libraries(smam
+# General
+  downloader
+  database
+  installer
+
+# Scrapers
+  amscraper
+  ltscraper
+  ghscraper
+
+# Utilities
+  utils_misc
+  utils_version
+
+# Thrid party
+  -lcurl
+  -lboost_program_options
+)
