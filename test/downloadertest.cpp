@@ -14,6 +14,14 @@ protected:
 	Downloader down;
 };
 
+int getFileSize(const char* path)
+{
+	std::ifstream ifs(path, std::ios::ate);
+	int size = ifs.tellg();
+	ifs.close();
+	return size;
+}
+
 TEST_F(DownloaderTest, TF2Items)
 {
 	auto result = down.html(
@@ -54,4 +62,28 @@ TEST_F(DownloaderTest, TF2Attributes)
 		"node_id\": \"", "=\""
 	);
 	EXPECT_EQ("MDc6UmVsZWFzZTE0OTE2MjE", result);
+}
+
+TEST_F(DownloaderTest, TF2ItemsFiles)
+{
+	ASSERT_TRUE(down.file("https://builds.limetech.io/files/tf2items-1.6.4-hg279-linux.zip", "tf2items-1.6.4-hg279-linux.zip"));
+	EXPECT_EQ(77707, getFileSize("tf2items-1.6.4-hg279-linux.zip"));
+}
+
+TEST_F(DownloaderTest, ThrillerFiles)
+{
+	ASSERT_TRUE(down.file("http://www.sourcemod.net/vbcompiler.php?file_id=128466", "thriller.smx"));
+	EXPECT_EQ(3691, getFileSize("thriller.smx"));
+
+	ASSERT_TRUE(down.file("https://forums.alliedmods.net/attachment.php?attachmentid=133555&d=1400274898", "thriller.plugin.txt"));
+	EXPECT_EQ(656, getFileSize("thriller.plugin.txt"));
+}
+
+TEST_F(DownloaderTest, TF2AttributesFiles)
+{
+	ASSERT_TRUE(down.file("https://github.com/FlaminSarge/tf2attributes/releases/download/v1.2.1/tf2attributes.smx", "tf2attributes.smx"));
+	EXPECT_EQ(12701, getFileSize("tf2attributes.smx"));
+
+	ASSERT_TRUE(down.file("https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt", "tf2.attributes.txt"));
+	EXPECT_EQ(3287, getFileSize("tf2.attributes.txt"));
 }

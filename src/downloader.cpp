@@ -47,18 +47,18 @@ bool Downloader::file(cstr& url, cstr& dest)
 		return false;
 	}
 
-	std::ofstream tempfile(dest);
-	set_opts(url, write, &tempfile);
+	std::ofstream ofs(dest);
+	set_opts(url, write, &ofs);
 
 	CURLcode res = curl_easy_perform(curl);
-	bool success = res != CURLE_OK;
+	bool success = res == CURLE_OK;
 
 	if(!success)
 	{
-		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
+		std::cerr << "Error: " << curl_easy_strerror(res) << '\n';
 	}
 
-	tempfile.close();
+	ofs.close();
 	curl_easy_cleanup(curl);
 
 	return success;
