@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "downloader.h"
 #include "utils/misc.h"
 
@@ -27,10 +29,11 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 	{
-		fprintf(stderr, "Error: %s\n", curl_easy_strerror(res));
+		std::cerr << "Error: " << curl_easy_strerror(res) << '\n';
 	}
 
 	curl_easy_cleanup(curl);
+
 	return Utils::extract(buffer, from, to);
 }
 

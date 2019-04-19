@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "downloadermock.h"
+#ifdef NDEBUG
+#undef NDEBUG // make downloader use curlmock
+#endif
 
 #include "../src/database.h"
 
@@ -9,7 +11,7 @@ using FileVector = const std::vector<File>;
 class DatabaseTest : public ::testing::Test
 {
 protected:
-	DownloaderMock downloader;
+	Downloader downloader;
 	Database db;
 
 	DatabaseTest():

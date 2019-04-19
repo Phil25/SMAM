@@ -40,7 +40,7 @@ add_subdirectory(scrapers)
 add_executable(smam main.cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  target_sources(smam PRIVATE ../test/downloadermock.cpp)
+  target_sources(smam PRIVATE ../test/curlmock.cpp)
 endif()
 
 target_link_libraries(smam

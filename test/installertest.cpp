@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "downloadermock.h"
+#ifdef NDEBUG
+#undef NDEBUG // make downloader use curlmock
+#endif
 
 #include "../src/installer.h"
 
@@ -26,7 +28,7 @@ inline void compare(FileVector& expected, FileVector& actual)
 class InstallerTest : public ::testing::Test
 {
 protected:
-	DownloaderMock downloader;
+	Downloader downloader;
 	Database db;
 
 	InstallerTest():

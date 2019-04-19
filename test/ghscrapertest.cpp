@@ -1,10 +1,12 @@
 #include "gtest/gtest.h"
 
+#ifdef NDEBUG
+#undef NDEBUG // make downloader use curlmock
+#endif
+
 #include "../src/scrapers/ghscraper.h"
 
-#include "downloadermock.h"
-
-static DownloaderMock dmock;
+static Downloader dmock;
 static GHScraper scraper(dmock);
 
 inline void compare(const Attachments& expected, const Attachments& actual)

@@ -1,6 +1,11 @@
 #pragma once
 
+#ifdef NDEBUG
 #include <curl/curl.h>
+#else
+#include "../test/curlmock.h"
+#endif
+
 #include <string>
 #include <fstream>
 

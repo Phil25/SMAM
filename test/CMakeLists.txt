@@ -4,11 +4,12 @@ target_sources(tests
   PRIVATE
 
 # Mocks
-  downloadermock.cpp
+  curlmock.cpp
 
 # Tests
   optstest.cpp
   utilstest.cpp
+  downloadertest.cpp
   databasetest.cpp
   amscrapertest.cpp
   ltscrapertest.cpp
