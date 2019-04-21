@@ -15,6 +15,8 @@ std::map<std::string, std::string> tpLink = {
 #include "./mockdata/thirdparty_link.json"
 };
 
+static std::string errmsg;
+
 std::vector<char> fetchData(const std::string& url)
 {
 	if(tpLink.count(url)) // call to thirdparty
@@ -93,7 +95,11 @@ void curl_easy_setopt(CURL*, CURLoption, long)
 CURLcode curl_easy_perform(CURL* curl)
 {
 	auto result = fetchData(curl->url);
-	if(!result.size()) return CURLE_NOT_OK;
+	if(!result.size())
+	{
+		errmsg = "Not found: \"" + curl->url + '\"';
+		return CURLE_NOT_OK;
+	}
 
 	auto bytesSent = 0;
 	auto bytesLeft = result.size();
@@ -120,7 +126,7 @@ CURLcode curl_easy_perform(CURL* curl)
 
 const char* curl_easy_strerror(CURLcode)
 {
-	return "Not found";
+	return errmsg.data();
 }
 
 void curl_easy_cleanup(CURL* curl)
