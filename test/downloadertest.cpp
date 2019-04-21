@@ -75,7 +75,7 @@ TEST_F(DownloaderTest, ThrillerFiles)
 	ASSERT_TRUE(down.file("http://www.sourcemod.net/vbcompiler.php?file_id=128466", "thriller.smx"));
 	EXPECT_EQ(3691, getFileSize("thriller.smx"));
 
-	ASSERT_TRUE(down.file("https://forums.alliedmods.net/attachment.php?attachmentid=133555&d=1400274898", "thriller.plugin.txt"));
+	ASSERT_TRUE(down.file("https://forums.alliedmods.net/attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&attachmentid=133555&d=1400274898", "thriller.plugin.txt"));
 	EXPECT_EQ(656, getFileSize("thriller.plugin.txt"));
 }
 
