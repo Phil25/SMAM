@@ -3,7 +3,7 @@
 
 #include "database.h"
 
-static const std::string URL = "https://smamdb.net/";
+using str = std::string;
 
 /*
  * Construct a URL passing requested IDs of addons as an `ids` GET
@@ -11,9 +11,9 @@ static const std::string URL = "https://smamdb.net/";
  *
  * Example: https://smamdb.net/?ids=accelerator,tf2items,thriller
  */
-static std::string constructUrl(const std::vector<std::string>& ids)
+static auto constructUrl(const str& dbUrl, const std::vector<str>& ids)
 {
-	std::string url(URL + "?ids=");
+	std::string url(dbUrl + "?ids=");
 
 	for(const auto& id : ids)
 	{
@@ -27,13 +27,13 @@ static std::string constructUrl(const std::vector<std::string>& ids)
 /*
  * Parse Json::Value as a File vector.
  */
-static std::vector<File> toFileVector(Json::Value files)
+static auto toFileVector(Json::Value files)
 {
 	std::vector<File> vec;
 
 	for(const auto& f : files)
 	{
-		vec.push_back(File(f.asString()));
+		vec.push_back({f.asString()});
 	}
 
 	return vec;
@@ -48,8 +48,9 @@ static Plan makePlan(Json::Value addon)
 	return Plan(addon["url"].asString(), toFileVector(addon["files"]));
 }
 
-Database::Database(Downloader& downloader):
-	downloader(downloader)
+Database::Database(Downloader& downloader, const str& dbUrl):
+	downloader(downloader),
+	dbUrl(dbUrl.back() == '/' ? dbUrl : dbUrl + '/')
 {
 }
 
@@ -66,7 +67,8 @@ void Database::precache(const std::vector<std::string>& ids)
 {
 	if(ids.empty()) return;
 
-	std::stringstream s(downloader.html(constructUrl(ids)));
+	auto url = constructUrl(dbUrl, ids);
+	std::stringstream s(downloader.html(url));
 	Json::Value root;
 
 	try

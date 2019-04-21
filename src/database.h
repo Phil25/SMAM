@@ -16,12 +16,13 @@ using Plan = std::tuple<std::string, std::vector<File>>;
 class Database
 {
 	Downloader& downloader;
+	const std::string dbUrl;
 
 	Plan nullPlan = {"", {}};
 	std::map<std::string, Plan> precached;
 
 public:
-	Database(Downloader&);
+	Database(Downloader&, const std::string& dbUrl="localhost:7666");
 
 	void precache(const std::vector<std::string>& ids);
 

@@ -87,3 +87,9 @@ TEST(OptsTest, DesinationPath)
 	ASSERT_TRUE(opts.destination());
 	EXPECT_EQ("/home/server", opts.destination());
 }
+
+TEST(OptsTest, DatabaseHost)
+{
+	const Opts opts = make("remove --db-host https://localhost:2121/");
+	EXPECT_EQ("https://localhost:2121/", opts.getDbHost());
+}

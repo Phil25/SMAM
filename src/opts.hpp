@@ -22,6 +22,9 @@ public:
 				("no-color", "Disable color in output")
 				("log", po::value<std::string>(), "Path to log file.")
 				("destination", po::value<std::string>(), "Path to server.")
+				("db-host", po::value<std::string>()
+					->default_value("https://smamdb.net/"),
+					"URL of the database.")
 				("command", po::value<std::string>()
 					->default_value("")->required(), "")
 				("addons", po::value<std::vector<std::string>>()
@@ -54,6 +57,11 @@ public:
 	const auto& getAddons() const
 	{
 		return vm["addons"].as<std::vector<std::string>>();
+	}
+
+	const auto& getDbHost() const
+	{
+		return vm["db-host"].as<std::string>();
 	}
 
 	bool help() const

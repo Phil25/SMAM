@@ -10,7 +10,7 @@ constexpr char tab = '\t';
 void install(const Opts& opts)
 {
 	Downloader down;
-	Database db(down);
+	Database db(down, opts.getDbHost());
 	Installer::initScrapers(down);
 
 	const auto& addons = opts.getAddons();
