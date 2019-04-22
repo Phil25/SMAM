@@ -50,7 +50,7 @@ static Plan makePlan(Json::Value addon)
 
 Database::Database(Downloader& downloader, const str& dbUrl):
 	downloader(downloader),
-	dbUrl(dbUrl.back() == '/' ? dbUrl : dbUrl + '/')
+	dbUrl(dbUrl)
 {
 }
 
