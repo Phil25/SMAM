@@ -13,7 +13,7 @@
  * Return vector of Attachment names matched against `base` regex.
  */
 static std::vector<std::string> findMatches(
-	const std::string base,
+	const std::string& base,
 	const Attachments& attachments
 ){
 	std::vector<std::string> filtered;
