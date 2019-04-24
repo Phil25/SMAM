@@ -3,8 +3,16 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
+#include "../src/utils/file.hpp"
 #include "../src/utils/misc.h"
 #include "../src/utils/version.h"
+
+TEST(UtilsTest, FileConstr)
+{
+	File f("some/dir/;file;name.txt");
+	EXPECT_EQ("some/dir/", f.path);
+	EXPECT_EQ("file;name.txt", f.name);
+}
 
 TEST(UtilsTest, ToLines)
 {

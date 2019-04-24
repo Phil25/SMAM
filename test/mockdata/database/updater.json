@@ -2,6 +2,6 @@
 	"id": "updater",
 	"url": "https://bitbucket.org/GoD_Tony/updater/downloads/",
 	"files": [
-		"p:updater.smx"
+		"plugins/;updater.smx"
 	]
 }

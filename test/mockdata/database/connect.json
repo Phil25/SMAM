@@ -2,6 +2,6 @@
 	"id": "connect",
 	"url": "https://builds.limetech.io/?p=connect",
 	"files": [
-		"a:.*"
+		"../../;.*"
 	]
 }

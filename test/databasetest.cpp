@@ -30,7 +30,7 @@ TEST_F(DatabaseTest, PositiveSingle)
 	EXPECT_EQ("https://builds.limetech.io/?p=accelerator", url);
 
 	ASSERT_EQ(1, files.size());
-	EXPECT_EQ('a', files[0].tag);
+	EXPECT_EQ("../../", files[0].path);
 	EXPECT_EQ(".*", files[0].name);
 }
 

@@ -2,7 +2,7 @@
 	"id": "tf2attributes",
 	"url": "https://github.com/FlaminSarge/tf2attributes/",
 	"files": [
-		"p:tf2attributes.smx",
-		"g:https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt"
+		"plugins/;tf2attributes.smx",
+		"gamedata/;https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt"
 	]
 }

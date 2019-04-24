@@ -2,7 +2,7 @@
 	"id": "afk_manager",
 	"url": "https://forums.alliedmods.net/showpost.php?p=708265",
 	"files": [
-		"p:http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
-		"t:http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt"
+		"plugins/;http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
+		"translations/;http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt"
 	]
 }

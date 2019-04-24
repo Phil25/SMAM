@@ -3,18 +3,18 @@
 #include <string>
 
 /*
- * Defines a filename, tag and the URL from which the file
- * can be downloaded.
+ * Defines a destination path, filename and the URL from which
+ * the file can be downloaded.
  */
 struct File
 {
-	const char tag;
-	std::string name, url;
+	std::string path, name, url;
 
-	File(const std::string& entry, const std::string url=""):
-		tag(entry[0]),
-		name(entry.substr(2)),
+	File(const std::string& data, const std::string url=""):
 		url(url)
 	{
+		auto splitAt = data.find_first_of(';');
+		path = data.substr(0, splitAt);
+		name = data.substr(++splitAt);
 	}
 };
