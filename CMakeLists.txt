@@ -22,6 +22,8 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build .
 # when building with Visual Studio
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+
 # Adds targets: gtest, gtest_main, gmock and gmock_main
 add_subdirectory("${CMAKE_BINARY_DIR}/googletest-src"
                  "${CMAKE_BINARY_DIR}/googletest-build")

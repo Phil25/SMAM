@@ -61,4 +61,5 @@ target_link_libraries(smam
 # Thrid party
   -lcurl
   -lboost_program_options
+  -lstdc++fs
 )

@@ -11,6 +11,12 @@
 #include <vector>
 #include <map>
 
+#ifdef PROJECT_SOURCE_DIR
+#define ROOT PROJECT_SOURCE_DIR
+#else
+#define ROOT ".."
+#endif
+
 std::map<std::string, std::string> tpLink = {
 #include "./mockdata/thirdparty_link.json"
 };
@@ -21,7 +27,7 @@ std::vector<char> fetchData(const std::string& url)
 {
 	if(tpLink.count(url)) // call to thirdparty
 	{
-		std::string location = "../test/mockdata/thirdparty/" + tpLink[url];
+		std::string location = ROOT "/test/mockdata/thirdparty/" + tpLink[url];
 		std::ifstream ifs(location, std::ios::in|std::ios::ate);
 		if(!ifs.is_open()) return {};
 
@@ -45,7 +51,7 @@ std::vector<char> fetchData(const std::string& url)
 
 		while(std::getline(dataStream, id, ','))
 		{
-			location = "../test/mockdata/database/" + id + ".json";
+			location = ROOT "/test/mockdata/database/" + id + ".json";
 			std::ifstream ifs(location, std::ios::in|std::ios::ate);
 			if(!ifs.is_open()) continue;
 

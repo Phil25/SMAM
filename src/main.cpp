@@ -1,14 +1,24 @@
 #include <iostream>
 
 #include "opts.hpp"
+#include "smfs.hpp"
+
 #include "installer.h"
 #include "downloader.h"
 
 constexpr char cr = '\n';
 constexpr char tab = '\t';
 
-void install(const Opts& opts)
+using execCmd = int (*)(const Opts&);
+
+int install(const Opts& opts)
 {
+	if(!smfs::goToSMRoot(opts.destination().value_or("")))
+	{
+		std::cerr << "error: could not find SourceMod root" << cr;
+		return 1;
+	}
+
 	Downloader down;
 	Database db(down, opts.getDbHost());
 	Installer::initScrapers(down);
@@ -21,22 +31,27 @@ void install(const Opts& opts)
 		std::cout << "Installing " << addon << "..." << cr;
 		for(const auto& file : Installer::getFiles(addon, db))
 		{
-			std::cout << tab << "    file : " << file.name << cr;
-			std::cout << tab << "get from : " << file.url << cr;
+			smfs::preparePath(file.path);
+			down.file(file.url, file.path + file.name);
 		}
 	}
+
+	return 0;
 }
 
-void remove(const Opts&)
+int remove(const Opts&)
 {
+	return 0;
 }
 
-void info(const Opts&)
+int info(const Opts&)
 {
+	return 0;
 }
 
-void search(const Opts&)
+int search(const Opts&)
 {
+	return 0;
 }
 
 int main(int argc, const char* argv[])
@@ -58,7 +73,7 @@ int main(int argc, const char* argv[])
 
 		try
 		{
-			std::map<std::string_view, void (*)(const Opts&)>
+			return std::map<std::string_view, execCmd>
 			{
 				{"install", install},
 				{"remove", remove},
