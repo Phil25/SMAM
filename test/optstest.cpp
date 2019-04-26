@@ -90,6 +90,6 @@ TEST(OptsTest, DesinationPath)
 
 TEST(OptsTest, DatabaseHost)
 {
-	const Opts opts = make("remove --db-host https://localhost:2121/");
-	EXPECT_EQ("https://localhost:2121/", opts.getDbHost());
+	const Opts opts = make("remove --db-url https://localhost:2121/");
+	EXPECT_EQ("https://localhost:2121/", opts.getDbUrl());
 }

@@ -20,7 +20,7 @@ int install(const Opts& opts)
 	}
 
 	Downloader down;
-	Database db(down, opts.getDbHost());
+	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
 
 	const auto& addons = opts.getAddons();
