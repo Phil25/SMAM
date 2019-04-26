@@ -13,17 +13,17 @@ addons:
             - libxml++2.6-dev
             - libjsoncpp-dev
             - libboost-program-options-dev
-            - gcc-7
-            - g++-7
+            - gcc-8
+            - g++-8
             - cmake
         update: true
 
 install:
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 
 script:
     - sudo ln -s /usr/include/jsoncpp/json/ /usr/include/json # Ubuntu fix because of course
-    - sudo ln -s /usr/bin/gcc-7 /usr/local/bin/gcc
-    - sudo ln -s /usr/bin/g++-7 /usr/local/bin/g++
+    - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
+    - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
     - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && ./bin/tests
