@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "opts.hpp"
-#include "smfs.hpp"
 
+#include "utils/archive.h"
 #include "installer.h"
 #include "downloader.h"
 
@@ -10,10 +10,35 @@ constexpr char cr = '\n';
 constexpr char tab = '\t';
 
 using execCmd = int (*)(const Opts&);
+namespace fs = std::filesystem;
+
+bool goToSMRoot(const fs::path& dest)
+{
+	if(!dest.empty())
+	{
+		fs::current_path(dest);
+	}
+
+	if(fs::is_directory("./plugins"))
+	{
+		return true; // already at SM root
+	}
+
+	for(const auto& prev : {"./sourcemod", "./addons/sourcemod"})
+	{
+		if(fs::is_directory(prev))
+		{
+			fs::current_path(prev);
+			return true;
+		}
+	}
+
+	return false;
+}
 
 int install(const Opts& opts)
 {
-	if(!smfs::goToSMRoot(opts.destination().value_or("")))
+	if(!goToSMRoot(opts.destination().value_or("")))
 	{
 		std::cerr << "error: could not find SourceMod root" << cr;
 		return 1;
@@ -31,8 +56,13 @@ int install(const Opts& opts)
 		std::cout << "Installing " << addon << "..." << cr;
 		for(const auto& file : Installer::getFiles(addon, db))
 		{
-			smfs::preparePath(file.path);
-			down.file(file.url, file.path + file.name);
+			fs::path path = file.path;
+			fs::create_directories(file.path);
+			path.append(file.name);
+
+			down.file(file.url, path);
+
+			if(Archive::valid(path)) Archive::extract(path);
 		}
 	}
 

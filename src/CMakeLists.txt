@@ -55,6 +55,7 @@ target_link_libraries(smam
   ghscraper
 
 # Utilities
+  utils_archive
   utils_misc
   utils_version
 
@@ -62,4 +63,5 @@ target_link_libraries(smam
   -lcurl
   -lboost_program_options
   -lstdc++fs
+  -lzip
 )
