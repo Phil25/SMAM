@@ -13,6 +13,7 @@ addons:
             - libxml++2.6-dev
             - libjsoncpp-dev
             - libboost-program-options-dev
+            - libzip-dev
             - gcc-8
             - g++-8
             - cmake
