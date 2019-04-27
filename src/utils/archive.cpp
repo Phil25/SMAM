@@ -1,7 +1,8 @@
 #include "archive.h"
 
-#include <zip.h>
+#include <iostream>
 #include <fstream>
+#include <zip.h>
 
 bool Archive::valid(const fs::path& file)
 {
@@ -25,6 +26,8 @@ bool Archive::extract(const fs::path& zipFile)
 		auto file = zipFile.parent_path();
 		file.append(s.name);
 		fs::create_directories(file.parent_path());
+
+		std::cout << "\t\t" << file << '\n';
 
 		zip_file* f = zip_fopen(z, s.name, 0);
 
