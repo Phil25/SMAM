@@ -15,7 +15,11 @@ declare -a data_dynamic_motd=(
 )
 declare -a data_funcommandsx=(
 	"funcommandsx"
-	"./mod/addons/sourcemod/funcommandsX_2.5.zip"
+	"./mod/addons/sourcemod/plugins/funcommandsX.smx"
+	"./mod/addons/sourcemod/configs/happy_phrases.ini"
+	"./mod/addons/sourcemod/translations/funcommandsX.phrases.txt"
+	"./mod/addons/sourcemod/translations/ru/funcommandsX.phrases.txt"
+	"./mod/addons/sourcemod/translations/tr/funcommandsX.phrases.txt"
 )
 declare -a data_tf2attributes=(
 	"tf2attributes"
@@ -24,7 +28,9 @@ declare -a data_tf2attributes=(
 )
 declare -a data_tf2items=(
 	"tf2items"
-	"./mod/tf2items-1.6.4-hg279-linux.zip"
+	"./mod/addons/sourcemod/scripting/tf2items_manager.sp"
+	"./mod/addons/sourcemod/scripting/include/tf2items.inc"
+	"./mod/addons/sourcemod/extensions/tf2items.ext.2.ep2v.so"
 )
 declare -a data_thriller=(
 	"thriller"

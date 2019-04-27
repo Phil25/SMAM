@@ -39,5 +39,6 @@ bool Archive::extract(const fs::path& zipFile)
 	}
 
 	zip_close(z);
+	fs::remove(zipFile);
 	return true;
 }
