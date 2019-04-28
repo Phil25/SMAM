@@ -1,10 +1,8 @@
 #include <iostream>
 
+#include "version.hpp"
 #include "downloader.h"
 #include "utils/misc.h"
-
-#define AGENT "SourceMod Addon Manager"
-#define VERSION "1.0"
 
 Downloader::Downloader():
 	curl(NULL)
@@ -29,7 +27,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 	{
-		std::cerr << "Error: " << curl_easy_strerror(res) << '\n';
+		std::cerr << "error: " << curl_easy_strerror(res) << '\n';
 	}
 
 	curl_easy_cleanup(curl);
@@ -55,7 +53,7 @@ bool Downloader::file(cstr& url, cstr& dest)
 
 	if(!success)
 	{
-		std::cerr << "Error: " << curl_easy_strerror(res) << '\n';
+		std::cerr << "error: " << curl_easy_strerror(res) << '\n';
 	}
 
 	ofs.close();
@@ -70,7 +68,7 @@ bool Downloader::file(cstr& url, cstr& dest)
 void Downloader::set_opts(cstr& url, curlcb callback, void* data)
 {
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, AGENT "/" VERSION);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, Version::fullAgent());
 
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);

@@ -22,7 +22,21 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build .
 # when building with Visual Studio
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+execute_process(COMMAND git rev-list --count HEAD
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_REVISION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(PROJECT_AGENT "SourceMod Addon Manager")
+
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 0)
+set(VERSION_PATCH 1a)
+set(VERSION_REVISION ${GIT_REVISION})
+set(AGENT ${PROJECT_AGENT})
+
+add_definitions(-D_PROJECT_ROOT=\"${PROJECT_SOURCE_DIR}\")
+
+configure_file("${PROJECT_SOURCE_DIR}/src/version.hpp.in" "${PROJECT_SOURCE_DIR}/src/version.hpp" @ONLY)
 
 # Adds targets: gtest, gtest_main, gmock and gmock_main
 add_subdirectory("${CMAKE_BINARY_DIR}/googletest-src"
