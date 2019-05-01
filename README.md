@@ -23,6 +23,6 @@ SourceMod Addon Manager (or SMAM) is an automatic installer for [SourceMod](http
 
 # Running and testing
 From the previously created `build` directory:
-	* Execute `./bin/smam` to run SMAM.
-	* Execute `./bin/tests` to run tests (only in `Debug` build).
-	* Call `../test/cmdinstalltest . ./bin/smam` to run execution tests.
+* Execute `./bin/smam` to run SMAM.
+* Execute `./bin/tests` to run tests (only in `Debug` build).
+* Call `../test/cmdinstalltest . ./bin/smam` to run execution tests.
