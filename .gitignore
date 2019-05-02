@@ -6,3 +6,6 @@ debug*/
 # ignore everything in thirdparty
 thirdparty/*
 !thirparty/CMakeLists.txt
+
+# ignore CMake-generated version.hpp
+src/version.hpp
