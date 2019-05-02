@@ -1,7 +1,8 @@
 #include <libxml++/libxml++.h>
-#include <iostream>
 
 #include "ltscraper.h"
+
+#include "../utils/printer.h"
 
 static constexpr std::string_view URL = "https://builds.limetech.io/";
 static int tdCount = 0;
@@ -105,7 +106,7 @@ Attachments LTScraper::fetch(const std::string& url)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Exception: " << e.what() << std::endl;
+		out(Ch::Error) << e.what() << cr;
 	}
 
 	return {{fileName, fileUrl}};

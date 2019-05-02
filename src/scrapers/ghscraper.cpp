@@ -1,8 +1,9 @@
 #include <json/json.h>
-#include <iostream>
 #include <sstream>
 
 #include "ghscraper.h"
+
+#include "../utils/printer.h"
 
 static constexpr std::string_view URL = "https://github.com/";
 static constexpr std::string_view URL_API = "https://api.github.com/repos/";
@@ -64,7 +65,7 @@ Attachments GHScraper::fetch(const std::string& url)
 	}
 	catch(const Json::RuntimeError& e)
 	{
-		std::cerr << "JSON Exception: " << e.what() << std::endl;
+		out(Ch::Error) << e.what() << cr;
 	}
 
 	return attachments;

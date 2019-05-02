@@ -57,6 +57,7 @@ target_link_libraries(smam
 # Utilities
   utils_archive
   utils_misc
+  utils_printer
   utils_version
 
 # Thrid party

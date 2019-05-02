@@ -32,6 +32,7 @@ target_link_libraries(tests
 
 # Utilities
   utils_misc
+  utils_printer
   utils_version
 
 # Thrid party

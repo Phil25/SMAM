@@ -1,6 +1,7 @@
 #include <boost/program_options.hpp>
 #include <functional>
-#include <iostream>
+
+#include "utils/printer.h"
 
 class Opts
 {
@@ -19,7 +20,8 @@ public:
 			desc.add_options()
 				("help,h", "Show help.")
 				("quiet,q", "Do not produce output.")
-				("no-color", "Disable color in output")
+				("no-prefix", "Disable prefixes in output.")
+				("no-color", "Disable color in output.")
 				("log", po::value<std::string>(), "Path to log file.")
 				("destination", po::value<std::string>(), "Path to server.")
 				("db-url", po::value<std::string>()
@@ -40,7 +42,7 @@ public:
 		}
 		catch(const po::error& e)
 		{
-			std::cerr << "error: " << e.what() << '\n';
+			out(Ch::Error) << e.what() << cr;
 		}
 	}
 
@@ -77,6 +79,11 @@ public:
 	bool noColor() const
 	{
 		return vm.count("no-color");
+	}
+
+	bool noPrefix() const
+	{
+		return vm.count("no-prefix");
 	}
 
 	auto log() const -> std::optional<std::string>

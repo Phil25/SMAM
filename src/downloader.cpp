@@ -1,8 +1,8 @@
-#include <iostream>
-
 #include "version.hpp"
 #include "downloader.h"
+
 #include "utils/misc.h"
+#include "utils/printer.h"
 
 Downloader::Downloader():
 	curl(NULL)
@@ -27,7 +27,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 	{
-		std::cerr << "error: " << curl_easy_strerror(res) << '\n';
+		out(Ch::Error) << curl_easy_strerror(res) << cr;
 	}
 
 	curl_easy_cleanup(curl);
@@ -53,7 +53,7 @@ bool Downloader::file(cstr& url, cstr& dest)
 
 	if(!success)
 	{
-		std::cerr << "error: " << curl_easy_strerror(res) << '\n';
+		out(Ch::Error) << curl_easy_strerror(res) << cr;
 	}
 
 	ofs.close();

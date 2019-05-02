@@ -1,7 +1,8 @@
-#include <iostream>
 #include <libxml++/libxml++.h>
 
 #include "amscraper.h"
+
+#include "../utils/printer.h"
 #include "../utils/version.h"
 
 static constexpr std::string_view URL = "https://forums.alliedmods.net/";
@@ -187,7 +188,7 @@ Attachments AMScraper::fetch(const std::string& url)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Exception: " << e.what() << std::endl;
+		out(Ch::Error) << e.what() << cr;
 	}
 
 	return fetchAttachments(contents);

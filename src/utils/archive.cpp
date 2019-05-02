@@ -1,8 +1,9 @@
 #include "archive.h"
 
-#include <iostream>
 #include <fstream>
 #include <zip.h>
+
+#include "printer.h"
 
 bool Archive::valid(const fs::path& file)
 {
@@ -19,6 +20,8 @@ bool Archive::extract(const fs::path& zipFile)
 		return false;
 	}
 
+	out(Ch::Info) << "Extracting " << zipFile << "..." << cr;
+
 	for(int i = 0; i < zip_get_num_entries(z, 0); ++i)
 	{
 		if(zip_stat_index(z, i, 0, &s) != 0) continue;
@@ -27,7 +30,7 @@ bool Archive::extract(const fs::path& zipFile)
 		file.append(s.name);
 		fs::create_directories(file.parent_path());
 
-		std::cout << "\t\t" << file << '\n';
+		out() << file << cr;
 
 		zip_file* f = zip_fopen(z, s.name, 0);
 

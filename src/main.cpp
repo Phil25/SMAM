@@ -1,22 +1,19 @@
-#include <iostream>
-
 #include "opts.hpp"
 
 #include "utils/archive.h"
+#include "utils/printer.h"
+
 #include "installer.h"
 #include "downloader.h"
-
-constexpr char cr = '\n';
-constexpr char tab = '\t';
 
 using execCmd = int (*)(const Opts&);
 namespace fs = std::filesystem;
 
-bool goToSMRoot(const fs::path& dest)
+bool goToSMRoot(const fs::path& startAt)
 {
-	if(!dest.empty())
+	if(!startAt.empty())
 	{
-		fs::current_path(dest);
+		fs::current_path(startAt);
 	}
 
 	if(fs::is_directory("./plugins"))
@@ -40,7 +37,7 @@ int install(const Opts& opts)
 {
 	if(!goToSMRoot(opts.destination().value_or("")))
 	{
-		std::cerr << "error: could not find SourceMod root" << cr;
+		out(Ch::Error) << "Could not find SourceMod root." << cr;
 		return 1;
 	}
 
@@ -53,14 +50,18 @@ int install(const Opts& opts)
 
 	for(const auto& addon : addons)
 	{
-		std::cout << "Installing " << addon << "..." << cr;
+		out(Ch::Info)
+			<< Col::green
+			<< "Installing " << addon << "..."
+			<< Col::reset << cr;
+
 		for(const auto& file : Installer::getFiles(addon, db))
 		{
 			fs::path path = file.path;
 			fs::create_directories(file.path);
 			path.append(file.name);
 
-			std::cout << tab << path << cr;
+			out() << path << cr;
 
 			down.file(file.url, path);
 
@@ -90,36 +91,34 @@ int main(int argc, const char* argv[])
 {
 	const Opts opts(argc, argv);
 
+	if(opts.quiet())	out.quiet();
+	if(opts.noPrefix())	out.noPrefix();
+	if(opts.noColor())	out.colors = false;
+
 	if(opts.help())
 	{
-		std::cout << opts.getDescription() << '\n';
+		out() << opts.getDescription() << cr;
+		return 0;
 	}
-	else
+
+	const auto& command = opts.getCommand();
+
+	try
 	{
-		const auto& command = opts.getCommand();
-
-		if(opts.quiet())
+		return std::map<std::string_view, execCmd>
 		{
-			std::cout.rdbuf(nullptr); // mute std::cout
+			{"install", install},
+			{"remove", remove},
+			{"uninstall", remove},
+			{"info", info},
+			{"search", search},
 		}
-
-		try
-		{
-			return std::map<std::string_view, execCmd>
-			{
-				{"install", install},
-				{"remove", remove},
-				{"uninstall", remove},
-				{"info", info},
-				{"search", search},
-			}
-			.at(command)(opts);
-		}
-		catch(const std::out_of_range& e)
-		{
-			std::cerr << "error: unknown command \"" << command << "\"\n";
-			return 1;
-		}
+		.at(command)(opts);
+	}
+	catch(const std::out_of_range& e)
+	{
+		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
+		return 1;
 	}
 
 	return 0;

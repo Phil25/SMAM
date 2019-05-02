@@ -1,8 +1,8 @@
-#include <iostream>
 #include <regex>
 
 #include "installer.h"
 #include "utils/file.hpp"
+#include "utils/printer.h"
 #include "utils/version.h"
 
 #include "scrapers/amscraper.h"
@@ -32,7 +32,7 @@ static std::vector<std::string> findMatches(
 	}
 	catch(const std::regex_error& e)
 	{
-		std::cerr << "Invalid regex: " << base << "\" " << std::endl;
+		out(Ch::Error) << "Invalid regex: " << base << '\"' << cr;
 	}
 
 	return filtered;
