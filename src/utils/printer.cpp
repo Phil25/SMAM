@@ -31,6 +31,11 @@ std::ostream& Printer::operator()(Ch c)
 	return *chData[c].out;
 }
 
+std::ostream& Printer::getStream(Ch c)
+{
+	return *chData[c].out;
+}
+
 std::map<Ch, Printer::ChannelData> Printer::chData{
 	{Ch::Std,	{&std::cout, "    ", Col::reset}},
 	{Ch::Info,	{&std::cout, "[I] ", Col::blue}},

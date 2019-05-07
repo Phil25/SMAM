@@ -31,10 +31,10 @@ public:
 	bool colors = true;
 
 	void quiet(); // disable output entirely
-	void noPrefix(); // disable prefixes such as [ERROR], etc
+	void noPrefix(); // disable prefixes such as [E], etc
 
-	// Change channel
-	std::ostream& operator()(Ch c=Ch::Std);
+	std::ostream& getStream(Ch c=Ch::Std);
+	std::ostream& operator()(Ch c=Ch::Std); // Change channel
 };
 
 extern Printer out; // global console output

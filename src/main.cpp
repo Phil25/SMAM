@@ -97,29 +97,25 @@ int main(int argc, const char* argv[])
 
 	if(opts.help())
 	{
-		out() << opts.getDescription() << cr;
+		opts.printHelp(argv[0], out.getStream());
 		return 0;
 	}
 
 	const auto& command = opts.getCommand();
+	const std::map<std::string_view, execCmd> cmdMap{
+		{"install",		install},
+		{"remove",		remove},
+		{"uninstall",	remove},
+		{"info",		info},
+		{"search",		search},
+	};
 
-	try
-	{
-		return std::map<std::string_view, execCmd>
-		{
-			{"install", install},
-			{"remove", remove},
-			{"uninstall", remove},
-			{"info", info},
-			{"search", search},
-		}
-		.at(command)(opts);
-	}
-	catch(const std::out_of_range& e)
+	if(!cmdMap.count(command))
 	{
 		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
 		return 1;
 	}
 
+	cmdMap.at(command)(opts);
 	return 0;
 }
