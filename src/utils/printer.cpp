@@ -1,5 +1,7 @@
 #include "printer.h"
 
+#include <iostream>
+
 std::ostream& operator<<(std::ostream& os, const Col& c)
 {
 	if(!out.colors) return os;

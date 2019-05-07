@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <map>
 
 constexpr char cr = '\n';
