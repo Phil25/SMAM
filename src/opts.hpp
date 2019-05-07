@@ -23,7 +23,7 @@ public:
 				("no-prefix", "Disable prefixes in output.")
 				("no-color", "Disable color in output.")
 				("log", po::value<std::string>(), "Path to log file.")
-				("destination", po::value<std::string>(), "Path to server.")
+				("destination,d", po::value<std::string>(), "Path to server.")
 				("db-url", po::value<std::string>()
 					->default_value("https://smamdb.net/"),
 					"URL of the database.")

@@ -44,7 +44,7 @@ declare -a data_updater=(
 
 function test_addon()
 {
-	$SMAM install $1 --destination ./mod
+	$SMAM install $1 -d ./mod
 	shift
 	for file in $@; do
 		if [ ! -f "$file" ] || [ `stat -c%s "$file"` -eq 0 ]; then
@@ -77,7 +77,7 @@ if [ ! -f $SMAM ]; then
 	exit 1
 fi
 
-echo "Setting up environment in $BUILD_DEST/..."
+echo "Setting up environment in $BUILD_DEST/"
 rm -rf ./mod
 mkdir -vp ./mod/cfg \
 	./mod/addons/sourcemod/configs \
@@ -98,7 +98,7 @@ test_addon ${data_tf2items[@]}
 test_addon ${data_thriller[@]}
 test_addon ${data_updater[@]}
 
-echo "Tearing down environment in $BUILD_DEST/..."
+echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod
 
 cd - > /dev/null
