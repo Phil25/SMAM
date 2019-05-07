@@ -2,12 +2,12 @@
 
 # SourceMod Addon Manager
 
-SourceMod Addon Manager (or SMAM) is an automatic installer for [SourceMod](https://www.sourcemod.net/about.php) plugins or extensions.
+SourceMod Addon Manager (SMAM) is an automatic installer for [SourceMod](https://www.sourcemod.net/about.php) plugins or extensions.
 
 # Build dependencies
 * `g++-8` and `gcc-8` (C++17 Filesystem library)
 * [libcurl](https://curl.haxx.se/libcurl/)
-* [libxml++](http://libxmlplusplus.sourceforge.net/) (preferably version 3.0)
+* [libxml++](http://libxmlplusplus.sourceforge.net/) (preferably version 3.0+)
 * [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 * [Boost.Program\_options](https://www.boost.org/doc/libs/release/doc/html/program_options.html)
 * [libzip](https://libzip.org/)
@@ -26,3 +26,24 @@ From the previously created `build` directory:
 * Execute `./bin/smam` to run SMAM.
 * Execute `./bin/tests` to run tests (only in `Debug` build).
 * Call `../test/cmdinstalltest . ./bin/smam` to run execution tests.
+
+# Usage
+```
+Usage:
+  smam <command> [addons] [options]
+
+Commands:
+  install                              Install specified addons.
+  remove                               Remove specified addons.
+  search                               Search for addons.
+  info                                 Get info about installed addons.
+
+Options:
+  -h [ --help ]                        Show help.
+  -q [ --quiet ]                       Do not produce output.
+  --no-prefix                          Disable prefixes in output.
+  --no-color                           Disable color in output.
+  --log arg                            Path to log file.
+  -d [ --destination ] arg             Path to server.
+  --db-url arg (=https://smamdb.net/)  URL of the database.
+```
