@@ -1,28 +1,56 @@
 #include "version.hpp"
 #include "downloader.h"
 
+#include <fstream>
+#include <sstream>
+
 #include "utils/misc.h"
 #include "utils/printer.h"
 
-Downloader::Downloader():
-	curl(NULL)
+/*
+ * Write downloaded data into an ostream
+ */
+size_t write(const char* data, size_t size, size_t n, void* voss)
+{
+	size_t trueSize = size * n;
+	static_cast<std::ostream*>(voss)->write(data, trueSize);
+	return trueSize;
+}
+
+/*
+ * Set generic CURL options shared accross `html` and `file` calls.
+ */
+void setOpts(CURL* curl, const std::string& url, std::ostream* data)
+{
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, Version::fullAgent());
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);
+
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 4L);
+}
+
+Downloader::Downloader()
 {
 }
 
 /*
  * Download contents of a website and return it as std::string.
- * Passing nonempty `from` and `to` parameters returns only the data after
- * the first `from` match and before the following `to` match, excluding.
+ * Passing nonempty `from` and `to` parameters returns only the data
+ * after the first `from` match and before the following `to` match,
+ * excluding.
  */
 std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 {
 	if((curl = curl_easy_init()) == NULL)
 	{
-		return "";
+		return {};
 	}
 
-	std::string buffer;
-	set_opts(url, read, &buffer);
+	std::ostringstream oss;
+	setOpts(curl, url, &oss);
 
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
@@ -32,7 +60,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 
 	curl_easy_cleanup(curl);
 
-	return Utils::extract(buffer, from, to);
+	return Utils::extract(oss.str(), from, to);
 }
 
 /*
@@ -45,60 +73,21 @@ bool Downloader::file(cstr& url, cstr& dest)
 		return false;
 	}
 
-	std::ofstream ofs(dest);
-	set_opts(url, write, &ofs);
+	std::ostringstream oss;
+	setOpts(curl, url, &oss);
 
 	CURLcode res = curl_easy_perform(curl);
-	bool success = res == CURLE_OK;
-
-	if(!success)
+	if(res != CURLE_OK)
 	{
 		out(Ch::Error) << curl_easy_strerror(res) << cr;
+		return false;
 	}
+
+	std::ofstream ofs(dest);
+	ofs << oss.str();
 
 	ofs.close();
 	curl_easy_cleanup(curl);
 
-	return success;
-}
-
-/*
- * Set generic CURL options shared accross `html` and `file` calls.
- */
-void Downloader::set_opts(cstr& url, curlcb callback, void* data)
-{
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, Version::fullAgent());
-
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);
-
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 4L);
-}
-
-/*
- * `read` is used by `html` to append the downloaded data to buffer.
- */
-size_t Downloader::read(const char* data, size_t size, size_t n, void* b)
-{
-	size_t trueSize = size *n;
-	std::string* pbuffer = static_cast<std::string*>(b);
-
-	pbuffer->append(data, trueSize);
-
-	return trueSize;
-}
-
-/*
- * `write` is used by `file` to pass the downloaded data to file stream.
- */
-size_t Downloader::write(const char* data, size_t size, size_t n, void* f)
-{
-	size_t trueSize = size *n;
-	std::ofstream* pfile = static_cast<std::ofstream*>(f);
-
-	*pfile << std::string(data, trueSize);
-
-	return trueSize;
+	return true;
 }
