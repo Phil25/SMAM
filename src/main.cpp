@@ -10,11 +10,17 @@
 using execCmd = int (*)(const Opts&);
 namespace fs = std::filesystem;
 
-bool goToSMRoot(const fs::path& startAt)
+bool goToSMRoot(const fs::path& start)
 {
-	if(!startAt.empty())
+	if(!start.empty())
 	{
-		fs::current_path(startAt);
+		if(!fs::is_directory(start))
+		{
+			out(Ch::Error) << "Invalid directory: " << start << cr;
+			return false;
+		}
+
+		fs::current_path(start);
 	}
 
 	if(fs::is_directory("./plugins"))
@@ -31,6 +37,15 @@ bool goToSMRoot(const fs::path& startAt)
 		}
 	}
 
+	if(start.empty())
+	{
+		out(Ch::Error) << "SourceMod root not found here." << cr;
+	}
+	else
+	{
+		out(Ch::Error) << "SourceMod root not found in " << start << cr;
+	}
+
 	return false;
 }
 
@@ -38,7 +53,6 @@ int install(const Opts& opts)
 {
 	if(!goToSMRoot(opts.destination().value_or("")))
 	{
-		out(Ch::Error) << "Could not find SourceMod root." << cr;
 		return 1;
 	}
 
@@ -109,13 +123,14 @@ int main(int argc, const char* argv[])
 	if(opts.noPrefix())	out.noPrefix();
 	if(opts.noColor())	out.colors = false;
 
-	if(argc == 1)
+	const auto& command = opts.getCommand();
+
+	if(command.empty())
 	{
 		out(Ch::Error) << "No command provided." << cr;
 		return 1;
 	}
 
-	const auto& command = opts.getCommand();
 	const std::map<std::string_view, execCmd> cmdMap{
 		{"install",		install},
 		{"remove",		remove},
@@ -130,12 +145,11 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-	if(argc == 2)
+	if(opts.getAddons().empty())
 	{
 		out(Ch::Error) << "No addons specified." << cr;
 		return 1;
 	}
 
-	cmdMap.at(command)(opts);
-	return 0;
+	return cmdMap.at(command)(opts);
 }
