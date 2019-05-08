@@ -109,6 +109,12 @@ int main(int argc, const char* argv[])
 	if(opts.noPrefix())	out.noPrefix();
 	if(opts.noColor())	out.colors = false;
 
+	if(argc == 1)
+	{
+		out(Ch::Error) << "No command provided." << cr;
+		return 1;
+	}
+
 	const auto& command = opts.getCommand();
 	const std::map<std::string_view, execCmd> cmdMap{
 		{"install",		install},
@@ -121,6 +127,12 @@ int main(int argc, const char* argv[])
 	if(!cmdMap.count(command))
 	{
 		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
+		return 1;
+	}
+
+	if(argc == 2)
+	{
+		out(Ch::Error) << "No addons specified." << cr;
 		return 1;
 	}
 
