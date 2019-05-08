@@ -40,6 +40,7 @@ Commands:
 
 Options:
   -h [ --help ]                        Show help.
+  --version                            Show version.
   -q [ --quiet ]                       Do not produce output.
   --no-prefix                          Disable prefixes in output.
   --no-color                           Disable color in output.
