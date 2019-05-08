@@ -14,7 +14,7 @@ SourceMod Addon Manager (SMAM) is an automatic installer for [SourceMod](https:/
 * Ubuntu package names available in `.travis.yml` file.
 
 # Building
-1. Clone the repo and cd to it: `git clone github.com/Phil25/SMAM && cd SMAM`
+1. Clone the repo and cd to it: `git clone https://github.com/Phil25/SMAM && cd SMAM`
 1. Designate a directory for building: `mkdir build && cd build`
 1. Setup CMake providing `Debug` or `Release` as `CMAKE_BUILD_TYPE`:
 	* `cmake -DCMAKE_BUILD_TYPE=Debug ..` (required for automated tests)
