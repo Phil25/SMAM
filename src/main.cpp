@@ -1,4 +1,5 @@
 #include "opts.hpp"
+#include "version.hpp"
 
 #include "utils/archive.h"
 #include "utils/printer.h"
@@ -91,15 +92,22 @@ int main(int argc, const char* argv[])
 {
 	const Opts opts(argc, argv);
 
-	if(opts.quiet())	out.quiet();
-	if(opts.noPrefix())	out.noPrefix();
-	if(opts.noColor())	out.colors = false;
-
 	if(opts.help())
 	{
 		opts.printHelp(argv[0], out.getStream());
 		return 0;
 	}
+
+	if(opts.version())
+	{
+		out.noPrefix();
+		out() << Version::full() << cr;
+		return 0;
+	}
+
+	if(opts.quiet())	out.quiet();
+	if(opts.noPrefix())	out.noPrefix();
+	if(opts.noColor())	out.colors = false;
 
 	const auto& command = opts.getCommand();
 	const std::map<std::string_view, execCmd> cmdMap{

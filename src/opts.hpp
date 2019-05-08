@@ -19,6 +19,7 @@ public:
 			po::options_description general("Options");
 			general.add_options()
 				("help,h", "Show help.")
+				("version", "Show version.")
 				("quiet,q", "Do not produce output.")
 				("no-prefix", "Disable prefixes in output.")
 				("no-color", "Disable color in output.")
@@ -94,6 +95,11 @@ public:
 	bool help() const
 	{
 		return vm.count("help");
+	}
+
+	bool version() const
+	{
+		return vm.count("version");
 	}
 
 	bool quiet() const
