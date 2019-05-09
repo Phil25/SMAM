@@ -76,9 +76,12 @@ int install(const Opts& opts)
 			fs::create_directories(file.path);
 			path.append(file.name);
 
-			out() << path << cr;
+			if(!down.file(file.url, path))
+			{
+				continue;
+			}
 
-			down.file(file.url, path);
+			out() << path << cr;
 
 			if(Archive::valid(path)) Archive::extract(path);
 		}

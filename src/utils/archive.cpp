@@ -20,7 +20,7 @@ bool Archive::extract(const fs::path& zipFile)
 		return false;
 	}
 
-	out(Ch::Info) << "Extracting " << zipFile << "..." << cr;
+	out(Ch::Info) << "Extracting " << zipFile.filename() << "..." << cr;
 
 	for(int i = 0; i < zip_get_num_entries(z, 0); ++i)
 	{
