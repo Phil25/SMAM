@@ -4,6 +4,7 @@
 #include <zip.h>
 
 #include "printer.h"
+#include "smfs.h"
 
 bool Archive::valid(const fs::path& file)
 {
@@ -28,7 +29,12 @@ bool Archive::extract(const fs::path& zipFile)
 
 		auto file = zipFile.parent_path();
 		file.append(s.name);
-		fs::create_directories(file.parent_path());
+
+		if(!SMFS::prepare(file.parent_path()))
+		{
+			out(Ch::Warn) << "Ignoring " << file << cr;
+			continue;
+		}
 
 		out() << file << cr;
 

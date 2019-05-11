@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 #include "../src/utils/file.hpp"
 #include "../src/utils/misc.h"
+#include "../src/utils/smfs.h"
 #include "../src/utils/version.h"
 
 TEST(UtilsTest, FileConstr)
@@ -61,6 +62,59 @@ TEST(UtilsTest, Extract)
 
 	std::string noextract3 = Utils::extract("No extract", "", "extract");
 	EXPECT_EQ("No extract", noextract3);
+}
+
+TEST(UtilsTest, FindRoot)
+{
+	namespace fs = SMFS::fs;
+	ASSERT_TRUE(fs::create_directories("./mod/addons/sourcemod/plugins"));
+
+	auto equal = [](const fs::path& p)
+	{
+		static const fs::path root = "./mod/addons/sourcemod";
+
+		auto mp = SMFS::findRoot(p);
+		return mp.has_value() && fs::equivalent(mp.value(), root);
+	};
+
+	EXPECT_FALSE(SMFS::findRoot({}));
+	EXPECT_FALSE(equal(""));
+	EXPECT_FALSE(equal("."));
+	EXPECT_FALSE(equal("./"));
+
+	EXPECT_TRUE(equal("./mod"));
+	EXPECT_TRUE(equal("./mod/addons"));
+	EXPECT_TRUE(equal("./mod/addons/sourcemod"));
+	EXPECT_TRUE(equal("./mod/addons/sourcemod/plugins"));
+
+	fs::remove_all("./mod/");
+}
+
+TEST(UtilsTest, IsPathSafe)
+{
+	EXPECT_TRUE(SMFS::isPathSafe(""));
+	EXPECT_TRUE(SMFS::isPathSafe("."));
+	EXPECT_TRUE(SMFS::isPathSafe("./"));
+	EXPECT_TRUE(SMFS::isPathSafe(".."));
+	EXPECT_TRUE(SMFS::isPathSafe("../"));
+	EXPECT_TRUE(SMFS::isPathSafe("../."));
+	EXPECT_TRUE(SMFS::isPathSafe(".././"));
+	EXPECT_TRUE(SMFS::isPathSafe("../.."));
+	EXPECT_TRUE(SMFS::isPathSafe("../../"));
+	EXPECT_TRUE(SMFS::isPathSafe("../../."));
+	EXPECT_TRUE(SMFS::isPathSafe("../.././"));
+
+	EXPECT_FALSE(SMFS::isPathSafe("../../.."));
+	EXPECT_FALSE(SMFS::isPathSafe("../../../"));
+	EXPECT_FALSE(SMFS::isPathSafe("../../../."));
+	EXPECT_FALSE(SMFS::isPathSafe("../../.././"));
+	EXPECT_FALSE(SMFS::isPathSafe("../../../.."));
+
+	EXPECT_FALSE(SMFS::isPathSafe(".././../.."));
+	EXPECT_FALSE(SMFS::isPathSafe("../.././../"));
+	EXPECT_FALSE(SMFS::isPathSafe(".././.././../."));
+	EXPECT_FALSE(SMFS::isPathSafe(".././../../././"));
+	EXPECT_FALSE(SMFS::isPathSafe("../../.././././.."));
 }
 
 TEST(UtilsTest, VersionBiggest)

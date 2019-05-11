@@ -33,11 +33,13 @@ target_link_libraries(tests
 # Utilities
   utils_misc
   utils_printer
+  utils_smfs
   utils_version
 
 # Thrid party
   -lcurl
   -lboost_program_options
+  -lstdc++fs
 )
 
 add_test(

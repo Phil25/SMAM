@@ -3,6 +3,7 @@
 
 #include "utils/archive.h"
 #include "utils/printer.h"
+#include "utils/smfs.h"
 
 #include "installer.h"
 #include "downloader.h"
@@ -10,49 +11,17 @@
 using execCmd = int (*)(const Opts&);
 namespace fs = std::filesystem;
 
-bool goToSMRoot(const fs::path& start)
+int install(const Opts& opts)
 {
-	if(!start.empty())
-	{
-		if(!fs::is_directory(start))
-		{
-			out(Ch::Error) << "Invalid directory: " << start << cr;
-			return false;
-		}
+	auto root = SMFS::findRoot(opts.destination().value_or(""));
 
-		fs::current_path(start);
-	}
-
-	if(fs::is_directory("./plugins"))
+	if(root)
 	{
-		return true; // already at SM root
-	}
-
-	for(const auto& prev : {"./sourcemod", "./addons/sourcemod"})
-	{
-		if(fs::is_directory(prev))
-		{
-			fs::current_path(prev);
-			return true;
-		}
-	}
-
-	if(start.empty())
-	{
-		out(Ch::Error) << "SourceMod root not found here." << cr;
+		fs::current_path(root.value());
 	}
 	else
 	{
-		out(Ch::Error) << "SourceMod root not found in " << start << cr;
-	}
-
-	return false;
-}
-
-int install(const Opts& opts)
-{
-	if(!goToSMRoot(opts.destination().value_or("")))
-	{
+		out(Ch::Error) << "SourceMod root not found." << cr;
 		return 1;
 	}
 
@@ -70,20 +39,28 @@ int install(const Opts& opts)
 			<< "Installing " << addon << "..."
 			<< Col::reset << cr;
 
-		for(const auto& file : Installer::getFiles(addon, db))
+		for(const auto& f : Installer::getFiles(addon, db))
 		{
-			fs::path path = file.path;
-			fs::create_directories(file.path);
-			path.append(file.name);
+			fs::path file = f.path;
+			file.append(f.name);
 
-			if(!down.file(file.url, path))
+			if(!SMFS::prepare(file.parent_path()))
+			{
+				out(Ch::Warn) << "Ignoring " << file << cr;
+				continue;
+			}
+
+			if(!down.file(f.url, file))
 			{
 				continue;
 			}
 
-			out() << path << cr;
+			out() << file << cr;
 
-			if(Archive::valid(path)) Archive::extract(path);
+			if(Archive::valid(file))
+			{
+				Archive::extract(file);
+			}
 		}
 	}
 
