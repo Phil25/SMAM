@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #include "gtest/gtest.h"
 #include "../src/utils/file.hpp"
@@ -115,6 +116,100 @@ TEST(UtilsTest, IsPathSafe)
 	EXPECT_FALSE(SMFS::isPathSafe(".././.././../."));
 	EXPECT_FALSE(SMFS::isPathSafe(".././../../././"));
 	EXPECT_FALSE(SMFS::isPathSafe("../../.././././.."));
+}
+
+TEST(UtilsTest, WriteData)
+{
+	EXPECT_TRUE(SMFS::writeData());
+
+	auto last = SMFS::fs::current_path();
+	SMFS::fs::current_path("/");
+
+	EXPECT_FALSE(SMFS::writeData());
+
+	SMFS::fs::current_path(last);
+}
+
+TEST(UtilsTest, IsInstalled)
+{
+	SMFS::fs::path dataFile = "testsmamdata";
+	std::ofstream ofs(dataFile, std::ios::trunc);
+	ASSERT_TRUE(ofs);
+
+	ofs << "multifile path/to/file1\n";
+	ofs << "multifile path/to/file2\n";
+	ofs << "multifile path/to/file3\n";
+
+	ofs << "spacemultifile \"path/to/file with spaces1\"\n";
+	ofs << "spacemultifile \"path/to/file with spaces2\"\n";
+	ofs << "spacemultifile \"path/to/file with spaces3\"\n";
+
+	ofs << "singlefile path/to/file4\n";
+	ofs << "spacesinglefile \"path/to/file with spaces4\"\n";
+
+	ofs << "nofiles\n";
+
+	ofs.close();
+
+	SMFS::loadData(dataFile);
+
+	EXPECT_TRUE(SMFS::isInstalled("multifile"));
+	EXPECT_TRUE(SMFS::isInstalled("spacemultifile"));
+
+	EXPECT_TRUE(SMFS::isInstalled("singlefile"));
+	EXPECT_TRUE(SMFS::isInstalled("spacesinglefile"));
+
+	EXPECT_FALSE(SMFS::isInstalled("nofiles"));
+	EXPECT_FALSE(SMFS::isInstalled("nothingatall"));
+
+	ASSERT_TRUE(SMFS::fs::remove(dataFile));
+}
+
+TEST(UtilsTest, RemoveAddon)
+{
+	namespace fs = SMFS::fs;
+
+	fs::create_directory("plugins");
+	fs::create_directory("gamedata");
+	fs::create_directory("translations");
+	std::ofstream("plugins/bin1.smx", std::ios::binary);
+	std::ofstream("gamedata/gd.txt");
+	std::ofstream("plugins/bin2.smx", std::ios::binary);
+	std::ofstream("translations/addon2.phrases.txt");
+
+	EXPECT_TRUE(fs::exists("plugins/bin1.smx"));
+	EXPECT_TRUE(fs::exists("gamedata/gd.txt"));
+	EXPECT_TRUE(fs::exists("plugins/bin2.smx"));
+	EXPECT_TRUE(fs::exists("translations/addon2.phrases.txt"));
+
+	fs::path dataFile = "testsmamdata";
+	std::ofstream ofs(dataFile, std::ios::trunc);
+	EXPECT_TRUE(ofs);
+
+	ofs << "addon1 plugins/bin1.smx\n";
+	ofs << "addon1 gamedata/gd.txt\n"; // shared with addon2
+
+	ofs << "addon2 plugins/bin2.smx\n";
+	ofs << "addon2 gamedata/gd.txt\n"; // shared with addon1
+	ofs << "addon2 translations/addon2.phrases.txt\n";
+
+	ofs.close();
+
+	SMFS::loadData(dataFile);
+
+	EXPECT_FALSE(SMFS::removeAddon("addon3"));
+	EXPECT_FALSE(SMFS::removeAddon("addon2 "));
+
+	EXPECT_TRUE(SMFS::removeAddon("addon2"));
+	EXPECT_TRUE(fs::exists("plugins/bin1.smx"));
+	EXPECT_TRUE(fs::exists("gamedata/gd.txt"));
+	EXPECT_FALSE(fs::exists("plugins/bin2.smx"));
+	EXPECT_FALSE(fs::exists("translations/addon2.phrases.txt"));
+
+	fs::remove(dataFile);
+	fs::remove_all("plugins");
+	fs::remove_all("gamedata");
+	fs::remove_all("translations");
 }
 
 TEST(UtilsTest, VersionBiggest)

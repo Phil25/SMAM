@@ -25,6 +25,7 @@ int install(const Opts& opts)
 		return 1;
 	}
 
+	SMFS::loadData();
 	Downloader down;
 	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
@@ -59,12 +60,16 @@ int install(const Opts& opts)
 
 			if(Archive::valid(file))
 			{
-				Archive::extract(file);
+				SMFS::addFiles(addon, Archive::extract(file));
+			}
+			else
+			{
+				SMFS::addFile(addon, file);
 			}
 		}
 	}
 
-	return 0;
+	return !SMFS::writeData();
 }
 
 int remove(const Opts&)

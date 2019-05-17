@@ -10,5 +10,5 @@ namespace Archive
 	bool valid(const fs::path&);
 
 	// Extract archive at `path` in the same directory
-	bool extract(const fs::path&);
+	auto extract(const fs::path&) -> std::vector<fs::path>;
 }

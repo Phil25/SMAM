@@ -11,16 +11,17 @@ bool Archive::valid(const fs::path& file)
 	return file.extension() == ".zip";
 }
 
-bool Archive::extract(const fs::path& zipFile)
+auto Archive::extract(const fs::path& zipFile) -> std::vector<fs::path>
 {
 	struct zip* z;
 	struct zip_stat s;
 
 	if((z = zip_open(zipFile.c_str(), 0, NULL)) == NULL)
 	{
-		return false;
+		return {};
 	}
 
+	std::vector<fs::path> files;
 	out(Ch::Info) << "Extracting " << zipFile.filename() << "..." << cr;
 
 	for(int i = 0; i < zip_get_num_entries(z, 0); ++i)
@@ -44,10 +45,12 @@ bool Archive::extract(const fs::path& zipFile)
 		zip_fread(f, contents, s.size);
 
 		std::ofstream(file).write(contents, s.size);
+		files.push_back(file);
+
 		zip_fclose(f);
 	}
 
 	zip_close(z);
 	fs::remove(zipFile);
-	return true;
+	return files;
 }
