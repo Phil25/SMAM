@@ -165,51 +165,76 @@ TEST(UtilsTest, IsInstalled)
 	ASSERT_TRUE(SMFS::fs::remove(dataFile));
 }
 
-TEST(UtilsTest, RemoveAddon)
+TEST(UtilsTest, GetFiles)
 {
 	namespace fs = SMFS::fs;
-
-	fs::create_directory("plugins");
-	fs::create_directory("gamedata");
-	fs::create_directory("translations");
-	std::ofstream("plugins/bin1.smx", std::ios::binary);
-	std::ofstream("gamedata/gd.txt");
-	std::ofstream("plugins/bin2.smx", std::ios::binary);
-	std::ofstream("translations/addon2.phrases.txt");
-
-	EXPECT_TRUE(fs::exists("plugins/bin1.smx"));
-	EXPECT_TRUE(fs::exists("gamedata/gd.txt"));
-	EXPECT_TRUE(fs::exists("plugins/bin2.smx"));
-	EXPECT_TRUE(fs::exists("translations/addon2.phrases.txt"));
 
 	fs::path dataFile = "testsmamdata";
 	std::ofstream ofs(dataFile, std::ios::trunc);
 	EXPECT_TRUE(ofs);
 
 	ofs << "addon1 plugins/bin1.smx\n";
-	ofs << "addon1 gamedata/gd.txt\n"; // shared with addon2
+	ofs << "addon1 gamedata/gd.txt\n";
 
 	ofs << "addon2 plugins/bin2.smx\n";
-	ofs << "addon2 gamedata/gd.txt\n"; // shared with addon1
-	ofs << "addon2 translations/addon2.phrases.txt\n";
+	ofs << "addon2 gamedata/gd.txt\n";
+	ofs << "addon2 translations/phrases.txt\n";
 
 	ofs.close();
 
 	SMFS::loadData(dataFile);
 
-	EXPECT_FALSE(SMFS::removeAddon("addon3"));
-	EXPECT_FALSE(SMFS::removeAddon("addon2 "));
+	auto comp = [](std::set<fs::path> expected, std::set<fs::path> actual)
+	{
+		ASSERT_EQ(expected.size(), actual.size());
 
-	EXPECT_TRUE(SMFS::removeAddon("addon2"));
-	EXPECT_TRUE(fs::exists("plugins/bin1.smx"));
-	EXPECT_TRUE(fs::exists("gamedata/gd.txt"));
-	EXPECT_FALSE(fs::exists("plugins/bin2.smx"));
-	EXPECT_FALSE(fs::exists("translations/addon2.phrases.txt"));
+		auto end = expected.end();
+		auto exp = expected.begin();
+		auto act = actual.begin();
+
+		for(; exp != end; ++exp, ++act)
+		{
+			EXPECT_EQ(*exp, *act);
+		}
+	};
+
+	comp({"plugins/bin1.smx", "gamedata/gd.txt"}, SMFS::getFiles("addon1"));
+	comp({"plugins/bin2.smx", "gamedata/gd.txt", "translations/phrases.txt"}, SMFS::getFiles("addon2"));
 
 	fs::remove(dataFile);
-	fs::remove_all("plugins");
-	fs::remove_all("gamedata");
-	fs::remove_all("translations");
+}
+
+TEST(UtilsTest, CountSharedFiles)
+{
+	namespace fs = SMFS::fs;
+
+	fs::path dataFile = "testsmamdata";
+	std::ofstream ofs(dataFile, std::ios::trunc);
+	EXPECT_TRUE(ofs);
+
+	ofs << "addon1 plugins/bin1.smx\n";
+	ofs << "addon1 gamedata/gd.txt\n"; // shared with rest
+
+	ofs << "addon2 plugins/bin2.smx\n";
+	ofs << "addon2 gamedata/gd.txt\n"; // shared with rest
+	ofs << "addon2 translations/addon2.phrases.txt\n"; // shared with 3
+
+	ofs << "addon3 plugins/bin3.smx\n";
+	ofs << "addon3 gamedata/gd.txt\n"; // shared with rest
+	ofs << "addon3 translations/addon2.phrases.txt\n"; // shared with 2
+
+	ofs.close();
+
+	SMFS::loadData(dataFile);
+
+	EXPECT_EQ(SMFS::countSharedFiles("plugins/bin1.smx"), 1);
+	EXPECT_EQ(SMFS::countSharedFiles("plugins/bin2.smx"), 1);
+	EXPECT_EQ(SMFS::countSharedFiles("plugins/bin3.smx"), 1);
+
+	EXPECT_EQ(SMFS::countSharedFiles("gamedata/gd.txt"), 3);
+	EXPECT_EQ(SMFS::countSharedFiles("translations/addon2.phrases.txt"), 2);
+
+	fs::remove(dataFile);
 }
 
 TEST(UtilsTest, VersionBiggest)

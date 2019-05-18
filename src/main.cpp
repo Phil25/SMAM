@@ -23,14 +23,14 @@ enum ExitCode
 
 int install(const Opts& opts)
 {
-	if(opts.getAddons().empty())
+	const auto& addons = opts.getAddons();
+	if(addons.empty())
 	{
 		out(Ch::Error) << "No addons specified." << cr;
 		return ExitCode::NoAddons;
 	}
 
 	auto root = SMFS::findRoot(opts.destination().value_or(""));
-
 	if(root)
 	{
 		fs::current_path(root.value());
@@ -45,8 +45,6 @@ int install(const Opts& opts)
 	Downloader down;
 	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
-
-	const auto& addons = opts.getAddons();
 	db.precache(addons);
 
 	for(const auto& addon : addons)
@@ -85,11 +83,77 @@ int install(const Opts& opts)
 		}
 	}
 
-	return SMFS::writeData() ? ExitCode::OK : ExitCode::WriteError;
+	if(!SMFS::writeData())
+	{
+		out(Ch::Error) << "Cannot write local addon metadata." << cr;
+		return ExitCode::WriteError;
+	}
+
+	return ExitCode::OK;
 }
 
-int remove(const Opts&)
+int remove(const Opts& opts)
 {
+	auto addons = opts.getAddons();
+	if(addons.empty())
+	{
+		out(Ch::Error) << "No addons specified." << cr;
+		return ExitCode::NoAddons;
+	}
+
+	auto root = SMFS::findRoot(opts.destination().value_or(""));
+	if(root)
+	{
+		fs::current_path(root.value());
+	}
+	else
+	{
+		out(Ch::Error) << "SourceMod root not found." << cr;
+		return ExitCode::NoSMRoot;
+	}
+
+	SMFS::loadData();
+
+	for(const auto& addon : addons)
+	{
+		if(!SMFS::isInstalled(addon))
+		{
+			out(Ch::Warn) << "Addon not installed: " << addon << cr;
+			continue;
+		}
+
+		out(Ch::Info)
+			<< Col::red
+			<< "Removing " << addon << "..."
+			<< Col::reset << cr;
+
+		for(const auto& f : SMFS::getFiles(addon))
+		{
+			if(!fs::exists(f))
+			{
+				out() << "Skipping nonexistent file: " << f << cr;
+				continue;
+			}
+
+			if(SMFS::countSharedFiles(f) > 1)
+			{
+				out() << "Skipping shared file: " << f << cr;
+				continue;
+			}
+
+			out() << f << cr;
+			fs::remove(f);
+		}
+
+		SMFS::removeAddon(addon);
+	}
+
+	if(!SMFS::writeData())
+	{
+		out(Ch::Error) << "Cannot write local addon metadata." << cr;
+		return ExitCode::WriteError;
+	}
+
 	return ExitCode::OK;
 }
 
@@ -125,7 +189,6 @@ int main(int argc, const char* argv[])
 	if(opts.noColor())	out.colors = false;
 
 	const auto& command = opts.getCommand();
-
 	if(command.empty())
 	{
 		out(Ch::Error) << "No command provided." << cr;

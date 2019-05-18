@@ -98,8 +98,13 @@ void SMFS::addFiles(const std::string& id, const PathVector& files)
 	data[id].insert(files.begin(), files.end());
 }
 
+void SMFS::removeAddon(const std::string& id)
+{
+	data.erase(id);
+}
+
 /*
- * Returns whether an addon of the given ID is installed
+ * Return whether an addon of the given ID is installed
  */
 bool SMFS::isInstalled(const std::string& id)
 {
@@ -107,9 +112,17 @@ bool SMFS::isInstalled(const std::string& id)
 }
 
 /*
+ * Return set of files associated with an AddonID
+ */
+auto SMFS::getFiles(const std::string& id) -> std::set<fs::path>
+{
+	return isInstalled(id) ? data[id] : std::set<fs::path>{};
+}
+
+/*
  * Return how many addons share the specified file
  */
-static int countSharedFiles(const SMFS::fs::path& file)
+int SMFS::countSharedFiles(const fs::path& file)
 {
 	int count = 0;
 	for(const auto& addon : data)
@@ -117,32 +130,4 @@ static int countSharedFiles(const SMFS::fs::path& file)
 		count += addon.second.count(file);
 	}
 	return count;
-}
-
-/*
- * Remove files of an addon, preserving files shared accross
- * mutliple installed addons
- */
-static void removeFiles(const std::string& id)
-{
-	for(const auto& file : data[id])
-	{
-		if(SMFS::fs::exists(file) && countSharedFiles(file) <= 1)
-		{
-			SMFS::fs::remove(file);
-		}
-	}
-}
-
-/*
- * Remove files of an addon and erase it from `data`
- */
-bool SMFS::removeAddon(const std::string& id)
-{
-	if(!SMFS::isInstalled(id)) return false;
-
-	removeFiles(id);
-	data.erase(id);
-
-	return true;
 }

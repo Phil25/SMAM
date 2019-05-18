@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <set>
 
 #include "file.hpp"
 
@@ -21,7 +22,9 @@ namespace SMFS // SourceMod file system
 
 	void addFile(const std::string& id, const fs::path&);
 	void addFiles(const std::string& id, const PathVector&);
+	void removeAddon(const std::string& id);
 
 	bool isInstalled(const std::string& id);
-	bool removeAddon(const std::string& id);
+	auto getFiles(const std::string& id) -> std::set<fs::path>;
+	int countSharedFiles(const fs::path& file);
 }
