@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo ""
-echo -e "\t\e[35m##############################################"
-echo -e "\t\e[35m############ TESTING INSTALLATION ############"
-echo -e "\t\e[35m##############################################"
+echo -e "\t\e[35m#############################################"
+echo -e "\t\e[35m############## TESTING REMOVAL ##############"
+echo -e "\t\e[35m#############################################"
 echo -e "\t\e[39m"
 
 declare -a data_advancedinfiniteammo=(
@@ -50,8 +50,10 @@ declare -a data_updater=(
 
 function test_addon()
 {
-	$SMAM install $1 -d ./mod
+	ADDON="$1"
 	shift
+
+	$SMAM install $ADDON -d ./mod
 	for file in $@; do
 		if [ ! -f "$file" ] || [ `stat -c%s "$file"` -eq 0 ]; then
 			echo -e "\e[31m[ ERROR ]\e[39m $file"
@@ -60,7 +62,65 @@ function test_addon()
 			echo -e "\e[32m[    OK ]\e[39m $file"
 		fi
 	done
+
+	$SMAM remove $ADDON -d ./mod
+	for file in $@; do
+		if [ ! -f "$file" ]; then
+			echo -e "\e[32m[    OK ]\e[39m Not found: $file"
+		else
+			echo -e "\e[31m[ ERROR ]\e[39m Still exists: $file"
+			exit 1
+		fi
+	done
 	echo ""
+}
+
+function test_shared()
+{
+	echo -e "\t\e[35m##############################################"
+	echo -e "\t\e[35m### TESTING SHARED FILE REMOVAL PREVENTION ###"
+	echo -e "\t\e[35m##############################################"
+	echo -e "\t\e[39m"
+
+	shift
+	UNSHARED_FILE="$1" # bin
+	SHARED_FILE="$2" # gamedata
+
+	$SMAM install thriller sharedthriller -d ./mod
+	for file in $@; do
+		if [ ! -f "$file" ] || [ `stat -c%s "$file"` -eq 0 ]; then
+			echo -e "\e[31m[ ERROR ]\e[39m $file"
+			exit 1
+		else
+			echo -e "\e[32m[    OK ]\e[39m $file"
+		fi
+	done
+
+	$SMAM remove sharedthriller -d ./mod
+	for file in $@; do
+		if [ ! -f "$file" ] || [ `stat -c%s "$file"` -eq 0 ]; then
+			echo -e "\e[31m[ ERROR ]\e[39m $file"
+			exit 1
+		else
+			echo -e "\e[32m[    OK ]\e[39m $file"
+		fi
+	done
+
+	$SMAM install sharedthriller -d ./mod
+	$SMAM remove thriller -d ./mod
+	if [ ! -f "$SHARED_FILE" ] || [ `stat -c%s "$SHARED_FILE"` -eq 0 ]; then
+		echo -e "\e[31m[ ERROR ]\e[39m $SHARED_FILE"
+		exit 1
+	else
+		echo -e "\e[32m[    OK ]\e[39m $SHARED_FILE"
+	fi
+
+	if [ ! -f "$UNSHARED_FILE" ]; then
+		echo -e "\e[32m[    OK ]\e[39m $UNSHARED_FILE"
+	else
+		echo -e "\e[31m[ ERROR ]\e[39m $UNSHARED_FILE"
+		exit 1
+	fi
 }
 
 if [ "$#" -lt 2 ]; then
@@ -103,6 +163,8 @@ test_addon ${data_tf2attributes[@]}
 test_addon ${data_tf2items[@]}
 test_addon ${data_thriller[@]}
 test_addon ${data_updater[@]}
+
+test_shared ${data_thriller[@]}
 
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod
