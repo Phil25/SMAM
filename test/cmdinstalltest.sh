@@ -47,6 +47,11 @@ declare -a data_updater=(
 	"updater"
 	"./mod/addons/sourcemod/plugins/updater.smx"
 )
+declare -a data_badaddon=(
+	"badaddon"
+	"../baddir/thriller.smx"
+	"../mod2/addons/sourcemod/data/thriller.plugin.txt"
+)
 
 function test_addon()
 {
@@ -61,6 +66,20 @@ function test_addon()
 		fi
 	done
 	echo ""
+}
+
+function test_badaddon()
+{
+	$SMAM install $1 -d ./mod
+	shift
+	for file in $@; do
+		if [ -f "$file" ]; then
+			echo -e "\e[31m[ ERROR ]\e[39m File exists: $file"
+			exit 1
+		else
+			echo -e "\e[32m[    OK ]\e[39m Not found: $file"
+		fi
+	done
 }
 
 if [ "$#" -lt 2 ]; then
@@ -103,6 +122,8 @@ test_addon ${data_tf2attributes[@]}
 test_addon ${data_tf2items[@]}
 test_addon ${data_thriller[@]}
 test_addon ${data_updater[@]}
+
+test_badaddon ${data_badaddon[@]}
 
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod
