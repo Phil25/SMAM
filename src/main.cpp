@@ -11,8 +11,24 @@
 using execCmd = int (*)(const Opts&);
 namespace fs = std::filesystem;
 
+enum ExitCode
+{
+	OK = 0,
+	WriteError = 1,
+	NoCommand,
+	UnknownCommand,
+	NoAddons,
+	NoSMRoot
+};
+
 int install(const Opts& opts)
 {
+	if(opts.getAddons().empty())
+	{
+		out(Ch::Error) << "No addons specified." << cr;
+		return ExitCode::NoAddons;
+	}
+
 	auto root = SMFS::findRoot(opts.destination().value_or(""));
 
 	if(root)
@@ -22,7 +38,7 @@ int install(const Opts& opts)
 	else
 	{
 		out(Ch::Error) << "SourceMod root not found." << cr;
-		return 1;
+		return ExitCode::NoSMRoot;
 	}
 
 	SMFS::loadData();
@@ -69,22 +85,22 @@ int install(const Opts& opts)
 		}
 	}
 
-	return !SMFS::writeData();
+	return SMFS::writeData() ? ExitCode::OK : ExitCode::WriteError;
 }
 
 int remove(const Opts&)
 {
-	return 0;
+	return ExitCode::OK;
 }
 
 int info(const Opts&)
 {
-	return 0;
+	return ExitCode::OK;
 }
 
 int search(const Opts&)
 {
-	return 0;
+	return ExitCode::OK;
 }
 
 int main(int argc, const char* argv[])
@@ -94,14 +110,14 @@ int main(int argc, const char* argv[])
 	if(opts.help())
 	{
 		opts.printHelp(argv[0], out.getStream());
-		return 0;
+		return ExitCode::OK;
 	}
 
 	if(opts.version())
 	{
 		out.noPrefix();
 		out() << Version::full() << cr;
-		return 0;
+		return ExitCode::OK;
 	}
 
 	if(opts.quiet())	out.quiet();
@@ -113,7 +129,7 @@ int main(int argc, const char* argv[])
 	if(command.empty())
 	{
 		out(Ch::Error) << "No command provided." << cr;
-		return 1;
+		return ExitCode::NoCommand;
 	}
 
 	const std::map<std::string_view, execCmd> cmdMap{
@@ -127,13 +143,7 @@ int main(int argc, const char* argv[])
 	if(!cmdMap.count(command))
 	{
 		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
-		return 1;
-	}
-
-	if(opts.getAddons().empty())
-	{
-		out(Ch::Error) << "No addons specified." << cr;
-		return 1;
+		return ExitCode::UnknownCommand;
 	}
 
 	return cmdMap.at(command)(opts);
