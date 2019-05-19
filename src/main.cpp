@@ -143,6 +143,7 @@ int remove(const Opts& opts)
 
 			out() << f << cr;
 			fs::remove(f);
+			SMFS::removeEmptyDirs(f);
 		}
 
 		SMFS::removeAddon(addon);

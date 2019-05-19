@@ -166,6 +166,14 @@ test_addon ${data_updater[@]}
 
 test_shared ${data_thriller[@]}
 
+# unused directory `source` created by funcommandsx
+if [ -d "./mod/addons/sourcemod/source" ]; then
+	echo -e "\e[31m[ ERROR ]\e[39m Unused directories not removed"
+	exit 1
+else
+	echo -e "\e[32m[    OK ]\e[39m Unused directories removed"
+fi
+
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod
 

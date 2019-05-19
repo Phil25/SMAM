@@ -16,6 +16,7 @@ namespace SMFS // SourceMod file system
 	auto findRoot(const fs::path& startAt) -> MaybePath;
 	bool prepare(const fs::path&);
 	bool isPathSafe(const fs::path&);
+	void removeEmptyDirs(fs::path startingFrom);
 
 	void loadData(const fs::path& filename=dataFilename);
 	bool writeData(const fs::path& filename=dataFilename);

@@ -118,6 +118,23 @@ TEST(UtilsTest, IsPathSafe)
 	EXPECT_FALSE(SMFS::isPathSafe("../../.././././.."));
 }
 
+TEST(UtilsTest, RemoveEmptyDirs)
+{
+	namespace fs = SMFS::fs;
+
+	fs::create_directories("something/this/way/comes");
+	fs::create_directories("something/this/somedir");
+	SMFS::removeEmptyDirs("something/this/way/comes");
+
+	EXPECT_FALSE(fs::exists("something/this/way/comes"));
+	EXPECT_FALSE(fs::exists("something/this/way"));
+
+	EXPECT_TRUE(fs::exists("something/this/"));
+	EXPECT_TRUE(fs::exists("something/this/somedir"));
+
+	fs::remove_all("something");
+}
+
 TEST(UtilsTest, WriteData)
 {
 	EXPECT_TRUE(SMFS::writeData());

@@ -40,6 +40,24 @@ bool SMFS::prepare(const fs::path& path)
 }
 
 /*
+ * Remove empty directories starting from the specified path,
+ * iterating into shallower directories. This path should always
+ * be (in practice) relative to the SourceMod root directory.
+ */
+void SMFS::removeEmptyDirs(fs::path p)
+{
+	while(!p.empty())
+	{
+		if(fs::is_directory(p) && fs::is_empty(p))
+		{
+			fs::remove_all(p);
+		}
+
+		p = p.parent_path();
+	}
+}
+
+/*
  * Make sure the path doesn't escape up to 2 directories
  * before the current path.
  */
