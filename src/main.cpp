@@ -8,7 +8,6 @@
 #include "installer.h"
 #include "downloader.h"
 
-using execCmd = int (*)(const Opts&);
 namespace fs = std::filesystem;
 
 enum ExitCode
@@ -21,7 +20,61 @@ enum ExitCode
 	NoSMRoot
 };
 
-int install(const Opts& opts)
+namespace Cmd
+{
+	using fptr = int (*)(const Opts&);
+	int install	(const Opts&);
+	int remove	(const Opts&);
+	int info	(const Opts&);
+	int search	(const Opts&);
+}
+
+int main(int argc, const char* argv[])
+{
+	const Opts opts(argc, argv);
+
+	if(opts.help())
+	{
+		opts.printHelp(argv[0], out.getStream());
+		return ExitCode::OK;
+	}
+
+	if(opts.version())
+	{
+		out.noPrefix();
+		out() << Version::full() << cr;
+		return ExitCode::OK;
+	}
+
+	if(opts.quiet())	out.quiet();
+	if(opts.noPrefix())	out.noPrefix();
+	if(opts.noColor())	out.colors = false;
+
+	const auto& command = opts.getCommand();
+	if(command.empty())
+	{
+		out(Ch::Error) << "No command provided." << cr;
+		return ExitCode::NoCommand;
+	}
+
+	const std::map<std::string_view, Cmd::fptr> cmds{
+		{"install",		Cmd::install},
+		{"remove",		Cmd::remove},
+		{"uninstall",	Cmd::remove},
+		{"info",		Cmd::info},
+		{"search",		Cmd::search},
+	};
+
+	if(!cmds.count(command))
+	{
+		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
+		return ExitCode::UnknownCommand;
+	}
+
+	return cmds.at(command)(opts);
+}
+
+int Cmd::install(const Opts& opts)
 {
 	const auto& addons = opts.getAddons();
 	if(addons.empty())
@@ -92,7 +145,7 @@ int install(const Opts& opts)
 	return ExitCode::OK;
 }
 
-int remove(const Opts& opts)
+int Cmd::remove(const Opts& opts)
 {
 	auto addons = opts.getAddons();
 	if(addons.empty())
@@ -158,57 +211,12 @@ int remove(const Opts& opts)
 	return ExitCode::OK;
 }
 
-int info(const Opts&)
+int Cmd::info(const Opts&)
 {
 	return ExitCode::OK;
 }
 
-int search(const Opts&)
+int Cmd::search(const Opts&)
 {
 	return ExitCode::OK;
-}
-
-int main(int argc, const char* argv[])
-{
-	const Opts opts(argc, argv);
-
-	if(opts.help())
-	{
-		opts.printHelp(argv[0], out.getStream());
-		return ExitCode::OK;
-	}
-
-	if(opts.version())
-	{
-		out.noPrefix();
-		out() << Version::full() << cr;
-		return ExitCode::OK;
-	}
-
-	if(opts.quiet())	out.quiet();
-	if(opts.noPrefix())	out.noPrefix();
-	if(opts.noColor())	out.colors = false;
-
-	const auto& command = opts.getCommand();
-	if(command.empty())
-	{
-		out(Ch::Error) << "No command provided." << cr;
-		return ExitCode::NoCommand;
-	}
-
-	const std::map<std::string_view, execCmd> cmdMap{
-		{"install",		install},
-		{"remove",		remove},
-		{"uninstall",	remove},
-		{"info",		info},
-		{"search",		search},
-	};
-
-	if(!cmdMap.count(command))
-	{
-		out(Ch::Error) << "Unknown command: \"" << command << '\"' << cr;
-		return ExitCode::UnknownCommand;
-	}
-
-	return cmdMap.at(command)(opts);
 }
