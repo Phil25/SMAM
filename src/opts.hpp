@@ -21,6 +21,7 @@ public:
 				("help,h", "Show help.")
 				("version", "Show version.")
 				("quiet,q", "Do not produce output.")
+				("force,f", "Force command execution.")
 				("no-prefix", "Disable prefixes in output.")
 				("no-color", "Disable color in output.")
 				("log", po::value<std::string>(), "Path to log file.")
@@ -105,6 +106,11 @@ public:
 	bool quiet() const
 	{
 		return vm.count("quiet");
+	}
+
+	bool force() const
+	{
+		return vm.count("force");
 	}
 
 	bool noColor() const

@@ -102,7 +102,7 @@ int Cmd::install(const Opts& opts)
 
 	for(const auto& addon : addons)
 	{
-		if(SMFS::isInstalled(addon))
+		if(SMFS::isInstalled(addon) && !opts.force())
 		{
 			out(Ch::Info) << addon << " already installed." << cr;
 			continue;
@@ -131,7 +131,7 @@ int Cmd::install(const Opts& opts)
 				continue;
 			}
 
-			out(existed ? Ch::Warn : Ch::Std)
+			out(existed && !opts.force() ? Ch::Warn : Ch::Std)
 				<< file << (existed ? " overwritten." : "") << cr;
 
 			if(Archive::valid(file))
