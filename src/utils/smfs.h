@@ -10,7 +10,6 @@ namespace SMFS // SourceMod file system
 {
 	namespace fs = std::filesystem;
 	using MaybePath = std::optional<fs::path>;
-	using PathVector = std::vector<fs::path>;
 	constexpr std::string_view dataFilename = ".smamdata";
 
 	auto findRoot(const fs::path& startAt) -> MaybePath;
@@ -22,7 +21,6 @@ namespace SMFS // SourceMod file system
 	bool writeData(const fs::path& filename=dataFilename);
 
 	void addFile(const std::string& id, const fs::path&);
-	void addFiles(const std::string& id, const PathVector&);
 	void removeAddon(const std::string& id);
 
 	bool isInstalled(const std::string& id);

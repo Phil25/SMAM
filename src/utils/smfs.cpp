@@ -111,11 +111,6 @@ void SMFS::addFile(const std::string& id, const fs::path& file)
 	data[id].insert(file);
 }
 
-void SMFS::addFiles(const std::string& id, const PathVector& files)
-{
-	data[id].insert(files.begin(), files.end());
-}
-
 void SMFS::removeAddon(const std::string& id)
 {
 	data.erase(id);
