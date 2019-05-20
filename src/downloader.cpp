@@ -55,7 +55,7 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 	{
-		out(Ch::Error) << curl_easy_strerror(res) << cr;
+		return {};
 	}
 
 	curl_easy_cleanup(curl);
@@ -66,11 +66,11 @@ std::string Downloader::html(cstr& url, cstr& from, cstr& to)
 /*
  * Download a file and write it to specified destination.
  */
-bool Downloader::file(cstr& url, cstr& dest)
+auto Downloader::file(cstr& url, cstr& dest) -> std::string
 {
 	if((curl = curl_easy_init()) == NULL)
 	{
-		return false;
+		return "Failed initializing downloader";
 	}
 
 	std::ostringstream oss;
@@ -79,8 +79,7 @@ bool Downloader::file(cstr& url, cstr& dest)
 	CURLcode res = curl_easy_perform(curl);
 	if(res != CURLE_OK)
 	{
-		out(Ch::Error) << curl_easy_strerror(res) << cr;
-		return false;
+		return curl_easy_strerror(res);
 	}
 
 	std::ofstream ofs(dest);
@@ -89,5 +88,5 @@ bool Downloader::file(cstr& url, cstr& dest)
 	ofs.close();
 	curl_easy_cleanup(curl);
 
-	return true;
+	return {};
 }

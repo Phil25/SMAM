@@ -102,6 +102,12 @@ int Cmd::install(const Opts& opts)
 
 	for(const auto& addon : addons)
 	{
+		if(SMFS::isInstalled(addon))
+		{
+			out(Ch::Info) << addon << " already installed." << cr;
+			continue;
+		}
+
 		out(Ch::Info)
 			<< Col::green
 			<< "Installing " << addon << "..."
@@ -114,16 +120,19 @@ int Cmd::install(const Opts& opts)
 
 			if(!SMFS::prepare(file.parent_path()))
 			{
-				out(Ch::Warn) << "Ignoring " << file << cr;
+				out(Ch::Warn) << file << " ignored." << cr;
 				continue;
 			}
 
-			if(!down.file(f.url, file))
+			bool existed = fs::exists(file);
+			if(auto err = down.file(f.url, file); !err.empty())
 			{
+				out(Ch::Error) << err << cr;
 				continue;
 			}
 
-			out() << file << cr;
+			out(existed ? Ch::Warn : Ch::Std)
+				<< file << (existed ? " overwritten." : "") << cr;
 
 			if(Archive::valid(file))
 			{

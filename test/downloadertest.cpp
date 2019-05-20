@@ -72,35 +72,35 @@ TEST_F(DownloaderTest, TF2Attributes)
 
 TEST_F(DownloaderTest, TF2ItemsFiles)
 {
-	ASSERT_TRUE(down.file("https://builds.limetech.io/files/tf2items-1.6.4-hg279-linux.zip", "tf2items-1.6.4-hg279-linux.zip"));
+	ASSERT_TRUE(down.file("https://builds.limetech.io/files/tf2items-1.6.4-hg279-linux.zip", "tf2items-1.6.4-hg279-linux.zip").empty());
 	ASSERT_TRUE(fileExists("tf2items-1.6.4-hg279-linux.zip"));
 	EXPECT_EQ(77707, getFileSize("tf2items-1.6.4-hg279-linux.zip"));
 }
 
 TEST_F(DownloaderTest, ThrillerFiles)
 {
-	ASSERT_TRUE(down.file("http://www.sourcemod.net/vbcompiler.php?file_id=128466", "thriller.smx"));
+	ASSERT_TRUE(down.file("http://www.sourcemod.net/vbcompiler.php?file_id=128466", "thriller.smx").empty());
 	ASSERT_TRUE(fileExists("thriller.smx"));
 	EXPECT_EQ(3691, getFileSize("thriller.smx"));
 
-	ASSERT_TRUE(down.file("https://forums.alliedmods.net/attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&attachmentid=133555&d=1400274898", "thriller.plugin.txt"));
+	ASSERT_TRUE(down.file("https://forums.alliedmods.net/attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&attachmentid=133555&d=1400274898", "thriller.plugin.txt").empty());
 	ASSERT_TRUE(fileExists("thriller.plugin.txt"));
 	EXPECT_EQ(656, getFileSize("thriller.plugin.txt"));
 }
 
 TEST_F(DownloaderTest, TF2AttributesFiles)
 {
-	ASSERT_TRUE(down.file("https://github.com/FlaminSarge/tf2attributes/releases/download/v1.2.1/tf2attributes.smx", "tf2attributes.smx"));
+	ASSERT_TRUE(down.file("https://github.com/FlaminSarge/tf2attributes/releases/download/v1.2.1/tf2attributes.smx", "tf2attributes.smx").empty());
 	ASSERT_TRUE(fileExists("tf2attributes.smx"));
 	EXPECT_EQ(12701, getFileSize("tf2attributes.smx"));
 
-	ASSERT_TRUE(down.file("https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt", "tf2.attributes.txt"));
+	ASSERT_TRUE(down.file("https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt", "tf2.attributes.txt").empty());
 	ASSERT_TRUE(fileExists("tf2.attributes.txt"));
 	EXPECT_EQ(3287, getFileSize("tf2.attributes.txt"));
 }
 
 TEST_F(DownloaderTest, InvalidLink)
 {
-	ASSERT_FALSE(down.file("invalid link", "somefile.bin"));
+	ASSERT_FALSE(down.file("invalid link", "somefile.bin").empty());
 	EXPECT_FALSE(fileExists("somefile.bin"));
 }

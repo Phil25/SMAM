@@ -159,12 +159,6 @@ test_addon ${data_advancedinfiniteammo[@]}
 test_addon ${data_afk_manager[@]}
 test_addon ${data_dynamic_motd[@]}
 test_addon ${data_funcommandsx[@]}
-test_addon ${data_tf2attributes[@]}
-test_addon ${data_tf2items[@]}
-test_addon ${data_thriller[@]}
-test_addon ${data_updater[@]}
-
-test_shared ${data_thriller[@]}
 
 # unused directory `source` created by funcommandsx
 if [ -d "./mod/addons/sourcemod/source" ]; then
@@ -173,6 +167,13 @@ if [ -d "./mod/addons/sourcemod/source" ]; then
 else
 	echo -e "\e[32m[    OK ]\e[39m Unused directories removed"
 fi
+
+test_addon ${data_tf2attributes[@]}
+test_addon ${data_tf2items[@]}
+test_addon ${data_thriller[@]}
+test_addon ${data_updater[@]}
+
+test_shared ${data_thriller[@]}
 
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod

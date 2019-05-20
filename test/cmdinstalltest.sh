@@ -68,6 +68,23 @@ function test_addon()
 	echo ""
 }
 
+function test_overwrite()
+{
+	# file for `updater` to overwrite
+	touch ${data_updater[1]}
+
+	$SMAM install $1 -d ./mod
+
+	# overwriting files
+	if [ `stat -c%s "${data_updater[1]}"` -eq 0 ]; then
+		echo -e "\e[31m[ ERROR ]\e[39m File not overwritten"
+		exit 1
+	else
+		echo -e "\e[32m[    OK ]\e[39m File overwritten"
+	fi
+	echo ""
+}
+
 function test_badaddon()
 {
 	$SMAM install $1 -d ./mod
@@ -80,6 +97,7 @@ function test_badaddon()
 			echo -e "\e[32m[    OK ]\e[39m Not found: $file"
 		fi
 	done
+	echo ""
 }
 
 if [ "$#" -lt 2 ]; then
@@ -121,7 +139,8 @@ test_addon ${data_funcommandsx[@]}
 test_addon ${data_tf2attributes[@]}
 test_addon ${data_tf2items[@]}
 test_addon ${data_thriller[@]}
-test_addon ${data_updater[@]}
+
+test_overwrite ${data_updater[@]}
 
 test_badaddon ${data_badaddon[@]}
 

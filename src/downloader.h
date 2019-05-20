@@ -16,6 +16,6 @@ class Downloader
 public:
 	Downloader();
 
-	std::string html(cstr& url, cstr& from="", cstr& to="");
-	bool file(cstr& url, cstr& dest);
+	auto html(cstr& url, cstr& from="", cstr& to="") -> std::string;
+	auto file(cstr& url, cstr& dest) -> std::string;
 };
