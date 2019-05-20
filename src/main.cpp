@@ -99,10 +99,28 @@ int Cmd::install(const Opts& opts)
 	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
 	db.precache(addons);
+	bool force = opts.force();
+
+	// prepare directories and add file to the addon list
+	auto prep = [force](const fs::path& file, const std::string& id)
+	{
+		if(!SMFS::prepare(file.parent_path()))
+		{
+			out(Ch::Warn) << "Ignoring " << file << cr;
+			return false;
+		}
+
+		bool exists = fs::exists(file);
+		out(exists && !force ? Ch::Warn : Ch::Std)
+			<< (exists ? "Overwriting " : "") << file << cr;
+
+		SMFS::addFile(id, file);
+		return true;
+	};
 
 	for(const auto& addon : addons)
 	{
-		if(SMFS::isInstalled(addon) && !opts.force())
+		if(SMFS::isInstalled(addon) && !force)
 		{
 			out(Ch::Info) << addon << " already installed." << cr;
 			continue;
@@ -117,30 +135,23 @@ int Cmd::install(const Opts& opts)
 		{
 			fs::path file = f.path;
 			file.append(f.name);
+			if(!prep(file, addon)) continue;
 
-			if(!SMFS::prepare(file.parent_path()))
-			{
-				out(Ch::Warn) << file << " ignored." << cr;
-				continue;
-			}
-
-			bool existed = fs::exists(file);
 			if(auto err = down.file(f.url, file); !err.empty())
 			{
 				out(Ch::Error) << err << cr;
 				continue;
 			}
 
-			out(existed && !opts.force() ? Ch::Warn : Ch::Std)
-				<< file << (existed ? " overwritten." : "") << cr;
-
 			if(Archive::valid(file))
 			{
-				SMFS::addFiles(addon, Archive::extract(file));
-			}
-			else
-			{
-				SMFS::addFile(addon, file);
+				out(Ch::Info)
+					<< "Extracting " << file.filename() << "..." << cr;
+
+				Archive::extract(file, [prep, &addon](const fs::path& f)
+				{
+					return prep(f, addon);
+				});
 			}
 		}
 	}

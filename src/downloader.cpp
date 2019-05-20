@@ -5,7 +5,6 @@
 #include <sstream>
 
 #include "utils/misc.h"
-#include "utils/printer.h"
 
 /*
  * Write downloaded data into an ostream
