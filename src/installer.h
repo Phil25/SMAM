@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "database.h"
 #include "downloader.h"
@@ -10,15 +11,10 @@
 
 namespace Installer
 {
-	using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
-	using ScraperArray = std::array<std::shared_ptr<Scraper>, 3>;
+	using Setup = std::function<bool(const File&)>;
 	using FileVector = std::vector<File>;
 
-	extern ScraperArray scrapers;
-
 	void initScrapers(Downloader&);
-
-	auto getFiles(const std::string& id, const Database&) -> FileVector;
-
-	auto getScraper(const std::string& url) -> MaybeScraper;
+	auto files(const std::string& id, const Database&) -> FileVector;
+	bool setup(const std::string& id, const Database&, Setup);
 };

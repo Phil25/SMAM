@@ -13,15 +13,14 @@ namespace SMFS // SourceMod file system
 	constexpr std::string_view dataFilename = ".smamdata";
 
 	auto findRoot(const fs::path& startAt) -> MaybePath;
-	bool prepare(const fs::path&);
 	bool isPathSafe(const fs::path&);
-	void removeEmptyDirs(fs::path startingFrom);
 
 	void loadData(const fs::path& filename=dataFilename);
 	bool writeData(const fs::path& filename=dataFilename);
 
-	void addFile(const std::string& id, const fs::path&);
+	bool regFile(const SMFS::fs::path& file, const std::string& id);
 	void removeAddon(const std::string& id);
+	void removeEmptyDirs(fs::path startingFrom);
 
 	bool isInstalled(const std::string& id);
 	auto getFiles(const std::string& id) -> std::set<fs::path>;

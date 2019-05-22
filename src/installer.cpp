@@ -9,6 +9,10 @@
 #include "scrapers/ltscraper.h"
 #include "scrapers/ghscraper.h"
 
+using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
+
+static std::array<std::shared_ptr<Scraper>, 3> scrapers;
+
 /*
  * Return vector of Attachment names matched against `base` regex.
  */
@@ -44,7 +48,7 @@ static std::vector<std::string> findMatches(
  * individual download URLs; ./scrapers/scraper.h).
  * Attachments are received from a Scraper and can be an empty object.
  *
- * The purpose is to obtain a File vector, each instance having appropriate
+ * The purpose is to obtain FileVector, each instance having appropriate
  * File::name (instead of ex. a link or regex string), and
  * File::url (URL from which the file can be downloaded).
  *
@@ -116,7 +120,45 @@ static void processFiles(
 	}
 }
 
-Installer::ScraperArray Installer::scrapers;
+/*
+ * Return appropriate Scraper for given URL or null.
+ */
+static auto getScraper(const std::string& url) -> MaybeScraper
+{
+	for(const auto& scraper : scrapers)
+	{
+		if(scraper->match(url))
+		{
+			return scraper;
+		}
+	}
+
+	return std::nullopt;
+}
+
+/*
+ * Returns the processed files of a specified addon.
+ */
+Installer::FileVector Installer::files(
+	const std::string& id,
+	const Database& db)
+{
+	auto [url, files] = db.get(id);
+
+	if(!url.empty())
+	{
+		Attachments attachments;
+
+		if(auto scraper = getScraper(url))
+		{
+			attachments = scraper->get()->fetch(url);
+		}
+
+		processFiles(url, files, attachments);
+	}
+
+	return files;
+}
 
 /*
  * Initialize std::array<Scraper, 3> of usable Scraper instances.
@@ -129,39 +171,15 @@ void Installer::initScrapers(Downloader& d)
 }
 
 /*
- * Return vector of fully processed File instances.
+ * Return whether all files passed to `setup` function were
+ * properly setup.
  */
-auto Installer::getFiles(Utils::cstr& id, const Database& db) -> FileVector
+bool Installer::setup(Utils::cstr& id, const Database& db, Setup setup)
 {
-	auto [url, files] = db.get(id);
-
-	if(!url.empty())
+	for(const auto& file : files(id, db))
 	{
-		Attachments attachments;
-
-		if(MaybeScraper scraper = getScraper(url))
-		{
-			attachments = scraper->get()->fetch(url);
-		}
-
-		processFiles(url, files, attachments);
+		if(!setup(file)) return false;
 	}
 
-	return files;
-}
-
-/*
- * Return appropriate Scraper for given URL or null.
- */
-auto Installer::getScraper(const std::string& url) -> MaybeScraper
-{
-	for(const auto& scraper : scrapers)
-	{
-		if(scraper->match(url))
-		{
-			return scraper;
-		}
-	}
-
-	return std::nullopt;
+	return true;
 }

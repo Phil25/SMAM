@@ -99,25 +99,8 @@ int Cmd::install(const Opts& opts)
 	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
 	db.precache(addons);
+
 	bool force = opts.force();
-
-	// prepare directories and add file to the addon list
-	auto prep = [force](const fs::path& file, const std::string& id)
-	{
-		if(!SMFS::prepare(file.parent_path()))
-		{
-			out(Ch::Warn) << "Ignoring " << file << cr;
-			return false;
-		}
-
-		bool exists = fs::exists(file);
-		out(exists && !force ? Ch::Warn : Ch::Std)
-			<< (exists ? "Overwriting " : "") << file << cr;
-
-		SMFS::addFile(id, file);
-		return true;
-	};
-
 	for(const auto& addon : addons)
 	{
 		if(SMFS::isInstalled(addon) && !force)
@@ -131,28 +114,31 @@ int Cmd::install(const Opts& opts)
 			<< "Installing " << addon << "..."
 			<< Col::reset << cr;
 
-		for(const auto& f : Installer::getFiles(addon, db))
+		bool success = Installer::setup(addon, db, [&](const File& f)
 		{
 			fs::path file = f.path;
 			file.append(f.name);
-			if(!prep(file, addon)) continue;
+			if(!SMFS::regFile(file, addon)) return false;
 
 			if(auto err = down.file(f.url, file); !err.empty())
 			{
 				out(Ch::Error) << err << cr;
-				continue;
+				return false;
 			}
 
-			if(Archive::valid(file))
+			if(!Archive::valid(file)) return true; // no further action
+
+			out(Ch::Info) << "Extracting " << f.name << "..." << cr;
+
+			return Archive::extract(file, [&](const fs::path& extracted)
 			{
-				out(Ch::Info)
-					<< "Extracting " << file.filename() << "..." << cr;
+				return SMFS::regFile(extracted, addon);
+			});
+		});
 
-				Archive::extract(file, [prep, &addon](const fs::path& f)
-				{
-					return prep(f, addon);
-				});
-			}
+		if(!success)
+		{
+			out(Ch::Error) << addon << " failed to install!" << cr;
 		}
 	}
 

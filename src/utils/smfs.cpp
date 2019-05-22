@@ -1,5 +1,7 @@
 #include "smfs.h"
 
+#include "printer.h"
+
 #include <fstream>
 #include <set>
 #include <map>
@@ -29,35 +31,6 @@ auto SMFS::findRoot(const fs::path& st) -> MaybePath
 }
 
 /*
- * Safely prepare directories for a file of an addon, preveting
- * the file.path to go beyond the allowed directory structure.
- */
-bool SMFS::prepare(const fs::path& path)
-{
-	if(!isPathSafe(path)) return false;
-	create_directories(path);
-	return true;
-}
-
-/*
- * Remove empty directories starting from the specified path,
- * iterating into shallower directories. This path should always
- * be (in practice) relative to the SourceMod root directory.
- */
-void SMFS::removeEmptyDirs(fs::path p)
-{
-	while(!p.empty())
-	{
-		if(fs::is_directory(p) && fs::is_empty(p))
-		{
-			fs::remove_all(p);
-		}
-
-		p = p.parent_path();
-	}
-}
-
-/*
  * Make sure the path doesn't escape up to 2 directories
  * before the current path.
  */
@@ -83,7 +56,7 @@ void SMFS::loadData(const fs::path& dataFile)
 	std::string id;
 	fs::path file;
 
-	while(ifs >> id >> file) addFile(id, file);
+	while(ifs >> id >> file) data[id].insert(file);
 	ifs.close();
 }
 
@@ -106,14 +79,61 @@ bool SMFS::writeData(const fs::path& dataFile)
 	return true;
 }
 
-void SMFS::addFile(const std::string& id, const fs::path& file)
+/*
+ * Safely prepare directories for a file of an addon, preveting
+ * the file.path to go beyond the allowed directory structure.
+ */
+static bool prepare(const SMFS::fs::path& path)
 {
-	data[id].insert(file);
+	if(!SMFS::isPathSafe(path)) return false;
+	create_directories(path);
+	return true;
 }
 
+/*
+ * Safely prepare directories for a specific file, and add it to cache
+ * under its addon's id.
+ */
+bool SMFS::regFile(const SMFS::fs::path& file, const std::string& id)
+{
+	if(!prepare(file.parent_path()))
+	{
+		out(Ch::Warn) << "Ignoring " << file << cr;
+		return false;
+	}
+
+	bool exists = SMFS::fs::exists(file);
+	out(exists ? Ch::Warn : Ch::Std)
+		<< (exists ? "Overwriting " : "") << file << cr;
+
+	data[id].insert(file);
+	return true;
+}
+
+/*
+ * Remove addon from local cache
+ */
 void SMFS::removeAddon(const std::string& id)
 {
 	data.erase(id);
+}
+
+/*
+ * Remove empty directories starting from the specified path,
+ * iterating into shallower directories. This path should always
+ * be (in practice) relative to the SourceMod root directory.
+ */
+void SMFS::removeEmptyDirs(fs::path p)
+{
+	while(!p.empty())
+	{
+		if(fs::is_directory(p) && fs::is_empty(p))
+		{
+			fs::remove_all(p);
+		}
+
+		p = p.parent_path();
+	}
 }
 
 /*

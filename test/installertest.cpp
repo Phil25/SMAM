@@ -49,7 +49,7 @@ TEST_F(InstallerTest, Accelerator)
 	};
 
 	db.precache({"accelerator"});
-	compare(expected, Installer::getFiles("accelerator", db));
+	compare(expected, Installer::files("accelerator", db));
 }
 
 TEST_F(InstallerTest, AdvancedInfiniteAmmo)
@@ -59,7 +59,7 @@ TEST_F(InstallerTest, AdvancedInfiniteAmmo)
 	};
 
 	db.precache({"advancedinfiniteammo"});
-	compare(expected, Installer::getFiles("advancedinfiniteammo", db));
+	compare(expected, Installer::files("advancedinfiniteammo", db));
 }
 
 TEST_F(InstallerTest, AFKManager)
@@ -70,7 +70,7 @@ TEST_F(InstallerTest, AFKManager)
 	};
 
 	db.precache({"afk_manager"});
-	compare(expected, Installer::getFiles("afk_manager", db));
+	compare(expected, Installer::files("afk_manager", db));
 }
 
 TEST_F(InstallerTest, Connect)
@@ -80,7 +80,7 @@ TEST_F(InstallerTest, Connect)
 	};
 
 	db.precache({"connect"});
-	compare(expected, Installer::getFiles("connect", db));
+	compare(expected, Installer::files("connect", db));
 }
 
 TEST_F(InstallerTest, DynamicMotd)
@@ -90,7 +90,7 @@ TEST_F(InstallerTest, DynamicMotd)
 	};
 
 	db.precache({"dynamic_motd"});
-	compare(expected, Installer::getFiles("dynamic_motd", db));
+	compare(expected, Installer::files("dynamic_motd", db));
 }
 
 TEST_F(InstallerTest, FuncommandsX)
@@ -100,7 +100,7 @@ TEST_F(InstallerTest, FuncommandsX)
 	};
 
 	db.precache({"funcommandsx"});
-	compare(expected, Installer::getFiles("funcommandsx", db));
+	compare(expected, Installer::files("funcommandsx", db));
 }
 
 TEST_F(InstallerTest, SteamTools)
@@ -110,7 +110,7 @@ TEST_F(InstallerTest, SteamTools)
 	};
 
 	db.precache({"steamtools"});
-	compare(expected, Installer::getFiles("steamtools", db));
+	compare(expected, Installer::files("steamtools", db));
 }
 
 TEST_F(InstallerTest, TF2Attributes)
@@ -121,7 +121,7 @@ TEST_F(InstallerTest, TF2Attributes)
 	};
 
 	db.precache({"tf2attributes"});
-	compare(expected, Installer::getFiles("tf2attributes", db));
+	compare(expected, Installer::files("tf2attributes", db));
 }
 
 TEST_F(InstallerTest, TF2Items)
@@ -131,7 +131,7 @@ TEST_F(InstallerTest, TF2Items)
 	};
 
 	db.precache({"tf2items"});
-	compare(expected, Installer::getFiles("tf2items", db));
+	compare(expected, Installer::files("tf2items", db));
 }
 
 TEST_F(InstallerTest, Thriller)
@@ -142,7 +142,7 @@ TEST_F(InstallerTest, Thriller)
 	};
 
 	db.precache({"thriller"});
-	compare(expected, Installer::getFiles("thriller", db));
+	compare(expected, Installer::files("thriller", db));
 }
 
 TEST_F(InstallerTest, Updater)
@@ -152,5 +152,5 @@ TEST_F(InstallerTest, Updater)
 	};
 
 	db.precache({"updater"});
-	compare(expected, Installer::getFiles("updater", db));
+	compare(expected, Installer::files("updater", db));
 }
