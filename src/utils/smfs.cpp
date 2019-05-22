@@ -111,10 +111,23 @@ bool SMFS::regFile(const SMFS::fs::path& file, const std::string& id)
 }
 
 /*
- * Remove addon from local cache
+ * Remove an addon and its files from the disk and local cache
  */
-void SMFS::removeAddon(const std::string& id)
+void SMFS::removeAddon(const std::string& id, bool print)
 {
+	for(const auto& f : SMFS::getFiles(id))
+	{
+		if(!fs::exists(f) || SMFS::countSharedFiles(f) > 1)
+		{
+			continue;
+		}
+
+		if(print) out() << f << cr;
+
+		fs::remove(f);
+		SMFS::removeEmptyDirs(f);
+	}
+
 	data.erase(id);
 }
 

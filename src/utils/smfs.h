@@ -19,7 +19,7 @@ namespace SMFS // SourceMod file system
 	bool writeData(const fs::path& filename=dataFilename);
 
 	bool regFile(const SMFS::fs::path& file, const std::string& id);
-	void removeAddon(const std::string& id);
+	void removeAddon(const std::string& id, bool print=true);
 	void removeEmptyDirs(fs::path startingFrom);
 
 	bool isInstalled(const std::string& id);

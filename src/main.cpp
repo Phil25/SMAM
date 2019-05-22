@@ -100,10 +100,9 @@ int Cmd::install(const Opts& opts)
 	Installer::initScrapers(down);
 	db.precache(addons);
 
-	bool force = opts.force();
 	for(const auto& addon : addons)
 	{
-		if(SMFS::isInstalled(addon) && !force)
+		if(SMFS::isInstalled(addon) && !opts.force())
 		{
 			out(Ch::Info) << addon << " already installed." << cr;
 			continue;
@@ -138,7 +137,8 @@ int Cmd::install(const Opts& opts)
 
 		if(!success)
 		{
-			out(Ch::Error) << addon << " failed to install!" << cr;
+			out(Ch::Error) << addon << " failed to install." << cr;
+			SMFS::removeAddon(addon, false);
 		}
 	}
 
@@ -185,25 +185,6 @@ int Cmd::remove(const Opts& opts)
 			<< Col::red
 			<< "Removing " << addon << "..."
 			<< Col::reset << cr;
-
-		for(const auto& f : SMFS::getFiles(addon))
-		{
-			if(!fs::exists(f))
-			{
-				out() << "Skipping nonexistent file: " << f << cr;
-				continue;
-			}
-
-			if(SMFS::countSharedFiles(f) > 1)
-			{
-				out() << "Skipping shared file: " << f << cr;
-				continue;
-			}
-
-			out() << f << cr;
-			fs::remove(f);
-			SMFS::removeEmptyDirs(f);
-		}
 
 		SMFS::removeAddon(addon);
 	}

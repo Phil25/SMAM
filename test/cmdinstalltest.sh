@@ -52,6 +52,11 @@ declare -a data_badaddon=(
 	"../baddir/thriller.smx"
 	"../mod2/addons/sourcemod/data/thriller.plugin.txt"
 )
+declare -a data_badthriller=(
+	"badthriller"
+	"./mod/addons/sourcemod/plugins/thriller.smx"
+	"./mod/addons/sourcemod/gamedata/invalid.plugin.txt"
+)
 
 function test_addon()
 {
@@ -87,6 +92,22 @@ function test_overwrite()
 
 function test_badaddon()
 {
+	$SMAM install $1 -d ./mod
+	shift
+	for file in $@; do
+		if [ -f "$file" ]; then
+			echo -e "\e[31m[ ERROR ]\e[39m File exists: $file"
+			exit 1
+		else
+			echo -e "\e[32m[    OK ]\e[39m Not found: $file"
+		fi
+	done
+	echo ""
+}
+
+function test_badthriller()
+{
+	$SMAM remove thriller -d ./mod
 	$SMAM install $1 -d ./mod
 	shift
 	for file in $@; do
@@ -143,6 +164,8 @@ test_addon ${data_thriller[@]}
 test_overwrite ${data_updater[@]}
 
 test_badaddon ${data_badaddon[@]}
+
+test_badthriller ${data_badthriller[@]}
 
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod
