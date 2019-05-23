@@ -182,6 +182,45 @@ TEST(UtilsTest, IsInstalled)
 	ASSERT_TRUE(SMFS::fs::remove(dataFile));
 }
 
+TEST(UtilsTest, GetFiles)
+{
+	namespace fs = SMFS::fs;
+
+	fs::path dataFile = "testsmamdata";
+	std::ofstream ofs(dataFile, std::ios::trunc);
+	EXPECT_TRUE(ofs);
+
+	ofs << "addon1 plugins/bin1.smx\n";
+	ofs << "addon1 gamedata/gd.txt\n";
+
+	ofs << "addon2 plugins/bin2.smx\n";
+	ofs << "addon2 gamedata/gd.txt\n";
+	ofs << "addon2 translations/phrases.txt\n";
+
+	ofs.close();
+
+	SMFS::loadData(dataFile);
+
+	auto comp = [](std::set<fs::path> expected, std::set<fs::path> actual)
+	{
+		ASSERT_EQ(expected.size(), actual.size());
+
+		auto end = expected.end();
+		auto exp = expected.begin();
+		auto act = actual.begin();
+
+		for(; exp != end; ++exp, ++act)
+		{
+			EXPECT_EQ(*exp, *act);
+		}
+	};
+
+	comp({"plugins/bin1.smx", "gamedata/gd.txt"}, SMFS::getFiles("addon1"));
+	comp({"plugins/bin2.smx", "gamedata/gd.txt", "translations/phrases.txt"}, SMFS::getFiles("addon2"));
+
+	fs::remove(dataFile);
+}
+
 TEST(UtilsTest, CountSharedFiles)
 {
 	namespace fs = SMFS::fs;

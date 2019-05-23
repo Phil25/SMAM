@@ -97,16 +97,6 @@ void SMFS::addFile(const fs::path& file, const std::string& id)
 }
 
 /*
- * Return set of files associated with an AddonID
- */
-static auto getFiles(const std::string& id) -> std::set<SMFS::fs::path>
-{
-	return SMFS::isInstalled(id)
-		? data[id]
-		: std::set<SMFS::fs::path>{};
-}
-
-/*
  * Remove an addon and its files from the disk and local cache
  */
 void SMFS::removeAddon(const std::string& id, const NotifyFile& cb)
@@ -156,6 +146,22 @@ void SMFS::removeEmptyDirs(fs::path p)
 bool SMFS::isInstalled(const std::string& id)
 {
 	return data.count(id);
+}
+
+/*
+ * Iterate over installed addons
+ */
+void SMFS::getInstalled(const ForAddon& cb)
+{
+	for(const auto& addon : data) cb(addon.first);
+}
+
+/*
+ * Return set of files associated with an AddonID
+ */
+auto SMFS::getFiles(const std::string& id) -> std::set<fs::path>
+{
+	return isInstalled(id) ? data[id] : std::set<fs::path>{};
 }
 
 /*

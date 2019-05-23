@@ -62,6 +62,7 @@ int main(int argc, const char* argv[])
 		{"remove",		Cmd::remove},
 		{"uninstall",	Cmd::remove},
 		{"info",		Cmd::info},
+		{"list",		Cmd::info},
 		{"search",		Cmd::search},
 	};
 
@@ -239,8 +240,28 @@ int Cmd::remove(const Opts& opts)
 	return ExitCode::OK;
 }
 
-int Cmd::info(const Opts&)
+int Cmd::info(const Opts& opts)
 {
+	auto root = SMFS::findRoot(opts.destination().value_or(""));
+	if(root)
+	{
+		fs::current_path(root.value());
+	}
+	else
+	{
+		out(Ch::Error) << "SourceMod root not found." << cr;
+		return ExitCode::NoSMRoot;
+	}
+
+	SMFS::loadData();
+
+	out(Ch::Info) << "Installed addons:" << cr;
+	SMFS::getInstalled([](const std::string& addon)
+	{
+		out() << addon << " ("
+			<< SMFS::getFiles(addon).size() << " file(s))" << cr;
+	});
+
 	return ExitCode::OK;
 }
 
