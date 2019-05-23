@@ -100,6 +100,7 @@ int Cmd::install(const Opts& opts)
 	Database db(down, opts.getDbUrl());
 	Installer::initScrapers(down);
 	db.precache(addons);
+	int failed = 0;
 
 	for(const auto& addon : addons)
 	{
@@ -154,8 +155,11 @@ int Cmd::install(const Opts& opts)
 
 		if(!success)
 		{
-			out(Ch::Error) << addon << " failed to install." << cr;
+			out(Ch::Error)
+				<< Col::red << "Failed to install " << addon
+				<< Col::reset << cr;
 			SMFS::removeAddon(addon);
+			++failed;
 		}
 	}
 
@@ -164,6 +168,10 @@ int Cmd::install(const Opts& opts)
 		out(Ch::Error) << "Cannot write local addon metadata." << cr;
 		return ExitCode::WriteError;
 	}
+
+	if(failed) out(Ch::Error)
+		<< Col::red << failed << " addon(s) failed to install."
+		<< Col::reset << cr;
 
 	return ExitCode::OK;
 }
@@ -199,7 +207,7 @@ int Cmd::remove(const Opts& opts)
 		}
 
 		out(Ch::Info)
-			<< Col::red
+			<< Col::yellow
 			<< "Removing " << addon << "..."
 			<< Col::reset << cr;
 
