@@ -8,7 +8,7 @@ bool Archive::valid(const fs::path& file)
 	return file.extension() == ".zip";
 }
 
-bool Archive::extract(const fs::path& zipFile, FileCb cb)
+bool Archive::extract(const fs::path& zipFile, const FileCb& cb)
 {
 	struct zip* z;
 	struct zip_stat s;

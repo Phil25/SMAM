@@ -12,5 +12,5 @@ namespace Archive
 	bool valid(const fs::path&);
 
 	// Extract archive at `path` in the same directory
-	bool extract(const fs::path&, FileCb cb);
+	bool extract(const fs::path&, const FileCb& cb);
 }

@@ -74,6 +74,7 @@ int main(int argc, const char* argv[])
 	return cmds.at(command)(opts);
 }
 
+
 int Cmd::install(const Opts& opts)
 {
 	const auto& addons = opts.getAddons();
@@ -113,11 +114,27 @@ int Cmd::install(const Opts& opts)
 			<< "Installing " << addon << "..."
 			<< Col::reset << cr;
 
+		auto regFile = [&](const fs::path& file)
+		{
+			if(!SMFS::prepare(file.parent_path()))
+			{
+				out(Ch::Warn) << "Ignoring " << file << cr;
+				return false;
+			}
+
+			bool exists = SMFS::fs::exists(file);
+			out(exists ? Ch::Warn : Ch::Std)
+				<< (exists ? "Overwriting " : "") << file << cr;
+
+			SMFS::addFile(file, addon);
+			return true;
+		};
+
 		bool success = Installer::setup(addon, db, [&](const File& f)
 		{
 			fs::path file = f.path;
 			file.append(f.name);
-			if(!SMFS::regFile(file, addon)) return false;
+			if(!regFile(file)) return false;
 
 			if(auto err = down.file(f.url, file); !err.empty())
 			{
@@ -131,14 +148,14 @@ int Cmd::install(const Opts& opts)
 
 			return Archive::extract(file, [&](const fs::path& extracted)
 			{
-				return SMFS::regFile(extracted, addon);
+				return regFile(extracted);
 			});
 		});
 
 		if(!success)
 		{
 			out(Ch::Error) << addon << " failed to install." << cr;
-			SMFS::removeAddon(addon, false);
+			SMFS::removeAddon(addon);
 		}
 	}
 
@@ -186,7 +203,23 @@ int Cmd::remove(const Opts& opts)
 			<< "Removing " << addon << "..."
 			<< Col::reset << cr;
 
-		SMFS::removeAddon(addon);
+		SMFS::removeAddon(addon,
+			[](const fs::path& file, bool exists, int shared)
+		{
+			if(!exists)
+			{
+				out() << "Skipping nonexistent file: " << file << cr;
+				return;
+			}
+
+			if(shared > 1)
+			{
+				out() << "Skipping shared file: " << file << cr;
+				return;
+			}
+
+			out() << file << cr;
+		});
 	}
 
 	if(!SMFS::writeData())

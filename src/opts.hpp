@@ -1,5 +1,4 @@
 #include <boost/program_options.hpp>
-#include <functional>
 #include <iomanip>
 
 #include "utils/printer.h"

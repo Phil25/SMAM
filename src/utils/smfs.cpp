@@ -1,7 +1,5 @@
 #include "smfs.h"
 
-#include "printer.h"
-
 #include <fstream>
 #include <set>
 #include <map>
@@ -48,6 +46,17 @@ bool SMFS::isPathSafe(const fs::path& path)
 }
 
 /*
+ * Safely prepare directories for a file of an addon, preveting
+ * the file.path to go beyond the allowed directory structure.
+ */
+bool SMFS::prepare(const fs::path& path)
+{
+	if(!isPathSafe(path)) return false;
+	create_directories(path);
+	return true;
+}
+
+/*
  * Load installed addons from `dataFile` file into `data` map
  */
 void SMFS::loadData(const fs::path& dataFile)
@@ -56,7 +65,7 @@ void SMFS::loadData(const fs::path& dataFile)
 	std::string id;
 	fs::path file;
 
-	while(ifs >> id >> file) data[id].insert(file);
+	while(ifs >> id >> file) addFile(file, id);
 	ifs.close();
 }
 
@@ -80,55 +89,47 @@ bool SMFS::writeData(const fs::path& dataFile)
 }
 
 /*
- * Safely prepare directories for a file of an addon, preveting
- * the file.path to go beyond the allowed directory structure.
+ * Add file to specified addon ID's cache
  */
-static bool prepare(const SMFS::fs::path& path)
+void SMFS::addFile(const fs::path& file, const std::string& id)
 {
-	if(!SMFS::isPathSafe(path)) return false;
-	create_directories(path);
-	return true;
+	data[id].insert(file);
 }
 
 /*
- * Safely prepare directories for a specific file, and add it to cache
- * under its addon's id.
+ * Return set of files associated with an AddonID
  */
-bool SMFS::regFile(const SMFS::fs::path& file, const std::string& id)
+static auto getFiles(const std::string& id) -> std::set<SMFS::fs::path>
 {
-	if(!prepare(file.parent_path()))
-	{
-		out(Ch::Warn) << "Ignoring " << file << cr;
-		return false;
-	}
-
-	bool exists = SMFS::fs::exists(file);
-	out(exists ? Ch::Warn : Ch::Std)
-		<< (exists ? "Overwriting " : "") << file << cr;
-
-	data[id].insert(file);
-	return true;
+	return SMFS::isInstalled(id)
+		? data[id]
+		: std::set<SMFS::fs::path>{};
 }
 
 /*
  * Remove an addon and its files from the disk and local cache
  */
-void SMFS::removeAddon(const std::string& id, bool print)
+void SMFS::removeAddon(const std::string& id, const NotifyFile& cb)
 {
-	for(const auto& f : SMFS::getFiles(id))
+	for(const auto& file : getFiles(id))
 	{
-		if(!fs::exists(f) || SMFS::countSharedFiles(f) > 1)
+		bool exists = fs::exists(file);
+		int shared = countSharedFiles(file);
+		cb(file, exists, shared);
+
+		if(exists && shared <= 1)
 		{
-			continue;
+			fs::remove(file);
+			SMFS::removeEmptyDirs(file);
 		}
-
-		if(print) out() << f << cr;
-
-		fs::remove(f);
-		SMFS::removeEmptyDirs(f);
 	}
 
 	data.erase(id);
+}
+
+void SMFS::removeAddon(const std::string& id)
+{
+	removeAddon(id, [](const fs::path&, bool, int){});
 }
 
 /*
@@ -155,14 +156,6 @@ void SMFS::removeEmptyDirs(fs::path p)
 bool SMFS::isInstalled(const std::string& id)
 {
 	return data.count(id);
-}
-
-/*
- * Return set of files associated with an AddonID
- */
-auto SMFS::getFiles(const std::string& id) -> std::set<fs::path>
-{
-	return isInstalled(id) ? data[id] : std::set<fs::path>{};
 }
 
 /*
