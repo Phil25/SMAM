@@ -15,6 +15,11 @@ namespace SMFS // SourceMod file system
 	using ForAddon = std::function<void(const std::string&)>;
 	constexpr std::string_view dataFilename = ".smamdata";
 
+	enum class DeleteResult
+	{
+		OK, NotExists, Shared
+	};
+
 	auto findRoot(const fs::path& startAt) -> MaybePath;
 	bool isPathSafe(const fs::path&);
 	bool prepare(const fs::path&);
@@ -23,7 +28,7 @@ namespace SMFS // SourceMod file system
 	bool writeData(const fs::path& filename=dataFilename);
 
 	void addFile(const fs::path& file, const std::string& id);
-	void removeAddon(const std::string& id, const NotifyFile& cb);
+	auto removeFile(const fs::path& file) -> DeleteResult;
 	void removeAddon(const std::string& id);
 	void removeEmptyDirs(fs::path startingFrom);
 

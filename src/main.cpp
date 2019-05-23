@@ -159,6 +159,12 @@ int Cmd::install(const Opts& opts)
 			out(Ch::Error)
 				<< Col::red << "Failed to install " << addon
 				<< Col::reset << cr;
+
+			for(const auto& file : SMFS::getFiles(addon))
+			{
+				SMFS::removeFile(file);
+			}
+
 			SMFS::removeAddon(addon);
 			++failed;
 		}
@@ -212,23 +218,25 @@ int Cmd::remove(const Opts& opts)
 			<< "Removing " << addon << "..."
 			<< Col::reset << cr;
 
-		SMFS::removeAddon(addon,
-			[](const fs::path& file, bool exists, int shared)
+		for(const auto& file : SMFS::getFiles(addon))
 		{
-			if(!exists)
+			switch(SMFS::removeFile(file))
 			{
-				out() << "Skipping nonexistent file: " << file << cr;
-				return;
-			}
+			case SMFS::DeleteResult::NotExists:
+				out() << "Skipping non-existent file: " << file << cr;
+				break;
 
-			if(shared > 1)
-			{
+			case SMFS::DeleteResult::Shared:
 				out() << "Skipping shared file: " << file << cr;
-				return;
-			}
+				break;
 
-			out() << file << cr;
-		});
+			case SMFS::DeleteResult::OK:
+				out() << file << cr;
+				break;
+			}
+		}
+
+		SMFS::removeAddon(addon);
 	}
 
 	if(!SMFS::writeData())

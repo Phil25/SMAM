@@ -97,29 +97,24 @@ void SMFS::addFile(const fs::path& file, const std::string& id)
 }
 
 /*
- * Remove an addon and its files from the disk and local cache
+ * Remove a file related to an addon
  */
-void SMFS::removeAddon(const std::string& id, const NotifyFile& cb)
+auto SMFS::removeFile(const fs::path& file) -> DeleteResult
 {
-	for(const auto& file : getFiles(id))
-	{
-		bool exists = fs::exists(file);
-		int shared = countSharedFiles(file);
-		cb(file, exists, shared);
+	if(!fs::exists(file)) return DeleteResult::NotExists;
+	if(countSharedFiles(file) > 1) return DeleteResult::Shared;
 
-		if(exists && shared <= 1)
-		{
-			fs::remove(file);
-			SMFS::removeEmptyDirs(file);
-		}
-	}
-
-	data.erase(id);
+	fs::remove(file);
+	SMFS::removeEmptyDirs(file);
+	return DeleteResult::OK;
 }
 
+/*
+ * Remove an addon from the local cache
+ */
 void SMFS::removeAddon(const std::string& id)
 {
-	removeAddon(id, [](const fs::path&, bool, int){});
+	data.erase(id);
 }
 
 /*
