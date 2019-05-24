@@ -2,38 +2,26 @@
 
 namespace Version
 {
-	constexpr const char* full()
-	{
-		return "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@-@VERSION_REVISION@";
-	}
-
-	constexpr const char* fullAgent()
-	{
-		return "@AGENT@/@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@-@VERSION_REVISION@";
-	}
-
-	constexpr const char* agent()
-	{
-		return "@AGNENT@";
-	}
-
-	constexpr const char* major()
-	{
-		return "@VERSION_MAJOR@";
-	}
-
-	constexpr const char* minor()
-	{
-		return "@VERSION_MINOR@";
-	}
-
-	constexpr const char* patch()
-	{
-		return "@VERSION_PATCH@";
-	}
-
-	constexpr const char* revision()
-	{
-		return "@VERSION_REVISION@";
-	}
+constexpr const char* full()
+{
+    return "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@-@VERSION_"
+           "REVISION@";
 }
+
+constexpr const char* fullAgent()
+{
+    return "@AGENT@/"
+           "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@-@VERSION_"
+           "REVISION@";
+}
+
+constexpr const char* agent() { return "@AGNENT@"; }
+
+constexpr const char* major() { return "@VERSION_MAJOR@"; }
+
+constexpr const char* minor() { return "@VERSION_MINOR@"; }
+
+constexpr const char* patch() { return "@VERSION_PATCH@"; }
+
+constexpr const char* revision() { return "@VERSION_REVISION@"; }
+}  // namespace Version

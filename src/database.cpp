@@ -3,54 +3,56 @@
 
 #include "database.h"
 
-using str = std::string;
-
+namespace
+{
 /*
  * Construct a URL passing requested IDs of addons as an `ids` GET
  * variable, separated by comma.
  *
  * Example: https://smamdb.net/?ids=accelerator,tf2items,thriller
  */
-static auto constructUrl(const str& dbUrl, const std::vector<str>& ids)
+inline auto makeUrl(const std::string&              dbUrl,
+                    const std::vector<std::string>& ids) noexcept
 {
-	std::string url(dbUrl + "?ids=");
+    std::string url(dbUrl + "?ids=");
 
-	for(const auto& id : ids)
-	{
-		url.append(id + ',');
-	}
+    for (const auto& id : ids)
+    {
+        url.append(id + ',');
+    }
 
-	url.pop_back(); // remove last comma
-	return url;
+    url.pop_back();  // remove last comma
+    return url;
 }
 
 /*
  * Parse Json::Value as a File vector.
  */
-static auto toFileVector(Json::Value files)
+inline auto toFileVector(Json::Value files) noexcept
 {
-	std::vector<File> vec;
+    std::vector<File> vec;
 
-	for(const auto& f : files)
-	{
-		vec.push_back({f.asString()});
-	}
+    for (const auto& f : files)
+    {
+        vec.push_back({f.asString()});
+    }
 
-	return vec;
+    return vec;
 }
 
 /*
  * Construct Plan from Json::Value
  * Plan = tuple of addon's URL and its File vector (database.h)
  */
-static Plan makePlan(Json::Value addon)
+inline auto makePlan(Json::Value addon) noexcept -> Plan
 {
-	return Plan(addon["url"].asString(), toFileVector(addon["files"]));
+    return Plan(addon["url"].asString(), toFileVector(addon["files"]));
 }
+}  // namespace
 
-Database::Database(Downloader& downloader, const str& dbUrl):
-	downloader(downloader),
-	dbUrl(dbUrl)
+Database::Database(Downloader&        downloader,
+                   const std::string& dbUrl) noexcept
+    : downloader(downloader), dbUrl(dbUrl)
 {
 }
 
@@ -59,43 +61,47 @@ Database::Database(Downloader& downloader, const str& dbUrl):
  * held map variable `pracached,` mapping ID strings to Plan.
  *
  * This must be called before actually getting the Plan.
- * The reason being that only the caller knows which addons to anticipate
- * and it's better to fetch them in one larger call than multiple
- * small ones.
+ * The reason being that only the caller knows which addons to
+ * anticipate and it's better to fetch them in one larger call than
+ * multiple small ones.
  */
-void Database::precache(const std::vector<std::string>& ids)
+void Database::precache(const std::vector<std::string>& ids) noexcept
 {
-	if(ids.empty()) return;
+    if (ids.empty()) return;
 
-	auto url = constructUrl(dbUrl, ids);
-	std::stringstream s(downloader.html(url));
-	Json::Value root;
+    auto              url = makeUrl(dbUrl, ids);
+    std::stringstream s(downloader.html(url));
+    Json::Value       root;
 
-	try
-	{
-		s >> root;
+    try
+    {
+        s >> root;
 
-		for(const auto& addon : root)
-		{
-			precached[addon["id"].asString()] = makePlan(addon);
-		}
-	}
-	catch(const Json::RuntimeError& e)
-	{
-	}
+        for (const auto& addon : root)
+        {
+            precached[addon["id"].asString()] = makePlan(addon);
+        }
+    }
+    catch (const Json::RuntimeError& e)
+    {
+    }
 }
 
-bool Database::isPrecached(const std::string& id)
+/*
+ * Return whether an addon was precached. If false, this usually means
+ * that it has not been found in the remote database.
+ */
+bool Database::isPrecached(const std::string& id) const noexcept
 {
-	return precached.count(id);
+    return precached.count(id);
 }
 
 /*
  * Return Plan of a particiular addon ID. Assuming it's precached.
  * Otherwise, a tuple of empty URL and vector will be returned.
  */
-const Plan& Database::get(const std::string& id) const
+auto Database::get(const std::string& id) const noexcept -> const Plan&
 {
-	auto it = precached.find(id);
-	return it == precached.end() ? nullPlan : it->second;
+    auto it = precached.find(id);
+    return it == precached.end() ? nullPlan : it->second;
 }

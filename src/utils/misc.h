@@ -5,15 +5,15 @@
 
 namespace Utils
 {
-	using cstr = const std::string;
-	using StringVector = std::vector<std::string>;
+using StringVector = std::vector<std::string>;
 
-	// split string to vector by newlines
-	StringVector toLines(const std::string&);
+// split string to vector by newlines
+auto toLines(const std::string&) noexcept -> StringVector;
 
-	// returns whether given string is a link
-	bool isLink(const std::string&);
+// returns whether given string is a link
+bool isLink(const std::string&) noexcept;
 
-	// extract string from data between `from` and `to`
-	std::string extract(cstr& data, cstr& from, cstr& to);
-}
+// extract string from data between `from` and `to`
+auto extract(const std::string& data, const std::string& from,
+             const std::string& to) noexcept -> std::string;
+}  // namespace Utils

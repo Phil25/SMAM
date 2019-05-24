@@ -1,31 +1,31 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <tuple>
 #include <map>
+#include <string>
+#include <tuple>
+#include <vector>
 
 #include "downloader.h"
 #include "utils/file.hpp"
 
-/*
- * Addon's URL & vector of assoiated Files.
- */
-using Plan = std::tuple<std::string, std::vector<File>>;
+// Addon's URL & vector of assoiated Files.
+using Plan    = std::tuple<std::string, std::vector<File>>;
+using PlanMap = std::map<std::string, Plan>;
 
 class Database
 {
-	Downloader& downloader;
-	const std::string dbUrl;
+    Downloader&       downloader;
+    const std::string dbUrl;
 
-	Plan nullPlan = {"", {}};
-	std::map<std::string, Plan> precached;
+    Plan    nullPlan = {"", {}};
+    PlanMap precached;
 
 public:
-	Database(Downloader&, const std::string& dbUrl="localhost:7666");
+    Database(Downloader&,
+             const std::string& dbUrl = "localhost:7666") noexcept;
 
-	void precache(const std::vector<std::string>& ids);
-	bool isPrecached(const std::string& id);
+    void precache(const std::vector<std::string>& ids) noexcept;
+    bool isPrecached(const std::string& id) const noexcept;
 
-	const Plan& get(const std::string& id) const;
+    const Plan& get(const std::string& id) const noexcept;
 };

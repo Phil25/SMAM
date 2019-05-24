@@ -6,40 +6,40 @@
 #include "utils/version.h"
 
 #include "scrapers/amscraper.h"
-#include "scrapers/ltscraper.h"
 #include "scrapers/ghscraper.h"
+#include "scrapers/ltscraper.h"
 
+namespace
+{
+std::array<std::shared_ptr<Scraper>, 3> scrapers;
 using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
-
-static std::array<std::shared_ptr<Scraper>, 3> scrapers;
 
 /*
  * Return vector of Attachment names matched against `base` regex.
  */
 static std::vector<std::string> findMatches(
-	const std::string& base,
-	const Attachments& attachments
-){
-	std::vector<std::string> filtered;
+    const std::string& base, const Attachments& attachments)
+{
+    std::vector<std::string> filtered;
 
-	try
-	{
-		const std::regex re(base);
+    try
+    {
+        const std::regex re(base);
 
-		for(const auto& [name, url] : attachments)
-		{
-			if(std::regex_match(name, re))
-			{
-				filtered.push_back(name);
-			}
-		}
-	}
-	catch(const std::regex_error& e)
-	{
-		out(Ch::Error) << "Invalid regex: " << base << '\"' << cr;
-	}
+        for (const auto& [name, url] : attachments)
+        {
+            if (std::regex_match(name, re))
+            {
+                filtered.push_back(name);
+            }
+        }
+    }
+    catch (const std::regex_error& e)
+    {
+        out(Ch::Error) << "Invalid regex: " << base << '\"' << cr;
+    }
 
-	return filtered;
+    return filtered;
 }
 
 /*
@@ -76,110 +76,112 @@ static std::vector<std::string> findMatches(
  *   URL can be obtained by combining the addon's base URL and the File
  *   name. URL is set.
  */
-static void processFiles(
-	const std::string& url,
-	std::vector<File>& files,
-	const Attachments& attachments // map<string, string>
-){
-	for(File& file : files)
-	{
-		auto attachment = attachments.find(file.name);
-		if(attachment != attachments.end()) // found
-		{
-			file.url = attachment->second;
-			continue;
-		}
+inline void processFiles(
+    const std::string& url, std::vector<File>& files,
+    const Attachments& attachments  // map<string, string>
+    ) noexcept
+{
+    for (File& file : files)
+    {
+        auto attachment = attachments.find(file.name);
+        if (attachment != attachments.end())  // found
+        {
+            file.url = attachment->second;
+            continue;
+        }
 
-		if(Utils::isLink(file.name)) // specified file is a link
-		{
-			size_t pos = file.name.rfind('/');
-			if(pos != std::string::npos)
-			{
-				file.url = file.name;
-				file.name = file.name.substr(++pos);
-			}
+        if (Utils::isLink(file.name))  // specified file is a link
+        {
+            size_t pos = file.name.rfind('/');
+            if (pos != std::string::npos)
+            {
+                file.url  = file.name;
+                file.name = file.name.substr(++pos);
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		auto names = findMatches(file.name, attachments);
-		if(!names.empty())
-		{
-			std::string name = Utils::Version::biggest(names);
-			attachment = attachments.find(name);
+        auto names = findMatches(file.name, attachments);
 
-			if(attachment != attachments.end())
-			{
-				file.name = name;
-				file.url = attachment->second;
-				continue;
-			}
-		}
+        if (!names.empty())
+        {
+            std::string name = Utils::Version::biggest(names);
+            attachment       = attachments.find(name);
 
-		file.url = url + file.name;
-	}
+            if (attachment != attachments.end())
+            {
+                file.name = name;
+                file.url  = attachment->second;
+                continue;
+            }
+        }
+
+        file.url = url + file.name;
+    }
 }
 
 /*
  * Return appropriate Scraper for given URL or null.
  */
-static auto getScraper(const std::string& url) -> MaybeScraper
+inline auto getScraper(const std::string& url) noexcept -> MaybeScraper
 {
-	for(const auto& scraper : scrapers)
-	{
-		if(scraper->match(url))
-		{
-			return scraper;
-		}
-	}
+    for (const auto& scraper : scrapers)
+    {
+        if (scraper->match(url))
+        {
+            return scraper;
+        }
+    }
 
-	return std::nullopt;
+    return std::nullopt;
 }
+}  // namespace
 
 /*
  * Returns the processed files of a specified addon.
  */
-Installer::FileVector Installer::files(
-	const std::string& id,
-	const Database& db)
+auto Installer::files(const std::string& id,
+                      const Database&    db) noexcept -> FileVector
 {
-	auto [url, files] = db.get(id);
+    auto [url, files] = db.get(id);
 
-	if(!url.empty())
-	{
-		Attachments attachments;
+    if (!url.empty())
+    {
+        Attachments attachments;
 
-		if(auto scraper = getScraper(url))
-		{
-			attachments = scraper->get()->fetch(url);
-		}
+        if (auto scraper = getScraper(url))
+        {
+            attachments = scraper->get()->fetch(url);
+        }
 
-		processFiles(url, files, attachments);
-	}
+        processFiles(url, files, attachments);
+    }
 
-	return files;
+    return files;
 }
 
 /*
  * Initialize std::array<Scraper, 3> of usable Scraper instances.
  */
-void Installer::initScrapers(Downloader& d)
+void Installer::initScrapers(Downloader& d) noexcept
 {
-	scrapers[0] = std::make_shared<AMScraper>(d);
-	scrapers[1] = std::make_shared<LTScraper>(d);
-	scrapers[2] = std::make_shared<GHScraper>(d);
+    scrapers[0] = std::make_shared<AMScraper>(d);
+    scrapers[1] = std::make_shared<LTScraper>(d);
+    scrapers[2] = std::make_shared<GHScraper>(d);
 }
 
 /*
  * Return whether all files passed to `setup` function were
  * properly setup.
  */
-bool Installer::setup(Utils::cstr& id, const Database& db, Setup setup)
+bool Installer::setup(const std::string& id, const Database& db,
+                      Setup setup) noexcept
 {
-	for(const auto& file : files(id, db))
-	{
-		if(!setup(file)) return false;
-	}
+    for (const auto& file : files(id, db))
+    {
+        if (!setup(file)) return false;
+    }
 
-	return true;
+    return true;
 }

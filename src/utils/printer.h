@@ -4,37 +4,46 @@
 
 constexpr char cr = '\n';
 
-enum class Ch { Std, Info, Warn, Error }; // channel
+enum class Ch
+{
+    Std,
+    Info,
+    Warn,
+    Error
+};  // channel
 
-enum class Col {
-	reset	= 0,
-	red		= 31,
-	green	= 32,
-	yellow	= 33,
-	blue	= 34,
+enum class Col
+{
+    reset  = 0,
+    red    = 31,
+    green  = 32,
+    yellow = 33,
+    blue   = 34,
 };
 
-extern std::ostream& operator<<(std::ostream& os, const Col& c);
+extern auto operator<<(std::ostream& os, const Col& c) noexcept
+    -> std::ostream&;
 
 class Printer
 {
-	struct ChannelData
-	{
-		std::ostream* out;
-		std::string_view prefix;
-		Col color;
-	};
+    struct ChannelData
+    {
+        std::ostream*    out;
+        std::string_view prefix;
+        Col              color;
+    };
 
-	static std::map<Ch, ChannelData> chData;
+    static std::map<Ch, ChannelData> chData;
 
 public:
-	bool colors = true;
+    bool colors = true;
 
-	void quiet(); // disable output entirely
-	void noPrefix(); // disable prefixes such as [E], etc
+    void quiet() noexcept;     // disable output entirely
+    void noPrefix() noexcept;  // disable prefixes such as [E], etc
 
-	std::ostream& getStream(Ch c=Ch::Std);
-	std::ostream& operator()(Ch c=Ch::Std); // Change channel
+    auto getStream(Ch c = Ch::Std) noexcept -> std::ostream&;
+    auto operator()(Ch c = Ch::Std) noexcept
+        -> std::ostream&;  // change channel
 };
 
-extern Printer out; // global console output
+extern Printer out;  // global console output

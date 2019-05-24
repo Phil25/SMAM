@@ -5,144 +5,131 @@
 
 class Opts
 {
-	boost::program_options::options_description	helpDesc;
-	boost::program_options::variables_map		vm = {};
+    boost::program_options::options_description helpDesc;
+    boost::program_options::variables_map       vm = {};
 
 public:
-	Opts(int argc, const char* argv[])
-	{
-		namespace po = boost::program_options;
+    Opts(int argc, const char* argv[]) noexcept
+    {
+        namespace po = boost::program_options;
 
-		try
-		{
-			po::options_description general("Options");
-			general.add_options()
-				("help,h", "Show help.")
-				("version", "Show version.")
-				("quiet,q", "Do not produce output.")
-				("force,f", "Force command execution.")
-				("no-prefix", "Disable prefixes in output.")
-				("no-color", "Disable color in output.")
-				("log", po::value<std::string>(), "Path to log file.")
-				("destination,d", po::value<std::string>(), "Path to server.")
-				("db-url", po::value<std::string>()
-					->default_value("https://smamdb.net/"),
-					"URL of the database.");
+        try
+        {
+            po::options_description general("Options");
 
-			po::options_description hidden("Hidden");
-			hidden.add_options()
-				("command", po::value<std::string>()
-					->default_value("")->required(), "")
-				("addons", po::value<std::vector<std::string>>()
-					->default_value({}, "")->required(), "");
+            // clang-format off
+            general.add_options()
+                ("help,h", "Show help.")
+                ("version", "Show version.")
+                ("quiet,q", "Do not produce output.")
+                ("force,f", "Force command execution.")
+                ("no-prefix", "Disable prefixes in output.")
+                ("no-color", "Disable color in output.")
+                ("log", po::value<std::string>(), "Path to log file.")
+                ("destination,d", po::value<std::string>(), "Path to server.")
+                ("db-url", po::value<std::string>()
+                    ->default_value("https://smamdb.net/"),
+                    "URL of the database.");
 
-			helpDesc.add(general);
-			general.add(hidden);
+            po::options_description hidden("Hidden");
+            hidden.add_options()
+                ("command", po::value<std::string>()
+                    ->default_value("")->required(), "")
+                ("addons", po::value<std::vector<std::string>>()
+                    ->default_value({}, "")->required(), "");
+            // clang-format on
 
-			po::positional_options_description pDesc;
-			pDesc.add("command", 1);
-			pDesc.add("addons", -1);
+            helpDesc.add(general);
+            general.add(hidden);
 
-			po::command_line_parser parser{argc, argv};
-			parser.options(general).positional(pDesc).allow_unregistered();
-			store(parser.run(), vm);
-		}
-		catch(const po::error& e)
-		{
-			out(Ch::Error) << e.what() << cr;
-		}
-	}
+            po::positional_options_description pDesc;
+            pDesc.add("command", 1);
+            pDesc.add("addons", -1);
 
-	void printHelp(const char* bin, std::ostream& os) const
-	{
-		using sv_pair = std::pair<std::string_view, std::string_view>;
-		constexpr std::array<sv_pair, 4> commands{
-			sv_pair("  install","Install specified addons."),
-			sv_pair("  remove",	"Remove specified addons."),
-			sv_pair("  search",	"Search for addons."),
-			sv_pair("  info",	"Get info about installed addons."),
-		};
-		const auto offset = helpDesc.get_option_column_width();
+            po::command_line_parser parser{argc, argv};
+            parser.options(general)
+                .positional(pDesc)
+                .allow_unregistered();
+            store(parser.run(), vm);
+        }
+        catch (const po::error& e)
+        {
+            out(Ch::Error) << e.what() << cr;
+        }
+    }
 
-		os << cr << "Usage:" << cr;
-		os << "  " << bin << " <command> [addons] [options]" << cr;
+    void printHelp(const char* bin, std::ostream& os) const noexcept
+    {
+        using sv_pair = std::pair<std::string_view, std::string_view>;
+        constexpr std::array<sv_pair, 4> commands{
+            sv_pair("  install", "Install specified addons."),
+            sv_pair("  remove", "Remove specified addons."),
+            sv_pair("  search", "Search for addons."),
+            sv_pair("  info", "Get info about installed addons."),
+        };
+        const auto offset = helpDesc.get_option_column_width();
 
-		os << cr << "Commands:" << cr;
-		for(auto [cmd, desc] : commands)
-		{
-			auto width = offset - cmd.size() + desc.size();
-			os << cmd << std::setw(width) << desc << cr;
-		}
+        os << cr << "Usage:" << cr;
+        os << "  " << bin << " <command> [addons] [options]" << cr;
 
-		os << helpDesc;
-	}
+        os << cr << "Commands:" << cr;
+        for (auto [cmd, desc] : commands)
+        {
+            auto width = offset - cmd.size() + desc.size();
+            os << cmd << std::setw(width) << desc << cr;
+        }
 
-	const auto& getCommand() const
-	{
-		return vm["command"].as<std::string>();
-	}
+        os << helpDesc;
+    }
 
-	const auto& getAddons() const
-	{
-		return vm["addons"].as<std::vector<std::string>>();
-	}
+    const auto& getCommand() const noexcept
+    {
+        return vm["command"].as<std::string>();
+    }
 
-	const auto& getDbUrl() const
-	{
-		return vm["db-url"].as<std::string>();
-	}
+    const auto& getAddons() const noexcept
+    {
+        return vm["addons"].as<std::vector<std::string>>();
+    }
 
-	bool help() const
-	{
-		return vm.count("help");
-	}
+    const auto& getDbUrl() const noexcept
+    {
+        return vm["db-url"].as<std::string>();
+    }
 
-	bool version() const
-	{
-		return vm.count("version");
-	}
+    bool help() const noexcept { return vm.count("help"); }
 
-	bool quiet() const
-	{
-		return vm.count("quiet");
-	}
+    bool version() const noexcept { return vm.count("version"); }
 
-	bool force() const
-	{
-		return vm.count("force");
-	}
+    bool quiet() const noexcept { return vm.count("quiet"); }
 
-	bool noColor() const
-	{
-		return vm.count("no-color");
-	}
+    bool force() const noexcept { return vm.count("force"); }
 
-	bool noPrefix() const
-	{
-		return vm.count("no-prefix");
-	}
+    bool noColor() const noexcept { return vm.count("no-color"); }
 
-	auto log() const -> std::optional<std::string>
-	{
-		if(vm.count("log"))
-		{
-			return vm["log"].as<std::string>();
-		}
-		else
-		{
-			return std::nullopt;
-		}
-	}
+    bool noPrefix() const noexcept { return vm.count("no-prefix"); }
 
-	auto destination() const -> std::optional<std::string>
-	{
-		if(vm.count("destination"))
-		{
-			return vm["destination"].as<std::string>();
-		}
-		else
-		{
-			return std::nullopt;
-		}
-	}
+    auto log() const noexcept -> std::optional<std::string>
+    {
+        if (vm.count("log"))
+        {
+            return vm["log"].as<std::string>();
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
+    auto destination() const noexcept -> std::optional<std::string>
+    {
+        if (vm.count("destination"))
+        {
+            return vm["destination"].as<std::string>();
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
 };

@@ -5,8 +5,8 @@
 class LTScraper : public Scraper
 {
 public:
-	LTScraper(Downloader&);
-	virtual ~LTScraper();
+    LTScraper(Downloader&) noexcept;
+    virtual ~LTScraper() noexcept;
 
-	Attachments fetch(const std::string& url) override;
+    auto fetch(const std::string& url) noexcept -> Attachments override;
 };

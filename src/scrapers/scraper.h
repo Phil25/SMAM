@@ -10,20 +10,21 @@ using Attachments = std::map<std::string, std::string>;
 
 class Scraper
 {
-	using cstr = const std::string;
-	using strv = const std::string_view;
-
 protected:
-	Downloader& downloader;
-	cstr aptUrl, dataFrom, dataTo;
+    Downloader&       downloader;
+    const std::string aptUrl, dataFrom, dataTo;
 
-	Scraper(Downloader& downloader, strv url, cstr& from="", cstr& to="");
-	virtual ~Scraper();
+    Scraper(Downloader& downloader, std::string_view url,
+            const std::string& from = "",
+            const std::string& to   = "") noexcept;
+
+    virtual ~Scraper() noexcept;
 
 public:
-	// fetch file download urls
-	virtual Attachments fetch(const std::string& url) = 0;
+    // fetch file download urls
+    virtual auto fetch(const std::string& url) noexcept
+        -> Attachments = 0;
 
-	// returns whether this scraper is applicable for given url
-	bool match(const std::string& url) const;
+    // returns whether this scraper is applicable for given url
+    bool match(const std::string& url) const noexcept;
 };

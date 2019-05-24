@@ -5,8 +5,11 @@
 #include "../utils/printer.h"
 #include "../utils/version.h"
 
-static constexpr std::string_view URL = "https://forums.alliedmods.net/";
-static constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
+namespace
+{
+constexpr std::string_view URL     = "https://forums.alliedmods.net/";
+constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
+}  // namespace
 
 /*
  * Wrapper around xmlpp::Node* for dealing with dynamic_casting
@@ -14,102 +17,96 @@ static constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
  */
 class AMNode
 {
-	const xmlpp::Node* node;
-	const std::vector<AMNode> children;
-	const std::string url;
+    const xmlpp::Node*        node;
+    const std::vector<AMNode> children;
+    const std::string         url;
 
 public:
-	AMNode(const xmlpp::Node* node):
-		node(node),
-		children(fetchChildren()),
-		url(fetchUrl())
-	{
-	}
+    AMNode(const xmlpp::Node* node) noexcept
+        : node(node), children(fetchChildren()), url(fetchUrl())
+    {
+    }
 
 private:
-	const std::vector<AMNode> fetchChildren() const
-	{
-		std::vector<AMNode> nodes;
+    auto fetchChildren() const noexcept -> std::vector<AMNode>
+    {
+        std::vector<AMNode> nodes;
 
-		for(const auto child : node->get_children())
-		{
-			nodes.push_back(AMNode(child));
-		}
+        for (const auto child : node->get_children())
+        {
+            nodes.push_back(AMNode(child));
+        }
 
-		return nodes;
-	}
+        return nodes;
+    }
+
+    auto fetchUrl() const noexcept -> std::string
+    {
+        auto e = dynamic_cast<const xmlpp::Element*>(node);
+        if (!e) return "";
+
+        std::string url = e->get_attribute_value("href");
+
+        if (!Utils::isLink(url))
+        {
+            url.insert(0, URL);
+        }
+
+        return url;
+    }
 
 public:
-	bool isAnchor() const
-	{
-		return node->get_name() == "a";
-	}
+    bool isAnchor() const noexcept { return node->get_name() == "a"; }
 
-	std::string getName() const
-	{
-		std::string name;
-		auto sourceNode = node->get_first_child();
-		auto t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+    auto getName() const noexcept -> std::string
+    {
+        std::string name;
+        auto        sourceNode = node->get_first_child();
+        auto t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
 
-		if(!t) // t->get_content() is "<strong>Get Plugin</strong>"
-		{
-			sourceNode = node // hop over to TextNode containing filename
-				->get_next_sibling()
-				->get_next_sibling()
-				->get_next_sibling();
+        if (!t)  // t->get_content() is "<strong>Get Plugin</strong>"
+        {
+            sourceNode =
+                node->get_next_sibling()  // hop over to TextNode
+                    ->get_next_sibling()  // contianing filename
+                    ->get_next_sibling();
 
-			t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+            t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
 
-			if(t) // should always be true
-			{
-				name = Utils::extract(t->get_content(), " (", ".sp - ");
-				name.append(".smx");
-			}
-		}
-		else if(t->get_content() == "Get Source")
-		{
-			sourceNode = node->get_next_sibling();
-			t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
+            if (t)  // should always be true
+            {
+                name = Utils::extract(t->get_content(), " (", ".sp - ");
+                name.append(".smx");
+            }
+        }
+        else if (t->get_content() == "Get Source")
+        {
+            sourceNode = node->get_next_sibling();
+            t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
 
-			if(t) // should always be true
-			{
-				name = Utils::extract(t->get_content(), " (", " - ");
-			}
-		}
-		else // t->get_content() is actual name of attachment
-		{
-			name = t->get_content();
-		}
+            if (t)  // should always be true
+            {
+                name = Utils::extract(t->get_content(), " (", " - ");
+            }
+        }
+        else  // t->get_content() is actual name of attachment
+        {
+            name = t->get_content();
+        }
 
-		return name;
-	}
+        return name;
+    }
 
-	std::string fetchUrl() const
-	{
-		auto e = dynamic_cast<const xmlpp::Element*>(node);
-		if(!e) return "";
+    auto getUrl() const noexcept -> const std::string& { return url; }
 
-		std::string url = e->get_attribute_value("href");
-
-		if(!Utils::isLink(url))
-		{
-			url.insert(0, URL);
-		}
-
-		return url;
-	}
-
-	const std::string& getUrl() const
-	{
-		return url;
-	}
-
-	const std::vector<AMNode>& getChildren() const
-	{
-		return children;
-	}
+    auto getChildren() const noexcept -> const std::vector<AMNode>&
+    {
+        return children;
+    }
 };
 
+namespace
+{
 /*
  * Is the URL replacable (URL_ALT).
  * URL_ALT specifies a URL for a source file (.sp) that is expected
@@ -121,75 +118,72 @@ public:
  * that the one with NONREPLACABLE URL is the precompiled one, taking
  * priority over the REPLACABLE one.
  */
-static bool isUrlReplaceable(const std::string& url)
+inline bool isUrlReplaceable(const std::string& url)
 {
-	return url.compare(0, URL_ALT.size(), URL_ALT) == 0;
+    return url.compare(0, URL_ALT.size(), URL_ALT) == 0;
 }
 
 /*
  * Recursively iterate all the nodes to get to anchor <a> nodes.
  * Fill the `map` paramater with file names, and file download URLs.
  */
-static void populateAttachments(const AMNode& node, Attachments& map)
+inline void populateAttachments(const AMNode& node, Attachments& map)
 {
-	if(node.isAnchor())
-	{
-		std::string name = node.getName();
-		auto entry = map.find(name);
+    if (node.isAnchor())
+    {
+        std::string name  = node.getName();
+        auto        entry = map.find(name);
 
-		if(entry == map.end()) // not found
-		{
-			map[name] = node.getUrl();
-		}
-		else if(isUrlReplaceable(entry->second))
-		{
-			entry->second = node.getUrl();
-		}
-	}
-	else
-	{
-		for(const auto& child : node.getChildren())
-		{
-			populateAttachments(child, map);
-		}
-	}
+        if (entry == map.end())  // not found
+        {
+            map[name] = node.getUrl();
+        }
+        else if (isUrlReplaceable(entry->second))
+        {
+            entry->second = node.getUrl();
+        }
+    }
+    else
+    {
+        for (const auto& child : node.getChildren())
+        {
+            populateAttachments(child, map);
+        }
+    }
 }
 
-static Attachments fetchAttachments(const xmlpp::DomParser& parser)
+inline auto fetchAttachments(const xmlpp::DomParser& parser)
+    -> Attachments
 {
-	const AMNode root = AMNode(parser.get_document()->get_root_node());
+    const AMNode root = AMNode(parser.get_document()->get_root_node());
 
-	Attachments attachments;
-	populateAttachments(root, attachments); // recursive
+    Attachments attachments;
+    populateAttachments(root, attachments);  // recursive
 
-	return attachments;
+    return attachments;
 }
+}  // namespace
 
-AMScraper::AMScraper(Downloader& downloader):
-	Scraper(downloader,
-		URL,
-		"<!-- attachments -->",
-		"<!-- / attachments -->"
-	)
-{
-}
-
-AMScraper::~AMScraper()
+AMScraper::AMScraper(Downloader& downloader) noexcept
+    : Scraper(downloader, URL, "<!-- attachments -->",
+              "<!-- / attachments -->")
 {
 }
 
-Attachments AMScraper::fetch(const std::string& url)
+AMScraper::~AMScraper() noexcept = default;
+
+auto AMScraper::fetch(const std::string& url) noexcept -> Attachments
 {
-	xmlpp::DomParser contents;
+    xmlpp::DomParser contents;
 
-	try
-	{
-		contents.parse_memory(downloader.html(url, dataFrom, dataTo));
-	}
-	catch(const std::exception& e)
-	{
-		out(Ch::Error) << e.what() << cr;
-	}
+    try
+    {
+        contents.parse_memory(downloader.html(url, dataFrom, dataTo));
+    }
+    catch (const std::exception& e)
+    {
+        out(Ch::Error) << e.what() << cr;
+    }
 
-	return fetchAttachments(contents);
+    return fetchAttachments(contents);
 }

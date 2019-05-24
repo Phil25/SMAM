@@ -10,12 +10,14 @@
 
 class Downloader
 {
-	using cstr = const std::string;
-	CURL* curl = NULL;
+    CURL* curl = NULL;
 
 public:
-	Downloader();
+    Downloader() noexcept;
 
-	auto html(cstr& url, cstr& from="", cstr& to="") -> std::string;
-	auto file(cstr& url, cstr& dest) -> std::string;
+    auto html(const std::string& url, const std::string& from = "",
+              const std::string& to = "") noexcept -> std::string;
+
+    auto file(const std::string& url, const std::string& dest) noexcept
+        -> std::string;
 };

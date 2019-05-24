@@ -5,24 +5,26 @@
 
 #include "../utils/printer.h"
 
-static constexpr std::string_view URL = "https://github.com/";
-static constexpr std::string_view URL_API = "https://api.github.com/repos/";
-static constexpr std::string_view RELEASES = "releases/latest";
+namespace
+{
+constexpr std::string_view URL      = "https://github.com/";
+constexpr std::string_view URL_API  = "https://api.github.com/repos/";
+constexpr std::string_view RELEASES = "releases/latest";
 
 /*
  * Get GitHub repository address from a full link.
  * https://github.com/user/repo/ -> user/repo/
  */
-static std::string getRepoUrl(const std::string& url)
+inline auto getRepoUrl(const std::string& url) -> std::string
 {
-	std::string repoUrl = url.substr(URL.size());
+    std::string repoUrl = url.substr(URL.size());
 
-	if(repoUrl.at(repoUrl.size() -1) != '/')
-	{
-		repoUrl += '/';
-	}
+    if (repoUrl.at(repoUrl.size() - 1) != '/')
+    {
+        repoUrl += '/';
+    }
 
-	return repoUrl;
+    return repoUrl;
 }
 
 /*
@@ -30,43 +32,43 @@ static std::string getRepoUrl(const std::string& url)
  * repository address.
  * user/repo -> https://api.github.com/repos/user/repo/releases/latest
  */
-static std::string getReleasesUrl(const std::string& repoUrl)
+inline auto getReleasesUrl(const std::string& repoUrl) -> std::string
 {
-	return std::string(URL_API).append(repoUrl).append(RELEASES);
+    return std::string(URL_API).append(repoUrl).append(RELEASES);
 }
+}  // namespace
 
-GHScraper::GHScraper(Downloader& downloader):
-	Scraper(downloader, URL)
-{
-}
-
-GHScraper::~GHScraper()
+GHScraper::GHScraper(Downloader& downloader) noexcept
+    : Scraper(downloader, URL)
 {
 }
 
-Attachments GHScraper::fetch(const std::string& url)
+GHScraper::~GHScraper() noexcept = default;
+
+auto GHScraper::fetch(const std::string& url) noexcept -> Attachments
 {
-	std::stringstream s(downloader.html(getReleasesUrl(getRepoUrl(url))));
-	Json::Value root;
-	Attachments attachments{};
+    std::stringstream s(
+        downloader.html(getReleasesUrl(getRepoUrl(url))));
+    Json::Value root;
+    Attachments attachments;
 
-	try
-	{
-		s >> root;
-		std::string name;
-		std::string url;
+    try
+    {
+        s >> root;
+        std::string name;
+        std::string url;
 
-		for(const auto& asset : root["assets"])
-		{
-			name = asset["name"].asString();
-			url = asset["browser_download_url"].asString();
-			attachments[name] = url;
-		}
-	}
-	catch(const Json::RuntimeError& e)
-	{
-		out(Ch::Error) << e.what() << cr;
-	}
+        for (const auto& asset : root["assets"])
+        {
+            name = asset["name"].asString();
+            url  = asset["browser_download_url"].asString();
+            attachments[name] = url;
+        }
+    }
+    catch (const Json::RuntimeError& e)
+    {
+        out(Ch::Error) << e.what() << cr;
+    }
 
-	return attachments;
+    return attachments;
 }

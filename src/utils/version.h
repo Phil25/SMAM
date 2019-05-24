@@ -4,17 +4,16 @@
 
 namespace Utils
 {
+class Version
+{
+    std::vector<int> nums = {};
 
-	class Version
-	{
-		std::vector<int> nums;
+public:
+    Version(std::string version) noexcept;
+    int compare(const Version& other) const noexcept;
 
-	public:
-		Version(std::string version);
-		int compare(const Version& other) const;
-
-		// return string representing biggest version value
-		static const std::string& biggest(const StringVector& versions);
-	};
-
-}
+    // return string representing biggest version value
+    static auto biggest(const StringVector& versions) noexcept
+        -> const std::string&;
+};
+}  // namespace Utils

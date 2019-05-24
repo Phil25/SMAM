@@ -5,8 +5,8 @@
 class GHScraper : public Scraper
 {
 public:
-	GHScraper(Downloader&);
-	virtual ~GHScraper();
+    GHScraper(Downloader&) noexcept;
+    virtual ~GHScraper() noexcept;
 
-	Attachments fetch(const std::string& url) override;
+    auto fetch(const std::string& url) noexcept -> Attachments override;
 };

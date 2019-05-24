@@ -8,13 +8,12 @@
  */
 struct File
 {
-	std::string path, name, url;
+    std::string path, name, url;
 
-	File(const std::string& data, const std::string url=""):
-		url(url)
-	{
-		auto splitAt = data.find_first_of(';');
-		path = data.substr(0, splitAt);
-		name = data.substr(++splitAt);
-	}
+    File(const std::string& data, const std::string url = "") : url(url)
+    {
+        auto splitAt = data.find_first_of(';');
+        path         = data.substr(0, splitAt);
+        name         = data.substr(++splitAt);
+    }
 };
