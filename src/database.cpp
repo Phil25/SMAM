@@ -85,6 +85,11 @@ void Database::precache(const std::vector<std::string>& ids)
 	}
 }
 
+bool Database::isPrecached(const std::string& id)
+{
+	return precached.count(id);
+}
+
 /*
  * Return Plan of a particiular addon ID. Assuming it's precached.
  * Otherwise, a tuple of empty URL and vector will be returned.

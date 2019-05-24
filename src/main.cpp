@@ -107,7 +107,17 @@ int Cmd::install(const Opts& opts)
 	{
 		if(SMFS::isInstalled(addon) && !opts.force())
 		{
-			out(Ch::Info) << addon << " already installed." << cr;
+			out(Ch::Info) << "Already installed: " << addon << cr;
+			continue;
+		}
+
+		if(!db.isPrecached(addon))
+		{
+			out(Ch::Error)
+				<< Col::red << "Not found: "
+				<< addon << Col::reset << cr;
+
+			++failed;
 			continue;
 		}
 

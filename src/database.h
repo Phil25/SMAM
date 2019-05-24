@@ -25,6 +25,7 @@ public:
 	Database(Downloader&, const std::string& dbUrl="localhost:7666");
 
 	void precache(const std::vector<std::string>& ids);
+	bool isPrecached(const std::string& id);
 
 	const Plan& get(const std::string& id) const;
 };
