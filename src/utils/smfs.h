@@ -28,6 +28,8 @@ namespace SMFS // SourceMod file system
 	bool writeData(const fs::path& filename=dataFilename);
 
 	void addFile(const fs::path& file, const std::string& id);
+	bool eraseFile(const fs::path& file, const std::string& id);
+
 	auto removeFile(const fs::path& file) -> DeleteResult;
 	void removeAddon(const std::string& id);
 	void removeEmptyDirs(fs::path startingFrom);

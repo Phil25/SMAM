@@ -97,6 +97,17 @@ void SMFS::addFile(const fs::path& file, const std::string& id)
 }
 
 /*
+ * Erase belonging of a file to an addon. Doesn't remove it from disk
+ */
+bool SMFS::eraseFile(const fs::path& file, const std::string& id)
+{
+	if(!isInstalled(id)) return false;
+
+	data[id].erase(file);
+	return true;
+}
+
+/*
  * Remove a file related to an addon
  */
 auto SMFS::removeFile(const fs::path& file) -> DeleteResult

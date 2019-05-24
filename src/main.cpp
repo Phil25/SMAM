@@ -148,10 +148,12 @@ int Cmd::install(const Opts& opts)
 
 			out(Ch::Info) << "Extracting " << f.name << "..." << cr;
 
-			return Archive::extract(file, [&](const fs::path& extracted)
+			bool res = Archive::extract(file, [&](const fs::path& f)
 			{
-				return regFile(extracted);
+				return regFile(f);
 			});
+
+			return res && SMFS::eraseFile(file, addon);
 		});
 
 		if(!success)
