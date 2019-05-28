@@ -151,7 +151,7 @@ TEST(UtilsTest, WriteData)
 
 TEST(UtilsTest, IsInstalled)
 {
-    SMFS::fs::path dataFile = "testsmamdata";
+    SMFS::fs::path dataFile = ".smamdata";  // must be .smamdata
     std::ofstream  ofs(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
 
@@ -170,7 +170,7 @@ TEST(UtilsTest, IsInstalled)
 
     ofs.close();
 
-    SMFS::loadData(dataFile);
+    ASSERT_TRUE(SMFS::loadData());
 
     EXPECT_TRUE(SMFS::isInstalled("multifile"));
     EXPECT_TRUE(SMFS::isInstalled("spacemultifile"));
@@ -188,7 +188,7 @@ TEST(UtilsTest, GetFiles)
 {
     namespace fs = SMFS::fs;
 
-    fs::path      dataFile = "testsmamdata";
+    fs::path      dataFile = ".smamdata";  // must be .smamdata
     std::ofstream ofs(dataFile, std::ios::trunc);
     EXPECT_TRUE(ofs);
 
@@ -201,10 +201,10 @@ TEST(UtilsTest, GetFiles)
 
     ofs.close();
 
-    SMFS::loadData(dataFile);
+    ASSERT_TRUE(SMFS::loadData());
 
-    auto comp = [](std::set<fs::path> expected,
-                   std::set<fs::path> actual) {
+    auto comp = [](const std::set<fs::path>& expected,
+                   const std::set<fs::path>& actual) {
         ASSERT_EQ(expected.size(), actual.size());
 
         auto end = expected.end();
@@ -223,14 +223,14 @@ TEST(UtilsTest, GetFiles)
           "translations/phrases.txt"},
          SMFS::getFiles("addon2"));
 
-    fs::remove(dataFile);
+    ASSERT_TRUE(fs::remove(dataFile));
 }
 
 TEST(UtilsTest, CountSharedFiles)
 {
     namespace fs = SMFS::fs;
 
-    fs::path      dataFile = "testsmamdata";
+    fs::path      dataFile = ".smamdata";  // must be .smamdata
     std::ofstream ofs(dataFile, std::ios::trunc);
     EXPECT_TRUE(ofs);
 
@@ -247,7 +247,7 @@ TEST(UtilsTest, CountSharedFiles)
 
     ofs.close();
 
-    SMFS::loadData(dataFile);
+    ASSERT_TRUE(SMFS::loadData());
 
     EXPECT_EQ(SMFS::countSharedFiles("plugins/bin1.smx"), 1);
     EXPECT_EQ(SMFS::countSharedFiles("plugins/bin2.smx"), 1);
@@ -257,7 +257,7 @@ TEST(UtilsTest, CountSharedFiles)
     EXPECT_EQ(SMFS::countSharedFiles("translations/addon2.phrases.txt"),
               2);
 
-    fs::remove(dataFile);
+    ASSERT_TRUE(fs::remove(dataFile));
 }
 
 TEST(UtilsTest, VersionBiggest)

@@ -12,8 +12,9 @@ namespace fs = std::filesystem;
 
 enum ExitCode
 {
-    OK         = 0,
-    WriteError = 1,
+    OK              = 0,
+    PermissionError = 1,
+    WriteError,
     NoCommand,
     UnknownCommand,
     NoAddons,
@@ -93,7 +94,12 @@ int Cmd::install(const Opts& opts) noexcept
         return ExitCode::NoSMRoot;
     }
 
-    SMFS::loadData();
+    if (!SMFS::loadData())
+    {
+        out(Ch::Error) << "No read/write premissions." << cr;
+        return ExitCode::PermissionError;
+    }
+
     Downloader down;
     Database   db(down, opts.getDbUrl());
     Installer::initScrapers(down);
@@ -208,7 +214,11 @@ int Cmd::remove(const Opts& opts) noexcept
         return ExitCode::NoSMRoot;
     }
 
-    SMFS::loadData();
+    if (!SMFS::loadData())
+    {
+        out(Ch::Error) << "No read/write premissions." << cr;
+        return ExitCode::PermissionError;
+    }
 
     for (const auto& addon : addons)
     {
@@ -263,7 +273,11 @@ int Cmd::info(const Opts& opts) noexcept
         return ExitCode::NoSMRoot;
     }
 
-    SMFS::loadData();
+    if (!SMFS::loadData())
+    {
+        out(Ch::Error) << "No read/write premissions." << cr;
+        return ExitCode::PermissionError;
+    }
 
     const auto& filter = opts.getAddons();
 

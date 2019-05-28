@@ -8,6 +8,8 @@ namespace
 {
 // AddonID -> [files]
 std::map<std::string, std::set<SMFS::fs::path>> data;
+
+constexpr std::string_view dataFilename = ".smamdata";
 }  // namespace
 
 /*
@@ -60,24 +62,40 @@ bool SMFS::prepare(const fs::path& path) noexcept
 }
 
 /*
- * Load installed addons from `dataFile` file into `data` map
+ * Return whether owner has read and write permissions in `path`
  */
-void SMFS::loadData(const fs::path& dataFile) noexcept
+bool SMFS::gotPermissions(const fs::path& path) noexcept
 {
-    std::ifstream ifs(dataFile);
+    auto perms = fs::status(path).permissions();
+    return (perms & fs::perms::owner_read) != fs::perms::none &&
+           (perms & fs::perms::owner_write) != fs::perms::none;
+}
+
+/*
+ * Load installed addons from `dataFile` file into `data` map.
+ * Return false if not sufficient permissions for either reading or
+ * writing.
+ */
+[[nodiscard]] bool SMFS::loadData() noexcept
+{
+    if (!gotPermissions(fs::current_path())) return false;
+
+    std::ifstream ifs(fs::path{dataFilename});
     std::string   id;
     fs::path      file;
 
     while (ifs >> id >> file) addFile(file, id);
     ifs.close();
+
+    return true;
 }
 
 /*
  * Write loaded data from the `data` map into `dataFile` file
  */
-bool SMFS::writeData(const fs::path& dataFile) noexcept
+[[nodiscard]] bool SMFS::writeData() noexcept
 {
-    std::ofstream ofs(dataFile, std::ios::trunc);
+    std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
     if (!ofs) return false;
 
     for (const auto& [addon, files] : data)
