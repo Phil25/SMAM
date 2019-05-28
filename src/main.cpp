@@ -173,7 +173,7 @@ int Cmd::install(const Opts& opts) noexcept
                 SMFS::removeFile(file);
             }
 
-            SMFS::removeAddon(addon);
+            SMFS::eraseAddon(addon);
             ++failed;
         }
     }
@@ -248,7 +248,7 @@ int Cmd::remove(const Opts& opts) noexcept
             }
         }
 
-        SMFS::removeAddon(addon);
+        SMFS::eraseAddon(addon);
     }
 
     if (!SMFS::writeData())

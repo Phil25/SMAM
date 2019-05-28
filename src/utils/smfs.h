@@ -32,9 +32,9 @@ bool gotPermissions(const fs::path& path) noexcept;
 
 void addFile(const fs::path& file, const std::string& id) noexcept;
 bool eraseFile(const fs::path& file, const std::string& id) noexcept;
+void eraseAddon(const std::string& id) noexcept;
 
 auto removeFile(const fs::path& file) noexcept -> DeleteResult;
-void removeAddon(const std::string& id) noexcept;
 void removeEmptyDirs(fs::path startingFrom) noexcept;
 
 bool isInstalled(const std::string& id) noexcept;

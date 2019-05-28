@@ -126,7 +126,17 @@ bool SMFS::eraseFile(const fs::path&    file,
     if (!isInstalled(id)) return false;
 
     data[id].erase(file);
+    if (!data[id].size()) eraseAddon(id);
+
     return true;
+}
+
+/*
+ * Erase an addon from the local cache
+ */
+void SMFS::eraseAddon(const std::string& id) noexcept
+{
+    data.erase(id);
 }
 
 /*
@@ -140,14 +150,6 @@ auto SMFS::removeFile(const fs::path& file) noexcept -> DeleteResult
     fs::remove(file);
     SMFS::removeEmptyDirs(file);
     return DeleteResult::OK;
-}
-
-/*
- * Remove an addon from the local cache
- */
-void SMFS::removeAddon(const std::string& id) noexcept
-{
-    data.erase(id);
 }
 
 /*

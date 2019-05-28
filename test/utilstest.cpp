@@ -120,6 +120,53 @@ TEST(UtilsTest, IsPathSafe)
     EXPECT_FALSE(SMFS::isPathSafe("../../.././././.."));
 }
 
+// LoadData follows same testing procedure as GetFiles
+
+TEST(UtilsTest, WriteData)
+{
+    EXPECT_TRUE(SMFS::writeData());
+
+    auto last = SMFS::fs::current_path();
+    SMFS::fs::current_path("/");
+
+    EXPECT_FALSE(SMFS::writeData());
+
+    SMFS::fs::current_path(last);
+}
+
+TEST(UtilsTest, DataCacheFile)
+{
+    SMFS::addFile("file1", "addon1");  // add file, installing addon1
+
+    ASSERT_TRUE(SMFS::isInstalled("addon1"));  // should be installed
+
+    ASSERT_EQ(1, SMFS::getFiles("addon1").size());
+    EXPECT_EQ("file1", *SMFS::getFiles("addon1").begin());
+
+    EXPECT_FALSE(SMFS::eraseFile("file1", "addon2"));  // wrong addon
+    EXPECT_TRUE(SMFS::eraseFile("file1", "addon1"));   // correct addon
+
+    EXPECT_EQ(0, SMFS::getFiles("addon1").size());  // no files left ->
+    EXPECT_FALSE(SMFS::isInstalled("addon1"));      // is not installed
+}
+
+TEST(UtilsTest, DataCacheAddon)
+{
+    SMFS::addFile("file1", "addon1");
+
+    ASSERT_TRUE(SMFS::isInstalled("addon1"));  // should be installed
+
+    ASSERT_EQ(1, SMFS::getFiles("addon1").size());
+    EXPECT_EQ("file1", *SMFS::getFiles("addon1").begin());
+
+    SMFS::eraseAddon("addon1");  // erase with its set of files
+
+    ASSERT_EQ(0, SMFS::getFiles("addon1").size());  // empty file set
+    EXPECT_FALSE(SMFS::isInstalled("addon1"));      // is not installed
+}
+
+// RemoveFile is checked by RemoveEmptyDirs + CountSharedFiles
+
 TEST(UtilsTest, RemoveEmptyDirs)
 {
     namespace fs = SMFS::fs;
@@ -135,18 +182,6 @@ TEST(UtilsTest, RemoveEmptyDirs)
     EXPECT_TRUE(fs::exists("something/this/somedir"));
 
     fs::remove_all("something");
-}
-
-TEST(UtilsTest, WriteData)
-{
-    EXPECT_TRUE(SMFS::writeData());
-
-    auto last = SMFS::fs::current_path();
-    SMFS::fs::current_path("/");
-
-    EXPECT_FALSE(SMFS::writeData());
-
-    SMFS::fs::current_path(last);
 }
 
 TEST(UtilsTest, IsInstalled)
