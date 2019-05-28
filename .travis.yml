@@ -28,4 +28,4 @@ script:
     - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
     - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && ./bin/tests
-    - ../test/cmdalltest.sh . ./bin/smam
+    - ../test/alltest.sh . ./bin/smam
