@@ -51,23 +51,23 @@ mkdir -vp ./mod/cfg \
 echo ""
 
 chmod -w -R ./mod
-$SMAM install thriller -d ./mod # 1 - permission error
-test_return 1 $?
+$SMAM install thriller -d ./mod # 2 - permission error
+test_return 2 $?
 chmod +w -R ./mod
 
-# Error code 2 should be checked with above as well
+# Error code 3 should be checked with above as well
 
-$SMAM -d ./mod # 3 - no command
-test_return 3 $?
-
-$SMAM badcommand -d ./mod # 4 - unknown command
+$SMAM -d ./mod # 4 - no command
 test_return 4 $?
 
-$SMAM install -d ./mod # 5 - no addons
+$SMAM badcommand -d ./mod # 5 - unknown command
 test_return 5 $?
 
-$SMAM install thriller # 6 - SM root not found
+$SMAM install -d ./mod # 6 - no addons
 test_return 6 $?
+
+$SMAM install thriller # 7 - SM root not found
+test_return 7 $?
 
 echo "Tearing down environment in $BUILD_DEST/"
 rm -vrf ./mod

@@ -8,12 +8,15 @@
 #include "downloader.h"
 #include "installer.h"
 
+#include <unistd.h>  // getuid
+
 namespace fs = std::filesystem;
 
 enum ExitCode
 {
-    OK              = 0,
-    PermissionError = 1,
+    OK        = 0,
+    RanAsRoot = 1,
+    NoPermissions,
     WriteError,
     NoCommand,
     UnknownCommand,
@@ -45,6 +48,12 @@ int main(int argc, const char* argv[])
         out.noPrefix();
         out() << Version::full() << cr;
         return ExitCode::OK;
+    }
+
+    if (!getuid() && !opts.forceRoot())
+    {
+        out(Ch::Error) << "SMAM should not be ran as root." << cr;
+        return ExitCode::RanAsRoot;
     }
 
     if (opts.quiet()) out.quiet();
@@ -97,7 +106,7 @@ int Cmd::install(const Opts& opts) noexcept
     if (!SMFS::loadData())
     {
         out(Ch::Error) << "No read/write premissions." << cr;
-        return ExitCode::PermissionError;
+        return ExitCode::NoPermissions;
     }
 
     Downloader down;
@@ -217,7 +226,7 @@ int Cmd::remove(const Opts& opts) noexcept
     if (!SMFS::loadData())
     {
         out(Ch::Error) << "No read/write premissions." << cr;
-        return ExitCode::PermissionError;
+        return ExitCode::NoPermissions;
     }
 
     for (const auto& addon : addons)
@@ -276,7 +285,7 @@ int Cmd::info(const Opts& opts) noexcept
     if (!SMFS::loadData())
     {
         out(Ch::Error) << "No read/write premissions." << cr;
-        return ExitCode::PermissionError;
+        return ExitCode::NoPermissions;
     }
 
     const auto& filter = opts.getAddons();
