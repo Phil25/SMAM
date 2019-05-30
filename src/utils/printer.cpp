@@ -2,48 +2,75 @@
 
 #include <iostream>
 
-auto operator<<(std::ostream& os, const Col& c) noexcept
-    -> std::ostream&
-{
-    if (!out.colors) return os;
-    return os << "\033[1;" << static_cast<int>(c) << 'm';
-}
-
 namespace
 {
+using Channels    = std::array<Ch, 4>;
+using Defaultdata = std::array<Printer::ChannelData, 4>;
+
 // Helper for iterating channels
-constexpr std::array<Ch, 4> chs = {Ch::Std, Ch::Info, Ch::Warn,
-                                   Ch::Error};
+constexpr Channels chs = {Ch::Std, Ch::Info, Ch::Warn, Ch::Error};
+
+// Default data of Printer
+constexpr Defaultdata def = {{
+    {"    ", Col::null, &std::cout},
+    {"[I] ", Col::blue, &std::cout},
+    {"[W] ", Col::yellow, &std::clog},
+    {"[E] ", Col::red, &std::cerr},
+}};
+
+static_assert(chs.size() == def.size());
+
+// Stream consumer
+struct : public std::ostream
+{
+    template <typename T>
+    void operator<<(const T&) noexcept
+    {
+    }
+} nullStream;
+
 }  // namespace
 
-void Printer::quiet() noexcept
+Printer::Printer(bool prefix, bool color, bool output) noexcept
 {
-    for (auto& c : chs) chData[c].out->rdbuf(nullptr);
+    setPrefix(prefix);
+    setColor(color);
+    setOutput(output);
 }
 
-void Printer::noPrefix() noexcept
+void Printer::setPrefix(bool b) noexcept
 {
-    for (auto& c : chs) chData[c].prefix = "";
+    int i = 0;
+    for (Ch c : chs) data[c].prefix = b ? def[i++].prefix : "";
 }
 
-auto Printer::operator()(Ch c) noexcept -> std::ostream&
+void Printer::setColor(bool b) noexcept
 {
-    *chData[c].out << chData[c].color;
-    *chData[c].out << chData[c].prefix;
-    *chData[c].out << Col::reset;
-
-    return *chData[c].out;
+    int i = 0;
+    for (Ch c : chs) data[c].color = b ? def[i++].color : Col::null;
+    this->color = b;
 }
 
-auto Printer::getStream(Ch c) noexcept -> std::ostream&
+void Printer::setOutput(bool b) noexcept
 {
-    return *chData[c].out;
+    int i = 0;
+    for (Ch ch : chs) data[ch].out = b ? def[i++].out : &nullStream;
 }
 
-std::map<Ch, Printer::ChannelData> Printer::chData{
-    {Ch::Std, {&std::cout, "    ", Col::reset}},
-    {Ch::Info, {&std::cout, "[I] ", Col::blue}},
-    {Ch::Warn, {&std::clog, "[W] ", Col::yellow}},
-    {Ch::Error, {&std::cerr, "[E] ", Col::red}}};
+auto Printer::operator<<(Col c) noexcept -> Printer&
+{
+    if (c == Col::null || !color) return *this;
+    return *this << "\033[1;" << static_cast<int>(c) << 'm';
+}
+
+auto Printer::operator<<(Ch c) noexcept -> Printer&
+{
+    return *this << data[c].color << data[c].prefix << Col::reset;
+}
+
+auto Printer::operator()(Ch c) noexcept -> Printer&
+{
+    return this->operator<<(c);
+}
 
 Printer out;  // instantiate Printer global

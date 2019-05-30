@@ -10,10 +10,11 @@ enum class Ch
     Info,
     Warn,
     Error
-};  // channel
+};
 
 enum class Col
 {
+    null   = -1,
     reset  = 0,
     red    = 31,
     green  = 32,
@@ -21,29 +22,41 @@ enum class Col
     blue   = 34,
 };
 
-extern auto operator<<(std::ostream& os, const Col& c) noexcept
-    -> std::ostream&;
-
 class Printer
 {
+public:
     struct ChannelData
     {
-        std::ostream*    out;
         std::string_view prefix;
         Col              color;
+        std::ostream*    out;
     };
 
-    static std::map<Ch, ChannelData> chData;
+    using DataMap = std::map<Ch, ChannelData>;
+
+private:
+    bool    color   = true;
+    Ch      current = Ch::Std;
+    DataMap data;
 
 public:
-    bool colors = true;
+    Printer(bool prefix = true, bool color = true,
+            bool output = true) noexcept;
 
-    void quiet() noexcept;     // disable output entirely
-    void noPrefix() noexcept;  // disable prefixes such as [E], etc
+    void setPrefix(bool) noexcept;
+    void setColor(bool) noexcept;
+    void setOutput(bool) noexcept;
 
-    auto getStream(Ch c = Ch::Std) noexcept -> std::ostream&;
-    auto operator()(Ch c = Ch::Std) noexcept
-        -> std::ostream&;  // change channel
+    auto operator<<(Col) noexcept -> Printer&;  // change color
+    auto operator<<(Ch) noexcept -> Printer&;   // change channel
+    auto operator()(Ch = Ch::Std) noexcept -> Printer&;
+
+    template <typename T>
+    auto operator<<(const T& t) noexcept -> Printer&
+    {
+        *data[current].out << t;
+        return *this;
+    }
 };
 
 extern Printer out;  // global console output

@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void printHelp(const char* bin, std::ostream& os) const noexcept
+    void printHelp(const char* bin, Printer& p) const noexcept
     {
         using sv_pair = std::pair<std::string_view, std::string_view>;
         constexpr std::array<sv_pair, 4> commands{
@@ -70,17 +70,17 @@ public:
         };
         const auto offset = helpDesc.get_option_column_width();
 
-        os << cr << "Usage:" << cr;
-        os << "  " << bin << " <command> [addons] [options]" << cr;
+        p << cr << "Usage:" << cr;
+        p << "  " << bin << " <command> [addons] [options]" << cr;
 
-        os << cr << "Commands:" << cr;
+        p << cr << "Commands:" << cr;
         for (auto [cmd, desc] : commands)
         {
             auto width = offset - cmd.size() + desc.size();
-            os << cmd << std::setw(width) << desc << cr;
+            p << cmd << std::setw(width) << desc << cr;
         }
 
-        os << helpDesc;
+        p << helpDesc;
     }
 
     const auto& getCommand() const noexcept

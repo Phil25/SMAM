@@ -39,14 +39,14 @@ int main(int argc, const char* argv[])
 
     if (opts.help())
     {
-        opts.printHelp(argv[0], out.getStream());
+        opts.printHelp(argv[0], out);
         return ExitCode::OK;
     }
 
     if (opts.version())
     {
-        out.noPrefix();
-        out() << Version::full() << cr;
+        out.setPrefix(false);
+        out << Version::full() << cr;
         return ExitCode::OK;
     }
 
@@ -56,9 +56,9 @@ int main(int argc, const char* argv[])
         return ExitCode::RanAsRoot;
     }
 
-    if (opts.quiet()) out.quiet();
-    if (opts.noPrefix()) out.noPrefix();
-    if (opts.noColor()) out.colors = false;
+    out.setPrefix(!opts.noPrefix());
+    out.setColor(!opts.noColor());
+    out.setOutput(!opts.quiet());
 
     const auto& command = opts.getCommand();
     if (command.empty())
