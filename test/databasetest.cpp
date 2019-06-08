@@ -12,7 +12,7 @@ protected:
     Downloader downloader;
     Database   db;
 
-    DatabaseTest() : db(downloader) {}
+    DatabaseTest() : db(downloader, "localhost:7666") {}
 };
 
 TEST_F(DatabaseTest, PositiveSingle)

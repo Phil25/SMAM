@@ -21,8 +21,7 @@ class Database
     PlanMap precached;
 
 public:
-    Database(Downloader&,
-             const std::string& dbUrl = "localhost:7666") noexcept;
+    Database(Downloader&, const std::string& dbUrl) noexcept;
 
     void precache(const std::vector<std::string>& ids) noexcept;
     bool isPrecached(const std::string& id) const noexcept;

@@ -31,7 +31,7 @@ protected:
     Downloader downloader;
     Database   db;
 
-    InstallerTest() : db(downloader) {}
+    InstallerTest() : db(downloader, "localhost:7666") {}
 
     void SetUp() override { Installer::initScrapers(downloader); }
 };
