@@ -5,8 +5,6 @@
 #include <optional>
 #include <set>
 
-#include "file.hpp"
-
 namespace SMFS  // SourceMod file system
 {
 namespace fs = std::filesystem;

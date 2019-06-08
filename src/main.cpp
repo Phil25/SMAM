@@ -151,8 +151,16 @@ int Cmd::install(const Opts& opts) noexcept
         };
 
         bool success = Installer::setup(addon, db, [&](const File& f) {
+            if (f.at == std::string::npos)
+            {
+                out(Ch::Error) << "Invalid addon format, please report "
+                                  "to submitter."
+                               << cr;
+                return false;
+            }
+
             fs::path file = f.path;
-            file.append(f.name);
+            file /= f.name;
             if (!regFile(file)) return false;
 
             if (auto err = down.file(f.url, file); !err.empty())

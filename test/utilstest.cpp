@@ -9,11 +9,27 @@
 #include "../src/utils/version.h"
 #include "gtest/gtest.h"
 
-TEST(UtilsTest, FileConstr)
+TEST(UtilsTest, FileConstruction)
 {
-    File f("some/dir/;file;name.txt");
-    EXPECT_EQ("some/dir/", f.path);
-    EXPECT_EQ("file;name.txt", f.name);
+    File f1("some/dir/;filename.txt");
+    EXPECT_EQ("some/dir/", f1.path);
+    EXPECT_EQ("filename.txt", f1.name);
+    EXPECT_EQ(9, f1.at);
+
+    File f2("some/dir/;");
+    EXPECT_TRUE(f2.path.empty());
+    EXPECT_TRUE(f2.name.empty());
+    EXPECT_EQ(std::string::npos, f2.at);
+
+    File f3(";/filename.txt");
+    EXPECT_TRUE(f3.path.empty());
+    EXPECT_TRUE(f3.name.empty());
+    EXPECT_EQ(std::string::npos, f3.at);
+
+    File f4("some/dir/filename.txt");
+    EXPECT_TRUE(f4.path.empty());
+    EXPECT_TRUE(f4.name.empty());
+    EXPECT_EQ(std::string::npos, f4.at);
 }
 
 TEST(UtilsTest, ToLines)
