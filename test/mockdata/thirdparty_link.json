@@ -7,6 +7,7 @@
 {"https://builds.limetech.io/?p=steamtools", "steamtools.html"},
 {"https://builds.limetech.io/?p=tf2items", "tf2items.html"},
 {"https://api.github.com/repos/FlaminSarge/tf2attributes/releases/latest", "tf2attributes.html"},
+{"https://api.github.com/repos/Phil25/RTD/releases/latest", "rtd.html"},
 {"https://forums.alliedmods.net/showpost.php?p=1590169", "thriller.html"},
 
 {"http://www.sourcemod.net/vbcompiler.php?file_id=148649", "AdvancedInfiniteAmmo.smx"},
@@ -19,4 +20,5 @@
 {"https://forums.alliedmods.net/attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&attachmentid=133555&d=1400274898", "thriller.plugin.txt"},
 {"https://github.com/FlaminSarge/tf2attributes/releases/download/v1.2.1/tf2attributes.smx", "tf2attributes.smx"},
 {"https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt", "tf2.attributes.txt"},
+{"https://github.com/Phil25/RTD/releases/download/2.3.1/rtd-2.3.1.zip", "rtd-2.3.1.zip"},
 {"https://bitbucket.org/GoD_Tony/updater/downloads/updater.smx", "updater.smx"},
