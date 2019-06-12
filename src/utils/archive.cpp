@@ -26,6 +26,8 @@ bool Archive::extract(const fs::path& zipFile,
         auto file = zipFile.parent_path();
         file.append(s.name);
 
+        if (file.filename().empty()) continue;
+
         if (!cb(file)) continue;
 
         zip_file* f = zip_fopen(z, s.name, 0);

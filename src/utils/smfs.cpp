@@ -114,7 +114,7 @@ bool SMFS::gotPermissions(const fs::path& path) noexcept
  */
 void SMFS::addFile(const fs::path& file, const std::string& id) noexcept
 {
-    data[id].insert(file);
+    if (!fs::is_directory(file)) data[id].insert(file);
 }
 
 /*
