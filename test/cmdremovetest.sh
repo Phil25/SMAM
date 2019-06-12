@@ -43,6 +43,14 @@ declare -a data_thriller=(
 	"./mod/addons/sourcemod/plugins/thriller.smx"
 	"./mod/addons/sourcemod/gamedata/thriller.plugin.txt"
 )
+declare -a data_rtd=(
+	"rtd"
+	"./mod/addons/sourcemod/configs/rtd2_perks.default.cfg"
+	"./mod/addons/sourcemod/plugins/rtd.smx"
+	"./mod/addons/sourcemod/scripting/rtd.sp"
+	"./mod/addons/sourcemod/translations/rtd2.phrases.txt"
+	"./mod/addons/sourcemod/translations/rtd2_perks.phrases.txt"
+)
 declare -a data_updater=(
 	"updater"
 	"./mod/addons/sourcemod/plugins/updater.smx"
@@ -171,6 +179,7 @@ fi
 test_addon ${data_tf2attributes[@]}
 test_addon ${data_tf2items[@]}
 test_addon ${data_thriller[@]}
+test_addon ${data_rtd[@]}
 test_addon ${data_updater[@]}
 
 test_shared ${data_thriller[@]}
