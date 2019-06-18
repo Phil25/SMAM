@@ -25,7 +25,7 @@ public:
                 ("force,f", "Force command execution.")
                 ("no-prefix", "Disable prefixes in output.")
                 ("no-color", "Disable color in output.")
-                ("force-running-as-root", "Run SMAM even as root.")
+                ("allow-running-as-root", "Run SMAM even as root.")
                 ("log", po::value<std::string>(), "Path to log file.")
                 ("destination,d", po::value<std::string>(), "Path to server.")
                 ("db-url", po::value<std::string>()
@@ -112,7 +112,7 @@ public:
 
     bool forceRoot() const noexcept
     {
-        return vm.count("force-running-as-root");
+        return vm.count("allow-running-as-root");
     }
 
     auto log() const noexcept -> std::optional<std::string>
