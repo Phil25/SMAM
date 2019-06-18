@@ -13,7 +13,7 @@ SourceMod Addon Manager (SMAM) is an automatic installer for [SourceMod](https:/
 * [Help Menu](#help-menu-)
 
 # Idea [^](#table-of-contents)
-The idea of SMAM is to provide the community with automatic addon management, while at the same time not requiring developers to update their mean of distribution (AlliedModders, GitHub, or some other place). To achieve that, SMAM communites with a web application, SMAMDB, hosted over at [smamdb.net](https://smamdb.net). SMAMDB is nothing more than a database holding information about where to download and install the specified addon files. SMAMDB is open source and can be viewed at [its GitHub page](https://github.com/Phil25/SMAMDB). And, if you're interested, you may read more about it on [its wiki](https://github.com/Phil25/SMAMDB/wiki).
+The idea of SMAM is to provide the community with automatic addon management, while at the same time not requiring developers to update their mean of distribution (AlliedModders, GitHub, or some other place). To achieve that, SMAM communicates with a web application, SMAMDB, hosted over at [smamdb.net](https://smamdb.net). SMAMDB is nothing more than a database holding information about where to download and install the specified addon files. SMAMDB is open source and can be viewed at [its GitHub page](https://github.com/Phil25/SMAMDB). And, if you're interested, you may read more about it on [its wiki](https://github.com/Phil25/SMAMDB/wiki).
 
 # Features [^](#table-of-contents)
 SMAM is a server-side tool that allows you to, per server directory:
