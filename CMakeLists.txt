@@ -44,5 +44,7 @@ add_subdirectory("${CMAKE_BINARY_DIR}/googletest-src"
 
 add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(test)
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  enable_testing()
+  add_subdirectory(test)
+endif()

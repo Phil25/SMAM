@@ -9,33 +9,20 @@ endif()
 
 pkg_check_modules(JSONCPP jsoncpp)
 
-add_library(scraper)
-target_sources(scraper
-  PRIVATE scraper.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/scraper.h
-)
-target_include_directories(scraper PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+# Scraper base
+add_library(scraper scraper.cpp)
+target_link_libraries(scraper PRIVATE downloader)
 
-add_library(amscraper)
-target_sources(amscraper
-  PRIVATE amscraper.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/amscraper.h
-)
-target_link_libraries(amscraper scraper ${LIBXML++_LIBRARIES})
-target_include_directories(amscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})
+# AlliedModders scraper
+add_library(amscraper amscraper.cpp)
+target_link_libraries(amscraper PRIVATE scraper utils_printer utils_version ${LIBXML++_LIBRARIES})
+target_include_directories(amscraper PRIVATE ${LIBXML++_INCLUDE_DIRS})
 
-add_library(ltscraper)
-target_sources(ltscraper
-  PRIVATE ltscraper.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ltscraper.h
-)
-target_link_libraries(ltscraper scraper ${LIBXML++_LIBRARIES})
-target_include_directories(ltscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${LIBXML++_INCLUDE_DIRS})
+# LimeTech scraper
+add_library(ltscraper ltscraper.cpp)
+target_link_libraries(ltscraper PRIVATE scraper utils_printer ${LIBXML++_LIBRARIES})
+target_include_directories(ltscraper PRIVATE ${LIBXML++_INCLUDE_DIRS})
 
-add_library(ghscraper)
-target_sources(ghscraper
-  PRIVATE ghscraper.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ghscraper.h
-)
-target_link_libraries(ghscraper scraper ${JSONCPP_LIBRARIES})
-target_include_directories(ghscraper PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${JSONCPP_INCLUDE_DIRS})
+# GitHub scraper
+add_library(ghscraper ghscraper.cpp)
+target_link_libraries(ghscraper PRIVATE scraper utils_printer ${JSONCPP_LIBRARIES})

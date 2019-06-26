@@ -4,31 +4,26 @@ include(FindPkgConfig)
 pkg_check_modules(JSONCPP jsoncpp)
 
 find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
+find_package(CURL REQUIRED)
+
+# Options
+add_library(opts opts.cpp)
+target_link_libraries(opts PRIVATE boost_program_options)
 
 # Downloader
-add_library(downloader)
-target_sources(downloader
-  PRIVATE downloader.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/downloader.h
-)
-target_include_directories(downloader PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+add_library(downloader downloader.cpp)
+target_include_directories(downloader PRIVATE curl)
 
 # Database
-add_library(database)
-target_sources(database
-  PRIVATE database.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/database.h
-)
-target_link_libraries(database ${JSONCPP_LIBRARIES})
-target_include_directories(database PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${JSONCPP_INCLUDE_DIRS})
+add_library(database database.cpp)
+target_link_libraries(database PRIVATE downloader ${JSONCPP_LIBRARIES})
 
 # Installer
-add_library(installer)
-target_sources(installer
-  PRIVATE installer.cpp downloader.cpp database.cpp
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/installer.h
-)
-target_include_directories(installer PUBLIC downloader database ${CMAKE_CURRENT_LIST_DIR})
+add_library(installer installer.cpp)
+target_link_libraries(installer PRIVATE database scraper amscraper ltscraper ghscraper utils_printer utils_version)
+
+# Commands
+add_subdirectory(commands)
 
 # Utilities
 add_subdirectory(utils)
@@ -43,27 +38,4 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   target_sources(smam PRIVATE ../test/curlmock.cpp)
 endif()
 
-target_link_libraries(smam
-# General
-  downloader
-  database
-  installer
-
-# Scrapers
-  amscraper
-  ltscraper
-  ghscraper
-
-# Utilities
-  utils_archive
-  utils_misc
-  utils_printer
-  utils_smfs
-  utils_version
-
-# Thrid party
-  -lcurl
-  -lboost_program_options
-  -lstdc++fs
-  -lzip
-)
+target_link_libraries(smam PRIVATE curl cmd_common cmd_install cmd_remove cmd_info cmd_search)

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "../src/opts.hpp"
+#include "../src/opts.h"
 
 /*
  * Convert string into command line options and return Opts object,
@@ -69,10 +69,10 @@ TEST(OptsTest, LogPath)
     EXPECT_EQ("info", opts.getCommand());
     EXPECT_EQ(1, opts.getAddons().size());
 
-    EXPECT_FALSE(opts.destination());
+    EXPECT_FALSE(opts.getDestination());
 
-    ASSERT_TRUE(opts.log());
-    EXPECT_EQ("/home/log", opts.log());
+    ASSERT_TRUE(opts.getLog());
+    EXPECT_EQ("/home/log", opts.getLog());
 }
 
 TEST(OptsTest, DesinationPath)
@@ -82,10 +82,10 @@ TEST(OptsTest, DesinationPath)
     EXPECT_EQ("info", opts.getCommand());
     EXPECT_EQ(0, opts.getAddons().size());
 
-    EXPECT_FALSE(opts.log());
+    EXPECT_FALSE(opts.getLog());
 
-    ASSERT_TRUE(opts.destination());
-    EXPECT_EQ("/home/server", opts.destination());
+    ASSERT_TRUE(opts.getDestination());
+    EXPECT_EQ("/home/server", opts.getDestination());
 }
 
 TEST(OptsTest, DatabaseHost)

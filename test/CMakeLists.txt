@@ -21,9 +21,16 @@ target_link_libraries(tests
   gtest_main
 
 # General
+  opts
   downloader
   database
   installer
+
+# Commands
+  cmd_install
+  cmd_remove
+  cmd_info
+  cmd_search
 
 # Scrapers
   amscraper
