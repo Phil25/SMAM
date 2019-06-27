@@ -29,7 +29,7 @@ int main(int argc, const char* argv[])
     if (!getuid() && !opts.allowRoot())
     {
         out(Ch::Error) << "SMAM should not be ran as root." << cr;
-        return ExitCode::RanAsRoot;
+        return ExitCode::RunAsRoot;
     }
 
     out.setPrefix(!opts.noPrefix());

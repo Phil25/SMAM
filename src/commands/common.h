@@ -5,7 +5,7 @@
 enum ExitCode
 {
     OK        = 0,
-    RanAsRoot = 1,
+    RunAsRoot = 1,
     NoPermissions,
     WriteError,
     NoCommand,
