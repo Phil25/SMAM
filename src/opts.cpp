@@ -13,7 +13,7 @@ Opts::Opts(int argc, const char* argv[]) noexcept
         // clang-format off
         general.add_options()
             ("help,h", "Show help.")
-            ("version", "Show version.")
+            ("version,v", "Show version.")
             ("quiet,q", "Do not produce output.")
             ("force,f", "Force command execution.")
             ("no-prefix", "Disable prefixes in output.")
