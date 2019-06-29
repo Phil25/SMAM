@@ -1,7 +1,9 @@
+#include "database.h"
+
 #include <json/json.h>
 #include <sstream>
 
-#include "database.h"
+#include "download.h"
 
 namespace
 {
@@ -50,11 +52,7 @@ inline auto makePlan(Json::Value addon) noexcept -> Plan
 }
 }  // namespace
 
-Database::Database(Downloader&        downloader,
-                   const std::string& dbUrl) noexcept
-    : downloader(downloader), dbUrl(dbUrl)
-{
-}
+Database::Database(const std::string& dbUrl) noexcept : dbUrl(dbUrl) {}
 
 /*
  * Precache data of specified addon IDs into a Database
@@ -70,7 +68,7 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
     if (ids.empty()) return;
 
     auto              url = makeUrl(dbUrl, ids);
-    std::stringstream s(downloader.html(url));
+    std::stringstream s(Download::page(url));
     Json::Value       root;
 
     try

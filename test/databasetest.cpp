@@ -5,14 +5,14 @@
 #endif
 
 #include "../src/database.h"
+#include "../src/download.h"
 
 class DatabaseTest : public ::testing::Test
 {
 protected:
-    Downloader downloader;
-    Database   db;
+    Database db;
 
-    DatabaseTest() : db(downloader, "localhost:7666") {}
+    DatabaseTest() : db("localhost:7666") {}
 };
 
 TEST_F(DatabaseTest, PositiveSingle)

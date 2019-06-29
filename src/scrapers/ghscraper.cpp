@@ -1,7 +1,9 @@
+#include "ghscraper.h"
+
 #include <json/json.h>
 #include <sstream>
 
-#include "ghscraper.h"
+#include "../download.h"
 
 #include "../utils/printer.h"
 
@@ -38,17 +40,14 @@ inline auto getReleasesUrl(const std::string& repoUrl) -> std::string
 }
 }  // namespace
 
-GHScraper::GHScraper(Downloader& downloader) noexcept
-    : Scraper(downloader, URL)
-{
-}
+GHScraper::GHScraper() noexcept : Scraper(URL) {}
 
 GHScraper::~GHScraper() noexcept = default;
 
 auto GHScraper::fetch(const std::string& url) noexcept -> Attachments
 {
     std::stringstream s(
-        downloader.html(getReleasesUrl(getRepoUrl(url))));
+        Download::page(getReleasesUrl(getRepoUrl(url))));
     Json::Value root;
     Attachments attachments;
 

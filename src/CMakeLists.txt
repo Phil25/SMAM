@@ -10,17 +10,18 @@ find_package(CURL REQUIRED)
 add_library(opts opts.cpp)
 target_link_libraries(opts PRIVATE boost_program_options)
 
-# Downloader
-add_library(downloader downloader.cpp)
-target_include_directories(downloader PRIVATE curl)
+# Download
+add_library(download download.cpp)
+
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+  target_link_libraries(download PRIVATE curl)
+else()
+  target_link_libraries(download PRIVATE curlmock)
+endif()
 
 # Database
 add_library(database database.cpp)
-target_link_libraries(database PRIVATE downloader ${JSONCPP_LIBRARIES})
-
-# Installer
-add_library(installer installer.cpp)
-target_link_libraries(installer PRIVATE database scraper amscraper ltscraper ghscraper utils_printer utils_version)
+target_link_libraries(database PRIVATE download ${JSONCPP_LIBRARIES})
 
 # Commands
 add_subdirectory(commands)
@@ -33,9 +34,4 @@ add_subdirectory(scrapers)
 
 # Main
 add_executable(smam main.cpp)
-
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  target_sources(smam PRIVATE ../test/curlmock.cpp)
-endif()
-
-target_link_libraries(smam PRIVATE curl cmd_common cmd_install cmd_remove cmd_info cmd_search)
+target_link_libraries(smam PRIVATE cmd_common cmd_install cmd_remove cmd_info cmd_search)

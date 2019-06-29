@@ -6,8 +6,8 @@
 
 #include "../src/scrapers/ghscraper.h"
 
-Downloader dmock;
-GHScraper  scraper(dmock);
+static GHScraper scraper;
+using Attachments = Scraper::Attachments;
 
 inline void compare(const Attachments& expected,
                     const Attachments& actual) noexcept

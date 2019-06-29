@@ -5,7 +5,6 @@
 #include <tuple>
 #include <vector>
 
-#include "downloader.h"
 #include "utils/file.hpp"
 
 // Addon's URL & vector of assoiated Files.
@@ -14,14 +13,13 @@ using PlanMap = std::map<std::string, Plan>;
 
 class Database
 {
-    Downloader&       downloader;
     const std::string dbUrl;
 
     Plan    nullPlan = {"", {}};
     PlanMap precached;
 
 public:
-    Database(Downloader&, const std::string& dbUrl) noexcept;
+    Database(const std::string& dbUrl) noexcept;
 
     void precache(const std::vector<std::string>& ids) noexcept;
     bool isPrecached(const std::string& id) const noexcept;

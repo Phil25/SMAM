@@ -1,6 +1,8 @@
+#include "ltscraper.h"
+
 #include <libxml++/libxml++.h>
 
-#include "ltscraper.h"
+#include "../download.h"
 
 #include "../utils/printer.h"
 
@@ -83,10 +85,7 @@ inline void findValidTd(xmlpp::Node* node, std::string& name,
 }
 }  // namespace
 
-LTScraper::LTScraper(Downloader& downloader) noexcept
-    : Scraper(downloader, URL, "</h2>", "</div>")
-{
-}
+LTScraper::LTScraper() noexcept : Scraper(URL, "</h2>", "</div>") {}
 
 LTScraper::~LTScraper() noexcept = default;
 
@@ -97,7 +96,7 @@ auto LTScraper::fetch(const std::string& url) noexcept -> Attachments
 
     try
     {
-        contents.parse_memory(downloader.html(url, dataFrom, dataTo));
+        contents.parse_memory(Download::page(url, dataFrom, dataTo));
         auto root = contents.get_document()->get_root_node();
         tdCount   = 0;
         found     = false;

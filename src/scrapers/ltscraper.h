@@ -2,10 +2,10 @@
 
 #include "scraper.h"
 
-class LTScraper : public Scraper
+class LTScraper final : public Scraper
 {
 public:
-    LTScraper(Downloader&) noexcept;
+    LTScraper() noexcept;
     virtual ~LTScraper() noexcept;
 
     auto fetch(const std::string& url) noexcept -> Attachments override;

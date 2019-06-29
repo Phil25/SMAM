@@ -6,8 +6,8 @@
 
 #include "../src/scrapers/ltscraper.h"
 
-static Downloader dmock;
-static LTScraper  scraper(dmock);
+static LTScraper scraper;
+using Attachments = Scraper::Attachments;
 
 inline void compare(const Attachments& expected,
                     const Attachments& actual) noexcept

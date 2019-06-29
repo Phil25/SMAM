@@ -6,8 +6,8 @@
 
 #include "../src/scrapers/amscraper.h"
 
-static Downloader dmock;
-static AMScraper  scraper(dmock);
+static AMScraper scraper;
+using Attachments = Scraper::Attachments;
 
 inline void compare(const Attachments& expected,
                     const Attachments& actual)

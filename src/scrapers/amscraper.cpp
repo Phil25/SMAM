@@ -1,6 +1,8 @@
+#include "amscraper.h"
+
 #include <libxml++/libxml++.h>
 
-#include "amscraper.h"
+#include "../download.h"
 
 #include "../utils/printer.h"
 #include "../utils/version.h"
@@ -127,7 +129,8 @@ inline bool isUrlReplaceable(const std::string& url)
  * Recursively iterate all the nodes to get to anchor <a> nodes.
  * Fill the `map` paramater with file names, and file download URLs.
  */
-inline void populateAttachments(const AMNode& node, Attachments& map)
+inline void populateAttachments(const AMNode&         node,
+                                Scraper::Attachments& map)
 {
     if (node.isAnchor())
     {
@@ -153,20 +156,19 @@ inline void populateAttachments(const AMNode& node, Attachments& map)
 }
 
 inline auto fetchAttachments(const xmlpp::DomParser& parser)
-    -> Attachments
+    -> Scraper::Attachments
 {
     const AMNode root = AMNode(parser.get_document()->get_root_node());
 
-    Attachments attachments;
+    Scraper::Attachments attachments;
     populateAttachments(root, attachments);  // recursive
 
     return attachments;
 }
 }  // namespace
 
-AMScraper::AMScraper(Downloader& downloader) noexcept
-    : Scraper(downloader, URL, "<!-- attachments -->",
-              "<!-- / attachments -->")
+AMScraper::AMScraper() noexcept
+    : Scraper(URL, "<!-- attachments -->", "<!-- / attachments -->")
 {
 }
 
@@ -178,7 +180,7 @@ auto AMScraper::fetch(const std::string& url) noexcept -> Attachments
 
     try
     {
-        contents.parse_memory(downloader.html(url, dataFrom, dataTo));
+        contents.parse_memory(Download::page(url, dataFrom, dataTo));
     }
     catch (const std::exception& e)
     {

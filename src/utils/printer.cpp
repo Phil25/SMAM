@@ -57,6 +57,12 @@ void Printer::setOutput(bool b) noexcept
     for (Ch ch : chs) data[ch].out = b ? def[i++].out : &nullStream;
 }
 
+auto Printer::operator<<(const char c) noexcept -> Printer&
+{
+    *data[current].out << c;
+    return *this;
+}
+
 auto Printer::operator<<(Col c) noexcept -> Printer&
 {
     if (c == Col::null || !color) return *this;

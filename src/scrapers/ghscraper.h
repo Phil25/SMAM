@@ -2,10 +2,10 @@
 
 #include "scraper.h"
 
-class GHScraper : public Scraper
+class GHScraper final : public Scraper
 {
 public:
-    GHScraper(Downloader&) noexcept;
+    GHScraper() noexcept;
     virtual ~GHScraper() noexcept;
 
     auto fetch(const std::string& url) noexcept -> Attachments override;

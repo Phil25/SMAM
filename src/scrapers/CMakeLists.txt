@@ -11,7 +11,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 
 # Scraper base
 add_library(scraper scraper.cpp)
-target_link_libraries(scraper PRIVATE downloader)
+target_link_libraries(scraper PRIVATE download)
 
 # AlliedModders scraper
 add_library(amscraper amscraper.cpp)

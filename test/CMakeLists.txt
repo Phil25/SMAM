@@ -1,15 +1,9 @@
-add_executable(tests)
+add_library(curlmock curlmock.cpp)
 
-target_sources(tests
-  PRIVATE
-
-# Mocks
-  curlmock.cpp
-
-# Tests
+add_executable(tests
   optstest.cpp
   utilstest.cpp
-  downloadertest.cpp
+  downloadtest.cpp
   databasetest.cpp
   amscrapertest.cpp
   ltscrapertest.cpp
@@ -22,9 +16,10 @@ target_link_libraries(tests
 
 # General
   opts
-  downloader
+  download
   database
   installer
+  curlmock
 
 # Commands
   cmd_install

@@ -1,10 +1,16 @@
-#include "downloader.h"
-#include "version.hpp"
+#include "download.h"
+
+#ifdef NDEBUG
+#include <curl/curl.h>
+#else
+#include "../test/curlmock.h"
+#endif
 
 #include <fstream>
 #include <sstream>
 
 #include "utils/misc.h"
+#include "version.hpp"
 
 namespace
 {
@@ -20,7 +26,7 @@ inline size_t write(const char* data, size_t size, size_t n,
 }
 
 /*
- * Set generic CURL options shared accross `html` and `file` calls.
+ * Set generic CURL options shared accross `page` and `file` calls.
  */
 inline void setOpts(CURL* curl, const std::string& url,
                     std::ostream* data) noexcept
@@ -36,19 +42,17 @@ inline void setOpts(CURL* curl, const std::string& url,
 }
 }  // namespace
 
-Downloader::Downloader() noexcept = default;
-
 /*
  * Download contents of a website and return it as std::string.
  * Passing nonempty `from` and `to` parameters returns only the data
  * after the first `from` match and before the following `to` match,
  * excluding.
  */
-std::string Downloader::html(const std::string& url,
-                             const std::string& from,
-                             const std::string& to) noexcept
+auto Download::page(const std::string& url, const std::string& from,
+                    const std::string& to) noexcept -> std::string
 {
-    if ((curl = curl_easy_init()) == NULL)
+    CURL* curl = curl_easy_init();
+    if (curl == NULL)
     {
         return {};
     }
@@ -70,12 +74,13 @@ std::string Downloader::html(const std::string& url,
 /*
  * Download a file and write it to specified destination.
  */
-auto Downloader::file(const std::string& url,
-                      const std::string& dest) noexcept -> std::string
+auto Download::file(const std::string& url,
+                    const std::string& dest) noexcept -> std::string
 {
-    if ((curl = curl_easy_init()) == NULL)
+    CURL* curl = curl_easy_init();
+    if (curl == NULL)
     {
-        return "Failed initializing downloader";
+        return "Failed initializing downloader.";
     }
 
     std::ostringstream oss;

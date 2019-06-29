@@ -47,6 +47,7 @@ public:
     void setColor(bool) noexcept;
     void setOutput(bool) noexcept;
 
+    auto operator<<(const char) noexcept -> Printer&;
     auto operator<<(Col) noexcept -> Printer&;  // change color
     auto operator<<(Ch) noexcept -> Printer&;   // change channel
     auto operator()(Ch = Ch::Std) noexcept -> Printer&;

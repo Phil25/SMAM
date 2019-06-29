@@ -60,7 +60,7 @@ Commands:
 
 Options:
   -h [ --help ]                        Show help.
-  --version                            Show version.
+  -v [ --version ]                     Show version.
   -q [ --quiet ]                       Do not produce output.
   -f [ --force ]                       Force command execution.
   --no-prefix                          Disable prefixes in output.
