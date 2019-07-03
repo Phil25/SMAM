@@ -4,7 +4,7 @@
 
 namespace Utils
 {
-class Version
+class Version final
 {
     std::vector<int> nums = {};
 

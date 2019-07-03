@@ -11,7 +11,7 @@
 using Plan    = std::tuple<std::string, std::vector<File>>;
 using PlanMap = std::map<std::string, Plan>;
 
-class Database
+class Database final
 {
     const std::string dbUrl;
 

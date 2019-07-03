@@ -4,7 +4,7 @@
 
 #include "utils/printer.h"
 
-class Opts
+class Opts final
 {
     boost::program_options::options_description helpDesc;
     boost::program_options::variables_map       vm;

@@ -22,10 +22,10 @@ enum class Col
     blue   = 34,
 };
 
-class Printer
+class Printer final
 {
 public:
-    struct ChannelData
+    struct ChannelData final
     {
         std::string_view prefix;
         Col              color;

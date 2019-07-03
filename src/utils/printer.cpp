@@ -21,7 +21,7 @@ constexpr Defaultdata def = {{
 static_assert(chs.size() == def.size());
 
 // Stream consumer
-struct : public std::ostream
+struct final : public std::ostream
 {
     template <typename T>
     void operator<<(const T&) noexcept

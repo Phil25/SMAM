@@ -6,7 +6,7 @@ using StringVector = std::vector<std::string>;
 
 namespace
 {
-struct PrinterData
+struct PrinterData final
 {
     std::string prefix;
     Col         color;

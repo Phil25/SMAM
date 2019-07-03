@@ -17,7 +17,7 @@ constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
  * Wrapper around xmlpp::Node* for dealing with dynamic_casting
  * and validating relevant nodes, namely anchor nodes.
  */
-class AMNode
+class AMNode final
 {
     const xmlpp::Node*        node;
     const std::vector<AMNode> children;
