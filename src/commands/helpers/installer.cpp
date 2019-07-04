@@ -132,7 +132,7 @@ inline void processFiles(
 bool registerFile(const fs::path&    file,
                   const std::string& addon) noexcept
 {
-    if (!SMFS::prepare(file.parent_path()))
+    if (!SMFS::Path::prepare(file.parent_path()))
     {
         out(Ch::Warn) << "Ignoring " << file << cr;
         return false;
@@ -142,7 +142,7 @@ bool registerFile(const fs::path&    file,
     out(exists ? Ch::Warn : Ch::Std)
         << (exists ? "Overwriting " : "") << file << cr;
 
-    SMFS::addFile(file, addon);
+    SMFS::File::add(file, addon);
     return true;
 }
 
@@ -176,7 +176,7 @@ bool installFile(const File& data, const std::string& id) noexcept
                 return registerFile(extractedFile, id);
             });
 
-        return result && SMFS::eraseFile(file, id);
+        return result && SMFS::File::detach(file, id);
     }
 
     return true;
@@ -217,7 +217,7 @@ auto Installer::installAll() noexcept -> Report
 auto Installer::installSingle(const std::string& addon) noexcept
     -> Report::Type
 {
-    if (SMFS::isInstalled(addon) && !forceInstall)
+    if (SMFS::Addon::isInstalled(addon) && !forceInstall)
     {
         out(Ch::Info) << "Already installed: " << addon << cr << cr;
         return Report::Type::Skipped;
@@ -249,12 +249,12 @@ auto Installer::installSingle(const std::string& addon) noexcept
         out(Ch::Error) << Col::red << "Failed to install " << addon
                        << Col::reset << cr << cr;
 
-        for (const auto& file : SMFS::getFiles(addon))
+        for (const auto& file : SMFS::Addon::files(addon))
         {
-            SMFS::removeFile(file);
+            SMFS::File::remove(file);
         }
 
-        SMFS::eraseAddon(addon);
+        SMFS::Addon::erase(addon);
         return Report::Type::Failed;
     }
 

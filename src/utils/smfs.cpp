@@ -13,10 +13,27 @@ constexpr std::string_view dataFilename = ".smamdata";
 }  // namespace
 
 /*
+ * Make sure the path doesn't escape up to 2 directories
+ * before the current path.
+ */
+bool SMFS::Path::isSafe(const fs::path& path) noexcept
+{
+    static const fs::path back = "..";
+
+    int depth = 0;
+    for (auto f : path.lexically_normal())
+    {
+        if (f == back && ++depth > 2) return false;
+    }
+
+    return true;
+}
+
+/*
  * Finds SourceMod root ([...]/mod/addons/sourcemod)
  * from the ./mod directory or above.
  */
-auto SMFS::findRoot(const fs::path& st) noexcept -> MaybePath
+auto SMFS::Path::findRoot(const fs::path& st) noexcept -> MaybePath
 {
     auto cur  = fs::canonical(fs::exists(st) ? st : fs::current_path()),
          root = cur.root_path();
@@ -34,29 +51,12 @@ auto SMFS::findRoot(const fs::path& st) noexcept -> MaybePath
 }
 
 /*
- * Make sure the path doesn't escape up to 2 directories
- * before the current path.
- */
-bool SMFS::isPathSafe(const fs::path& path) noexcept
-{
-    static const fs::path back = "..";
-
-    int depth = 0;
-    for (auto f : path.lexically_normal())
-    {
-        if (f == back && ++depth > 2) return false;
-    }
-
-    return true;
-}
-
-/*
  * Safely prepare directories for a file of an addon, preveting
  * the file.path to go beyond the allowed directory structure.
  */
-bool SMFS::prepare(const fs::path& path) noexcept
+bool SMFS::Path::prepare(const fs::path& path) noexcept
 {
-    if (!isPathSafe(path)) return false;
+    if (!Path::isSafe(path)) return false;
     create_directories(path);
     return true;
 }
@@ -64,7 +64,7 @@ bool SMFS::prepare(const fs::path& path) noexcept
 /*
  * Return whether owner has read and write permissions in `path`
  */
-bool SMFS::gotPermissions(const fs::path& path) noexcept
+bool SMFS::Path::gotPermissions(const fs::path& path) noexcept
 {
     auto perms = fs::status(path).permissions();
     return (perms & fs::perms::owner_read) != fs::perms::none &&
@@ -72,19 +72,39 @@ bool SMFS::gotPermissions(const fs::path& path) noexcept
 }
 
 /*
+ * Remove empty directories starting from the specified path,
+ * iterating into shallower directories. This path should always
+ * be (in practice) relative to the SourceMod root directory.
+ */
+void SMFS::Path::removeEmpty(fs::path p) noexcept
+{
+    while (!p.empty())
+    {
+        if (fs::is_directory(p) && fs::is_empty(p))
+        {
+            fs::remove_all(p);
+        }
+
+        p = p.parent_path();
+    }
+}
+
+/*
  * Load installed addons from `dataFile` file into `data` map.
  * Return false if not sufficient permissions for either reading or
  * writing.
  */
-[[nodiscard]] bool SMFS::loadData() noexcept
+[[nodiscard]] bool SMFS::Data::load() noexcept
 {
-    if (!gotPermissions(fs::current_path())) return false;
+    if (!Path::gotPermissions(fs::current_path())) return false;
 
     std::ifstream ifs(fs::path{dataFilename});
     std::string   id;
     fs::path      file;
 
-    while (ifs >> id >> file) addFile(file, id);
+    data.clear();
+
+    while (ifs >> id >> file) File::add(file, id);
     ifs.close();
 
     return true;
@@ -93,7 +113,7 @@ bool SMFS::gotPermissions(const fs::path& path) noexcept
 /*
  * Write loaded data from the `data` map into `dataFile` file
  */
-[[nodiscard]] bool SMFS::writeData() noexcept
+[[nodiscard]] bool SMFS::Data::save() noexcept
 {
     std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
     if (!ofs) return false;
@@ -112,93 +132,44 @@ bool SMFS::gotPermissions(const fs::path& path) noexcept
 /*
  * Add file to specified addon ID's cache
  */
-void SMFS::addFile(const fs::path& file, const std::string& id) noexcept
+void SMFS::File::add(const fs::path&    file,
+                     const std::string& id) noexcept
 {
     if (!fs::is_directory(file)) data[id].insert(file);
 }
 
 /*
- * Erase belonging of a file to an addon. Doesn't remove it from disk
+ * Detach a file from an addon. In other words, remove it from the
+ * cached map of loaded addons. Doesn't remove it from disk
  */
-bool SMFS::eraseFile(const fs::path&    file,
-                     const std::string& id) noexcept
+bool SMFS::File::detach(const fs::path&    file,
+                        const std::string& id) noexcept
 {
-    if (!isInstalled(id)) return false;
+    if (!Addon::isInstalled(id)) return false;
 
     data[id].erase(file);
-    if (!data[id].size()) eraseAddon(id);
+    if (!data[id].size()) Addon::erase(id);
 
     return true;
 }
 
 /*
- * Erase an addon from the local cache
+ * Remove a file related to an addon from the disk
  */
-void SMFS::eraseAddon(const std::string& id) noexcept
-{
-    data.erase(id);
-}
-
-/*
- * Remove a file related to an addon
- */
-auto SMFS::removeFile(const fs::path& file) noexcept -> DeleteResult
+auto SMFS::File::remove(const fs::path& file) noexcept -> DeleteResult
 {
     if (!fs::exists(file)) return DeleteResult::NotExists;
-    if (countSharedFiles(file) > 1) return DeleteResult::Shared;
+    if (File::countShared(file) > 1) return DeleteResult::Shared;
 
     fs::remove(file);
-    SMFS::removeEmptyDirs(file);
+    Path::removeEmpty(file);
     return DeleteResult::OK;
-}
-
-/*
- * Remove empty directories starting from the specified path,
- * iterating into shallower directories. This path should always
- * be (in practice) relative to the SourceMod root directory.
- */
-void SMFS::removeEmptyDirs(fs::path p) noexcept
-{
-    while (!p.empty())
-    {
-        if (fs::is_directory(p) && fs::is_empty(p))
-        {
-            fs::remove_all(p);
-        }
-
-        p = p.parent_path();
-    }
-}
-
-/*
- * Return whether an addon of the given ID is installed
- */
-bool SMFS::isInstalled(const std::string& id) noexcept
-{
-    return data.count(id);
-}
-
-/*
- * Iterate over installed addons
- */
-void SMFS::getInstalled(const ForAddon& cb) noexcept
-{
-    for (const auto& addon : data) cb(addon.first);
-}
-
-/*
- * Return set of files associated with an AddonID
- */
-auto SMFS::getFiles(const std::string& id) noexcept
-    -> std::set<fs::path>
-{
-    return isInstalled(id) ? data[id] : std::set<fs::path>{};
 }
 
 /*
  * Return how many addons share the specified file
  */
-int SMFS::countSharedFiles(const fs::path& file) noexcept
+int SMFS::File::countShared(const fs::path& file) noexcept
 {
     int count = 0;
     for (const auto& addon : data)
@@ -206,4 +177,37 @@ int SMFS::countSharedFiles(const fs::path& file) noexcept
         count += addon.second.count(file);
     }
     return count;
+}
+
+/*
+ * Return set of files associated with an AddonID
+ */
+auto SMFS::Addon::files(const std::string& id) noexcept
+    -> std::set<fs::path>
+{
+    return isInstalled(id) ? data[id] : std::set<fs::path>{};
+}
+
+/*
+ * Erase an addon from the local cache
+ */
+void SMFS::Addon::erase(const std::string& id) noexcept
+{
+    data.erase(id);
+}
+
+/*
+ * Return whether an addon of the given ID is installed
+ */
+bool SMFS::Addon::isInstalled(const std::string& id) noexcept
+{
+    return data.count(id);
+}
+
+/*
+ * Iterate over installed addons
+ */
+void SMFS::Addon::getInstalled(const EachAddon& cb) noexcept
+{
+    for (const auto& addon : data) cb(addon.first);
 }

@@ -6,7 +6,9 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
 {
     namespace fs = std::filesystem;
 
-    auto root = SMFS::findRoot(opts.getDestination().value_or(""));
+    auto dest = opts.getDestination().value_or("");
+    auto root = SMFS::Path::findRoot(dest);
+
     if (root)
     {
         fs::current_path(root.value());
@@ -17,7 +19,7 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
         return ExitCode::NoSMRoot;
     }
 
-    if (!SMFS::loadData())
+    if (!SMFS::Data::load())
     {
         out(Ch::Error) << "No read/write premissions." << cr;
         return ExitCode::NoPermissions;
@@ -29,8 +31,8 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
     {
         out(Ch::Info) << "Installed addons:" << cr;
 
-        SMFS::getInstalled([](const std::string& addon) {
-            out() << addon << " (" << SMFS::getFiles(addon).size()
+        SMFS::Addon::getInstalled([](const std::string& addon) {
+            out() << addon << " (" << SMFS::Addon::files(addon).size()
                   << " file(s))" << cr;
         });
 
@@ -39,13 +41,13 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
 
     for (const auto& addon : filter)
     {
-        if (!SMFS::isInstalled(addon))
+        if (!SMFS::Addon::isInstalled(addon))
         {
             out(Ch::Warn) << "Not installed: " << addon << cr;
             continue;
         }
 
-        const auto& files = SMFS::getFiles(addon);
+        const auto& files = SMFS::Addon::files(addon);
 
         out(Ch::Info) << Col::green << addon << Col::reset << " ("
                       << files.size() << ')' << cr;

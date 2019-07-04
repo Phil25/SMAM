@@ -15,7 +15,9 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
         return ExitCode::NoAddons;
     }
 
-    auto root = SMFS::findRoot(opts.getDestination().value_or(""));
+    auto dest = opts.getDestination().value_or("");
+    auto root = SMFS::Path::findRoot(dest);
+
     if (root)
     {
         fs::current_path(root.value());
@@ -26,7 +28,7 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
         return ExitCode::NoSMRoot;
     }
 
-    if (!SMFS::loadData())
+    if (!SMFS::Data::load())
     {
         out(Ch::Error) << "No read/write permissions." << cr;
         return ExitCode::NoPermissions;
@@ -35,7 +37,7 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
     Installer installer(opts.getDbUrl(), addons, opts.force());
     auto      report = installer.installAll();
 
-    if (!SMFS::writeData())
+    if (!SMFS::Data::save())
     {
         out(Ch::Error) << "Cannot write local addon metadata." << cr;
         return ExitCode::WriteError;
