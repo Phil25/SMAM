@@ -14,6 +14,7 @@ struct PrinterData final
 
 const std::map<Report::Type, PrinterData> printer{
     {Report::Type::Installed, {"> Installed: ", Col::green}},
+    {Report::Type::Removed, {"> Removed: ", Col::green}},
     {Report::Type::Skipped, {"> Skipped: ", Col::yellow}},
     {Report::Type::Failed, {"> Failed: ", Col::red}},
 };
@@ -37,4 +38,9 @@ void Report::print(Type type) noexcept
     }
 
     out << Col::reset << cr;
+}
+
+void Report::print() noexcept
+{
+    for (const auto& i : printer) print(i.first);
 }

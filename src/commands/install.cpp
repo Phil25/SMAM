@@ -43,10 +43,7 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
 
     out(Ch::Info) << "Installation complete" << cr;
 
-    using Type = Report::Type;
-    report.print(Type::Installed);
-    report.print(Type::Skipped);
-    report.print(Type::Failed);
+    report.print();
 
     return ExitCode::OK;
 }

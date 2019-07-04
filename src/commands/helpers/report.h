@@ -14,6 +14,7 @@ public:
     enum class Type
     {
         Installed,
+        Removed,
         Skipped,
         Failed
     };
@@ -24,4 +25,5 @@ private:
 public:
     void insert(Type type, const std::string& addon) noexcept;
     void print(Type type) noexcept;
+    void print() noexcept;
 };
