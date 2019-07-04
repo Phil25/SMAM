@@ -13,6 +13,7 @@ add_executable(tests
 
 target_link_libraries(tests
   gtest_main
+  gmock_main
 
 # General
   opts
