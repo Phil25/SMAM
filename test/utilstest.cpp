@@ -20,22 +20,22 @@ TEST(UtilsTest, FileConstruction)
     File f1("some/dir/;filename.txt");
     EXPECT_EQ("some/dir/", f1.path);
     EXPECT_EQ("filename.txt", f1.name);
-    EXPECT_EQ(9, f1.at);
+    EXPECT_TRUE(f1.valid());
 
     File f2("some/dir/;");
     EXPECT_TRUE(f2.path.empty());
     EXPECT_TRUE(f2.name.empty());
-    EXPECT_EQ(std::string::npos, f2.at);
+    EXPECT_FALSE(f2.valid());
 
     File f3(";/filename.txt");
     EXPECT_TRUE(f3.path.empty());
     EXPECT_TRUE(f3.name.empty());
-    EXPECT_EQ(std::string::npos, f3.at);
+    EXPECT_FALSE(f3.valid());
 
     File f4("some/dir/filename.txt");
     EXPECT_TRUE(f4.path.empty());
     EXPECT_TRUE(f4.name.empty());
-    EXPECT_EQ(std::string::npos, f4.at);
+    EXPECT_FALSE(f4.valid());
 }
 
 TEST(UtilsTest, ToLines)

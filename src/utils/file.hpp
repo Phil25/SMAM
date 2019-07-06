@@ -6,10 +6,11 @@
  * Defines a destination path, filename and the URL from which
  * the file can be downloaded.
  */
-struct File final
+class File final
 {
-    const size_t at = std::string::npos;
+    size_t at = std::string::npos;
 
+public:
     std::string path, name, url;
 
     File(const std::string& data, const std::string& url = "") noexcept
@@ -19,6 +20,9 @@ struct File final
         path = data.substr(0, at);
         name = data.substr(at + 1);
     }
+
+    bool valid() const noexcept { return at != std::string::npos; }
+    void invalidate() noexcept { at = std::string::npos; }
 
 private:
     static auto findSplit(const std::string& data) noexcept -> size_t

@@ -8,5 +8,5 @@ public:
     GHScraper() noexcept;
     virtual ~GHScraper() noexcept;
 
-    auto fetch(const std::string& url) noexcept -> Attachments override;
+    auto fetch(const std::string& url) noexcept -> Data override;
 };

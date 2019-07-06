@@ -14,6 +14,11 @@ inline bool operator==(const File& f1, const File& f2) noexcept
     return f1.path == f2.path && f1.name == f2.name && f1.url == f2.url;
 }
 
+std::ostream& operator<<(std::ostream& os, const File& f) noexcept
+{
+    return os << f.path << ';' << f.name << " -- " << f.url;
+}
+
 inline auto getFilesOfOne(const std::string& id) noexcept
     -> std::vector<File>
 {

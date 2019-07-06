@@ -1,28 +1,29 @@
 #include <string>
+#include <vector>
 
 enum CURLoption
 {
-	CURLOPT_URL,
-	CURLOPT_USERAGENT,
-	CURLOPT_WRITEFUNCTION,
-	CURLOPT_WRITEDATA,
-	CURLOPT_FOLLOWLOCATION,
-	CURLOPT_TIMEOUT
+    CURLOPT_URL,
+    CURLOPT_USERAGENT,
+    CURLOPT_WRITEFUNCTION,
+    CURLOPT_WRITEDATA,
+    CURLOPT_FOLLOWLOCATION,
+    CURLOPT_TIMEOUT
 };
 
 enum CURLcode
 {
-	CURLE_OK,
-	CURLE_NOT_OK
+    CURLE_OK,
+    CURLE_NOT_OK
 };
 
 using CURLcallback = size_t (*)(const char*, size_t, size_t, void*);
 
 struct CURL
 {
-	std::string url;
-	CURLcallback callback;
-	void* arg;
+    std::string  url;
+    CURLcallback callback;
+    void*        arg;
 };
 
 CURL* curl_easy_init();
@@ -37,3 +38,11 @@ CURLcode curl_easy_perform(CURL*);
 const char* curl_easy_strerror(CURLcode);
 
 void curl_easy_cleanup(CURL*);
+
+namespace CURLMock
+{
+auto fetchData(const std::string& url) noexcept -> std::vector<char>;
+
+auto queryDatabase(const std::string& url) noexcept
+    -> std::vector<char>;
+}  // namespace CURLMock

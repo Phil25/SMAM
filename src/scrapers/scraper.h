@@ -7,8 +7,21 @@
 class Scraper
 {
 public:
-    using Attachments  = std::map<std::string, std::string>;
     using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
+
+    struct Data : std::map<std::string, std::string>
+    {
+        enum class Website
+        {
+            AlliedModders,
+            Limetech,
+            GitHub,
+            Unknown
+        };
+
+        std::string url     = {};
+        Website     website = Website::Unknown;
+    };
 
 private:
     constexpr static int COUNT = 3;
@@ -27,8 +40,7 @@ public:
     /*
      * Fetch file download urls.
      */
-    virtual auto fetch(const std::string& url) noexcept
-        -> Attachments = 0;
+    virtual auto fetch(const std::string& url) noexcept -> Data = 0;
 
     /*
      * Return whether this scraper is applicable for given url.

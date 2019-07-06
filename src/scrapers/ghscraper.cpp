@@ -44,12 +44,14 @@ GHScraper::GHScraper() noexcept : Scraper(URL) {}
 
 GHScraper::~GHScraper() noexcept = default;
 
-auto GHScraper::fetch(const std::string& url) noexcept -> Attachments
+auto GHScraper::fetch(const std::string& url) noexcept -> Data
 {
-    std::stringstream s(
-        Download::page(getReleasesUrl(getRepoUrl(url))));
-    Json::Value root;
-    Attachments attachments;
+    auto              release = getReleasesUrl(getRepoUrl(url));
+    std::stringstream s(Download::page(release));
+    Json::Value       root;
+
+    Data data;
+    data.website = Data::Website::GitHub;
 
     try
     {
@@ -59,9 +61,9 @@ auto GHScraper::fetch(const std::string& url) noexcept -> Attachments
 
         for (const auto& asset : root["assets"])
         {
-            name = asset["name"].asString();
-            url  = asset["browser_download_url"].asString();
-            attachments[name] = url;
+            name       = asset["name"].asString();
+            url        = asset["browser_download_url"].asString();
+            data[name] = url;
         }
     }
     catch (const Json::RuntimeError& e)
@@ -69,5 +71,5 @@ auto GHScraper::fetch(const std::string& url) noexcept -> Attachments
         out(Ch::Error) << e.what() << cr;
     }
 
-    return attachments;
+    return data;
 }

@@ -23,9 +23,9 @@ namespace
 /*
  * Return vector of Attachment names matched against `base` regex.
  */
-inline auto findMatches(
-    const std::string&          base,
-    const Scraper::Attachments& attachments) noexcept -> StringVector
+inline auto findMatches(const std::string&   base,
+                        const Scraper::Data& data) noexcept
+    -> StringVector
 {
     StringVector filtered;
 
@@ -33,7 +33,7 @@ inline auto findMatches(
     {
         const std::regex re(base);
 
-        for (const auto& [name, url] : attachments)
+        for (const auto& [name, url] : data)
         {
             if (std::regex_match(name, re))
             {
@@ -84,15 +84,13 @@ inline auto findMatches(
  *   download URL can be obtained by combining the addon's base URL
  *   and the File name. URL is set.
  */
-inline void processFiles(
-    const std::string& url, std::vector<File>& files,
-    const Scraper::Attachments& attachments  // map<string, string>
-    ) noexcept
+inline void processFiles(std::vector<File>&   files,
+                         const Scraper::Data& data) noexcept
 {
     for (File& file : files)
     {
-        auto attachment = attachments.find(file.name);
-        if (attachment != attachments.end())  // found
+        auto attachment = data.find(file.name);
+        if (attachment != data.end())  // found
         {
             file.url = attachment->second;
             continue;
@@ -110,14 +108,14 @@ inline void processFiles(
             continue;
         }
 
-        auto names = findMatches(file.name, attachments);
+        auto names = findMatches(file.name, data);
 
         if (!names.empty())
         {
             std::string name = Utils::Version::biggest(names);
-            attachment       = attachments.find(name);
+            attachment       = data.find(name);
 
-            if (attachment != attachments.end())
+            if (attachment != data.end())
             {
                 file.name = name;
                 file.url  = attachment->second;
@@ -125,7 +123,14 @@ inline void processFiles(
             }
         }
 
-        file.url = url + file.name;
+        if (data.website == Scraper::Data::Website::AlliedModders)
+        {
+            file.invalidate();
+        }
+        else
+        {
+            file.url = data.url + file.name;
+        }
     }
 }
 
@@ -148,11 +153,9 @@ bool registerFile(const fs::path&    file,
 
 bool installFile(const File& data, const std::string& id) noexcept
 {
-    if (data.at == std::string::npos)
+    if (!data.valid())
     {
-        out(Ch::Error)
-            << "Invalid addon format, please report to submitter."
-            << cr;
+        out(Ch::Error) << "Invalid file: " << data.name << cr;
         return false;
     }
 
@@ -269,14 +272,15 @@ auto Installer::getAddonFiles(const std::string& id) noexcept
 
     if (!url.empty())
     {
-        Scraper::Attachments attachments;
+        Scraper::Data data;
 
         if (auto scraper = Scraper::get(url))
         {
-            attachments = scraper->get()->fetch(url);
+            data = scraper->get()->fetch(url);
         }
 
-        processFiles(url, files, attachments);
+        data.url = url;
+        processFiles(files, data);
     }
 
     return files;

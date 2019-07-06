@@ -129,17 +129,16 @@ inline bool isUrlReplaceable(const std::string& url)
  * Recursively iterate all the nodes to get to anchor <a> nodes.
  * Fill the `map` paramater with file names, and file download URLs.
  */
-inline void populateAttachments(const AMNode&         node,
-                                Scraper::Attachments& map)
+inline void populateScaperData(const AMNode& node, Scraper::Data& data)
 {
     if (node.isAnchor())
     {
         std::string name  = node.getName();
-        auto        entry = map.find(name);
+        auto        entry = data.find(name);
 
-        if (entry == map.end())  // not found
+        if (entry == data.end())  // not found
         {
-            map[name] = node.getUrl();
+            data[name] = node.getUrl();
         }
         else if (isUrlReplaceable(entry->second))
         {
@@ -150,20 +149,20 @@ inline void populateAttachments(const AMNode&         node,
     {
         for (const auto& child : node.getChildren())
         {
-            populateAttachments(child, map);
+            populateScaperData(child, data);
         }
     }
 }
 
-inline auto fetchAttachments(const xmlpp::DomParser& parser)
-    -> Scraper::Attachments
+inline auto fetchScraperData(const xmlpp::DomParser& parser)
+    -> Scraper::Data
 {
     const AMNode root = AMNode(parser.get_document()->get_root_node());
 
-    Scraper::Attachments attachments;
-    populateAttachments(root, attachments);  // recursive
+    Scraper::Data data;
+    populateScaperData(root, data);  // recursive
 
-    return attachments;
+    return data;
 }
 }  // namespace
 
@@ -174,7 +173,7 @@ AMScraper::AMScraper() noexcept
 
 AMScraper::~AMScraper() noexcept = default;
 
-auto AMScraper::fetch(const std::string& url) noexcept -> Attachments
+auto AMScraper::fetch(const std::string& url) noexcept -> Data
 {
     xmlpp::DomParser contents;
 
@@ -187,5 +186,8 @@ auto AMScraper::fetch(const std::string& url) noexcept -> Attachments
         out(Ch::Error) << e.what() << cr;
     }
 
-    return fetchAttachments(contents);
+    auto data    = fetchScraperData(contents);
+    data.website = Data::Website::AlliedModders;
+
+    return data;
 }

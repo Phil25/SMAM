@@ -9,7 +9,6 @@
 #endif
 
 #include <map>
-#include <vector>
 
 #ifdef _PROJECT_ROOT
 #define PROJECT_ROOT _PROJECT_ROOT
@@ -23,57 +22,64 @@ std::map<std::string, std::string> tpLink = {
 
 static std::string errmsg;
 
-auto fetchData(const std::string& url) noexcept -> std::vector<char>
+auto CURLMock::fetchData(const std::string& url) noexcept
+    -> std::vector<char>
 {
-    if (tpLink.count(url))  // call to thirdparty
+    if (!tpLink.count(url))  // unknown -> assume call to database
     {
-        std::string location =
-            PROJECT_ROOT "/test/mockdata/thirdparty/" + tpLink[url];
-        std::ifstream ifs(location, std::ios::in | std::ios::ate);
-        if (!ifs.is_open()) return {};
+        return queryDatabase(url);
+    }
 
-        auto              len = ifs.tellg();
-        std::vector<char> result(len);
+    // else call to a thirdparty website
+
+    std::string location =
+        PROJECT_ROOT "/test/mockdata/thirdparty/" + tpLink[url];
+    std::ifstream ifs(location, std::ios::in | std::ios::ate);
+    if (!ifs.is_open()) return {};
+
+    auto              len = ifs.tellg();
+    std::vector<char> result(len);
+
+    ifs.seekg(0, std::ios::beg);
+    ifs.read(&result[0], len);
+    ifs.close();
+
+    return result;
+}
+
+auto CURLMock::queryDatabase(const std::string& url) noexcept
+    -> std::vector<char>
+{
+    size_t pos = url.find('=');
+    if (pos == (size_t)std::string::npos) return {};
+
+    std::istringstream dataStream(url.substr(++pos));
+    std::string        id, location;
+    std::vector<char>  result{'['};
+
+    while (std::getline(dataStream, id, ','))
+    {
+        location =
+            PROJECT_ROOT "/test/mockdata/database/" + id + ".json";
+        std::ifstream ifs(location, std::ios::in | std::ios::ate);
+        if (!ifs.is_open()) continue;
+
+        auto len      = ifs.tellg();
+        auto prevSize = result.size();
+        result.resize(prevSize + len + 1);  // +1 for comma
 
         ifs.seekg(0, std::ios::beg);
-        ifs.read(&result[0], len);
+        ifs.read(&result[prevSize], len);
         ifs.close();
 
-        return result;
+        result[result.size() - 1] = ',';
     }
-    else  // assume it's a database call
-    {
-        size_t pos = url.find('=');
-        if (pos == (size_t)std::string::npos) return {};
 
-        std::istringstream dataStream(url.substr(++pos));
-        std::string        id, location;
-        std::vector<char>  result{'['};
+    auto size = result.size();
+    if (size == 1) return {'[', ']'};
 
-        while (std::getline(dataStream, id, ','))
-        {
-            location =
-                PROJECT_ROOT "/test/mockdata/database/" + id + ".json";
-            std::ifstream ifs(location, std::ios::in | std::ios::ate);
-            if (!ifs.is_open()) continue;
-
-            auto len      = ifs.tellg();
-            auto prevSize = result.size();
-            result.resize(prevSize + len + 1);  // +1 for comma
-
-            ifs.seekg(0, std::ios::beg);
-            ifs.read(&result[prevSize], len);
-            ifs.close();
-
-            result[result.size() - 1] = ',';
-        }
-
-        auto size = result.size();
-        if (size == 1) return {};
-
-        result[size - 1] = ']';  // turn last comma into ]
-        return result;
-    }
+    result[size - 1] = ']';  // turn last comma into ]
+    return result;
 }
 
 auto curl_easy_init() -> CURL* { return new CURL; }
@@ -97,7 +103,7 @@ void curl_easy_setopt(CURL*, CURLoption, long) {}
 
 auto curl_easy_perform(CURL* curl) -> CURLcode
 {
-    auto result = fetchData(curl->url);
+    auto result = CURLMock::fetchData(curl->url);
     if (!result.size())
     {
         errmsg = "Not found: \"" + curl->url + '\"';
@@ -107,6 +113,8 @@ auto curl_easy_perform(CURL* curl) -> CURLcode
     auto bytesSent = 0;
     auto bytesLeft = result.size();
     auto perRecv   = bytesLeft / 10;
+
+    if (perRecv < 10) perRecv = 10;
 
 #ifdef NDELAY
     using namespace std::chrono_literals;

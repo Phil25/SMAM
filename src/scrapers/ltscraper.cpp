@@ -89,7 +89,7 @@ LTScraper::LTScraper() noexcept : Scraper(URL, "</h2>", "</div>") {}
 
 LTScraper::~LTScraper() noexcept = default;
 
-auto LTScraper::fetch(const std::string& url) noexcept -> Attachments
+auto LTScraper::fetch(const std::string& url) noexcept -> Data
 {
     xmlpp::DomParser contents;
     std::string      fileName, fileUrl;
@@ -108,5 +108,9 @@ auto LTScraper::fetch(const std::string& url) noexcept -> Attachments
         out(Ch::Error) << e.what() << cr;
     }
 
-    return {{fileName, fileUrl}};
+    Data data;
+    data.website   = Data::Website::Limetech;
+    data[fileName] = fileUrl;
+
+    return data;
 }

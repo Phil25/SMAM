@@ -1,6 +1,7 @@
 add_library(curlmock curlmock.cpp)
 
 add_executable(tests
+  curlmocktest.cpp
   optstest.cpp
   utilstest.cpp
   downloadtest.cpp
