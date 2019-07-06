@@ -36,7 +36,7 @@ private:
 
         for (const auto child : node->get_children())
         {
-            nodes.push_back(AMNode(child));
+            nodes.emplace_back(child);
         }
 
         return nodes;
