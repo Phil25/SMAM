@@ -38,14 +38,16 @@ inline auto toFileVector(const json& files)
 }
 
 /*
- * Construct Plan from nlohmann::json
+ * Construct Database::Plan from nlohmann::json
  * Plan = tuple of addon's URL and its File vector (database.h)
  */
-inline auto makePlan(const json& addon) -> Plan
+inline auto makePlan(const json& addon) -> Database::Plan
 {
     return {addon.at("url"), toFileVector(addon.at("files"))};
 }
 }  // namespace
+
+Database::Plan Database::nullPlan = {"", {}};
 
 Database::Database(const std::string& dbUrl) noexcept : dbUrl(dbUrl) {}
 

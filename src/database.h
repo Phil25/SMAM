@@ -2,20 +2,22 @@
 
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "utils/file.hpp"
 
-// Addon's URL & vector of assoiated Files.
-using Plan    = std::tuple<std::string, std::vector<File>>;
-using PlanMap = std::map<std::string, Plan>;
-
 class Database final
 {
+public:
+    // Addon's URL & vector of assoiated Files.
+    using Plan    = std::pair<std::string, std::vector<File>>;
+    using PlanMap = std::map<std::string, Plan>;
+
+private:
+    static Plan nullPlan;
+
     const std::string dbUrl;
 
-    Plan    nullPlan = {"", {}};
     PlanMap cached;
 
 public:
