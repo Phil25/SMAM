@@ -1,9 +1,10 @@
 #include "database.h"
 
-#include <json/json.h>
-#include <sstream>
+#include <nlohmann/json.hpp>
 
 #include "download.h"
+
+using json = nlohmann::json;
 
 namespace
 {
@@ -28,27 +29,21 @@ inline auto makeUrl(const std::string&              dbUrl,
 }
 
 /*
- * Parse Json::Value as a File vector.
+ * Parse nlohmann::json as a File vector. Implicity converting
+ * std::string types.
  */
-inline auto toFileVector(Json::Value files) noexcept
+inline auto toFileVector(const json& files)
 {
-    std::vector<File> vec;
-
-    for (const auto& f : files)
-    {
-        vec.push_back({f.asString()});
-    }
-
-    return vec;
+    return std::vector<File>{files.begin(), files.end()};
 }
 
 /*
- * Construct Plan from Json::Value
+ * Construct Plan from nlohmann::json
  * Plan = tuple of addon's URL and its File vector (database.h)
  */
-inline auto makePlan(Json::Value addon) noexcept -> Plan
+inline auto makePlan(const json& addon) -> Plan
 {
-    return Plan(addon["url"].asString(), toFileVector(addon["files"]));
+    return {addon.at("url"), toFileVector(addon.at("files"))};
 }
 }  // namespace
 
@@ -67,39 +62,37 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
 {
     if (ids.empty()) return;
 
-    auto              url = makeUrl(dbUrl, ids);
-    std::stringstream s(Download::page(url));
-    Json::Value       root;
+    auto url = makeUrl(dbUrl, ids);
 
     try
     {
-        s >> root;
+        json root = json::parse(Download::page(url));
 
         for (const auto& addon : root)
         {
-            precached[addon["id"].asString()] = makePlan(addon);
+            cached[addon.at("id")] = makePlan(addon);
         }
     }
-    catch (const Json::RuntimeError& e)
+    catch (const json::exception& e)
     {
     }
 }
 
 /*
- * Return whether an addon was precached. If false, this usually means
+ * Return whether an addon was cached. If false, this usually means
  * that it has not been found in the remote database.
  */
 bool Database::isPrecached(const std::string& id) const noexcept
 {
-    return precached.count(id);
+    return cached.count(id);
 }
 
 /*
- * Return Plan of a particiular addon ID. Assuming it's precached.
+ * Return Plan of a particiular addon ID. Assuming it's cached.
  * Otherwise, a tuple of empty URL and vector will be returned.
  */
 auto Database::get(const std::string& id) const noexcept -> const Plan&
 {
-    auto it = precached.find(id);
-    return it == precached.end() ? nullPlan : it->second;
+    auto it = cached.find(id);
+    return it == cached.end() ? nullPlan : it->second;
 }

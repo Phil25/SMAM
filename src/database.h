@@ -16,7 +16,7 @@ class Database final
     const std::string dbUrl;
 
     Plan    nullPlan = {"", {}};
-    PlanMap precached;
+    PlanMap cached;
 
 public:
     Database(const std::string& dbUrl) noexcept;

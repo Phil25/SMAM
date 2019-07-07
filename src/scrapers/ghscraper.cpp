@@ -1,11 +1,12 @@
 #include "ghscraper.h"
 
-#include <json/json.h>
-#include <sstream>
+#include <nlohmann/json.hpp>
 
 #include "../download.h"
 
 #include "../utils/printer.h"
+
+using json = nlohmann::json;
 
 namespace
 {
@@ -46,27 +47,24 @@ GHScraper::~GHScraper() noexcept = default;
 
 auto GHScraper::fetch(const std::string& url) noexcept -> Data
 {
-    auto              release = getReleasesUrl(getRepoUrl(url));
-    std::stringstream s(Download::page(release));
-    Json::Value       root;
+    auto release = getReleasesUrl(getRepoUrl(url));
+    auto page    = Download::page(release);
 
     Data data;
     data.website = Data::Website::GitHub;
 
     try
     {
-        s >> root;
-        std::string name;
-        std::string url;
+        json root = json::parse(page);
 
-        for (const auto& asset : root["assets"])
+        std::string name, url;
+
+        for (const auto& asset : root.at("assets"))
         {
-            name       = asset["name"].asString();
-            url        = asset["browser_download_url"].asString();
-            data[name] = url;
+            data[asset.at("name")] = asset.at("browser_download_url");
         }
     }
-    catch (const Json::RuntimeError& e)
+    catch (const json::exception& e)
     {
         out(Ch::Error) << e.what() << cr;
     }
