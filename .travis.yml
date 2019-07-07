@@ -11,7 +11,7 @@ addons:
         packages:
             - libcurl4-gnutls-dev
             - libxml++2.6-dev
-            - libjsoncpp-dev
+            - nlohmann-json-dev
             - libboost-program-options-dev
             - libzip-dev
             - gcc-8
@@ -19,11 +19,7 @@ addons:
             - cmake
         update: true
 
-install:
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-
 script:
-    - sudo ln -s /usr/include/jsoncpp/json/ /usr/include/json # Ubuntu fix because of course
     - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
     - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
