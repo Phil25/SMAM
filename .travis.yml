@@ -1,7 +1,9 @@
 dist: xenial
 sudo: require
 
-language: cpp
+language: python
+python: "3.7"
+
 compiler: gcc
 
 addons:
@@ -9,19 +11,22 @@ addons:
         sources:
             - ubuntu-toolchain-r-test
         packages:
-            - libcurl4-gnutls-dev
-            - libxml++2.6-dev
-            - nlohmann-json-dev
-            - libboost-program-options-dev
-            - libzip-dev
             - gcc-8
             - g++-8
-            - cmake
         update: true
+
+install:
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+    - pip install conan
+    - conan user
 
 script:
     - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
     - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
-    - gcc -v && g++ -v && cmake --version
-    - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && ./bin/tests
+    - gcc -v && g++ -v
+    - mkdir build && cd build
+    - conan install .. --build missing -s compiler.libcxx=libstdc++11
+    - ~/.conan/data/cmake_installer/3.14.5/conan/stable/package/44fcf6b9a7fb86b2586303e3db40189d3b511830/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug
+    - ~/.conan/data/cmake_installer/3.14.5/conan/stable/package/44fcf6b9a7fb86b2586303e3db40189d3b511830/bin/cmake --build .
+    - ./bin/tests
     - ../test/alltest.sh . ./bin/smam

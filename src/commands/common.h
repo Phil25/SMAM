@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../opts.h"
+#include <opts.h>
 
 enum ExitCode
 {
