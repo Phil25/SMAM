@@ -1,6 +1,7 @@
 #include "amscraper.h"
 
-#include <libxml++/libxml++.h>
+#include <cassert>
+#include <pugixml.hpp>
 
 #include "../download.h"
 
@@ -11,104 +12,7 @@ namespace
 {
 constexpr std::string_view URL     = "https://forums.alliedmods.net/";
 constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
-}  // namespace
 
-/*
- * Wrapper around xmlpp::Node* for dealing with dynamic_casting
- * and validating relevant nodes, namely anchor nodes.
- */
-class AMNode final
-{
-    const xmlpp::Node*        node;
-    const std::vector<AMNode> children;
-    const std::string         url;
-
-public:
-    AMNode(const xmlpp::Node* node) noexcept
-        : node(node), children(fetchChildren()), url(fetchUrl())
-    {
-    }
-
-private:
-    auto fetchChildren() const noexcept -> std::vector<AMNode>
-    {
-        std::vector<AMNode> nodes;
-
-        for (const auto child : node->get_children())
-        {
-            nodes.emplace_back(child);
-        }
-
-        return nodes;
-    }
-
-    auto fetchUrl() const noexcept -> std::string
-    {
-        auto e = dynamic_cast<const xmlpp::Element*>(node);
-        if (!e) return "";
-
-        std::string url = e->get_attribute_value("href");
-
-        if (!Utils::isLink(url))
-        {
-            url.insert(0, URL);
-        }
-
-        return url;
-    }
-
-public:
-    bool isAnchor() const noexcept { return node->get_name() == "a"; }
-
-    auto getName() const noexcept -> std::string
-    {
-        std::string name;
-        auto        sourceNode = node->get_first_child();
-        auto t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
-
-        if (!t)  // t->get_content() is "<strong>Get Plugin</strong>"
-        {
-            sourceNode =
-                node->get_next_sibling()  // hop over to TextNode
-                    ->get_next_sibling()  // contianing filename
-                    ->get_next_sibling();
-
-            t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
-
-            if (t)  // should always be true
-            {
-                name = Utils::extract(t->get_content(), " (", ".sp - ");
-                name.append(".smx");
-            }
-        }
-        else if (t->get_content() == "Get Source")
-        {
-            sourceNode = node->get_next_sibling();
-            t = dynamic_cast<const xmlpp::TextNode*>(sourceNode);
-
-            if (t)  // should always be true
-            {
-                name = Utils::extract(t->get_content(), " (", " - ");
-            }
-        }
-        else  // t->get_content() is actual name of attachment
-        {
-            name = t->get_content();
-        }
-
-        return name;
-    }
-
-    auto getUrl() const noexcept -> const std::string& { return url; }
-
-    auto getChildren() const noexcept -> const std::vector<AMNode>&
-    {
-        return children;
-    }
-};
-
-namespace
-{
 /*
  * Is the URL replacable (URL_ALT).
  * URL_ALT specifies a URL for a source file (.sp) that is expected
@@ -126,41 +30,101 @@ inline bool isUrlReplaceable(const std::string& url)
 }
 
 /*
- * Recursively iterate all the nodes to get to anchor <a> nodes.
- * Fill the `map` paramater with file names, and file download URLs.
+ * Wrapper around pugi::xml_node for dealing with finding the
+ * attachment's name and its download URL.
  */
-inline void populateScaperData(const AMNode& node, Scraper::Data& data)
+class AMNode final
 {
-    if (node.isAnchor())
-    {
-        std::string name  = node.getName();
-        auto        entry = data.find(name);
+    const pugi::xml_node& node;
 
-        if (entry == data.end())  // not found
+    AMNode(const pugi::xml_node& node) noexcept : node(node) {}
+
+    auto name() const noexcept -> std::string
+    {
+        std::string name;
+        auto        src = node.first_child();
+
+        if (!node.text())
         {
-            data[name] = node.getUrl();
+            /*
+             * If node is not a text node, this means it contains tags
+             * within, which are "<strong>Get Plugin</strong>". This
+             * indicates that the actual filename is 3 nodes over in
+             * parentheses.
+             */
+
+            src = node.next_sibling().next_sibling().next_sibling();
+
+            assert(src.text() && "Node should be text");
+
+            name = Utils::extract(src.value(), " (", ".sp - ");
+            name.append(".smx");
+        }
+        else if (std::string{src.value()} == "Get Source")
+        {
+            /*
+             * If child node value is "Get Source", it's at the same
+             * attachment as the above condition, but only a single jump
+             * away from the actual filename.
+             */
+
+            src = node.next_sibling();
+
+            assert(src.text() && "Node should be text");
+
+            name = Utils::extract(src.value(), " (", " - ");
+        }
+        else
+        {
+            /*
+             * Otherwise the actual filename is the node's value.
+             */
+
+            name = src.value();
+        }
+
+        return name;
+    }
+
+    auto url() const noexcept -> std::string
+    {
+        auto href = node.attribute("href");
+        if (!href) return "";
+
+        std::string url = href.as_string();
+
+        if (!Utils::isLink(url)) url.insert(0, URL);
+
+        return url;
+    }
+
+public:
+    static auto parseData(const std::string& doc) noexcept;
+};
+
+auto AMNode::parseData(const std::string& doc) noexcept
+{
+    pugi::xml_document root;
+    Scraper::Data      data;
+
+    root.load_string(doc.c_str());
+
+    for (const auto& anchor : root.select_nodes("//a"))
+    {
+        auto node  = AMNode(anchor.node());
+        auto name  = node.name();
+        auto url   = node.url();
+        auto entry = data.find(name);
+
+        if (entry == data.end())
+        {
+            data.emplace(name, url);
         }
         else if (isUrlReplaceable(entry->second))
         {
-            entry->second = node.getUrl();
+            entry->second = url;
         }
     }
-    else
-    {
-        for (const auto& child : node.getChildren())
-        {
-            populateScaperData(child, data);
-        }
-    }
-}
-
-inline auto fetchScraperData(const xmlpp::DomParser& parser)
-    -> Scraper::Data
-{
-    const AMNode root = AMNode(parser.get_document()->get_root_node());
-
-    Scraper::Data data;
-    populateScaperData(root, data);  // recursive
 
     return data;
 }
@@ -175,18 +139,9 @@ AMScraper::~AMScraper() noexcept = default;
 
 auto AMScraper::fetch(const std::string& url) noexcept -> Data
 {
-    xmlpp::DomParser contents;
+    auto doc  = Download::page(url, dataFrom, dataTo);
+    auto data = AMNode::parseData(doc);
 
-    try
-    {
-        contents.parse_memory(Download::page(url, dataFrom, dataTo));
-    }
-    catch (const std::exception& e)
-    {
-        out(Ch::Error) << e.what() << cr;
-    }
-
-    auto data    = fetchScraperData(contents);
     data.website = Data::Website::AlliedModders;
 
     return data;

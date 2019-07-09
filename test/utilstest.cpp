@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "../src/utils/file.hpp"
 #include "../src/utils/misc.h"

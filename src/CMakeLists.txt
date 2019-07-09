@@ -1,26 +1,22 @@
 project(SMAM_src)
 
-include(FindPkgConfig)
-
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
-find_package(CURL REQUIRED)
-
 # Options
 add_library(opts opts.cpp)
-target_link_libraries(opts PRIVATE boost_program_options)
+target_link_libraries(opts PRIVATE CONAN_PKG::boost)
 
 # Download
 add_library(download download.cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL Release)
-  target_link_libraries(download PRIVATE curl)
+  target_link_libraries(download PRIVATE CONAN_PKG::libcurl)
 else()
   target_link_libraries(download PRIVATE curlmock)
 endif()
 
 # Database
 add_library(database database.cpp)
-target_link_libraries(database PRIVATE download ${JSONCPP_LIBRARIES})
+target_link_libraries(database PRIVATE download)
+target_include_directories(database PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 # Commands
 add_subdirectory(commands)

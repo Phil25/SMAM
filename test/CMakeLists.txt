@@ -13,8 +13,7 @@ add_executable(tests
 )
 
 target_link_libraries(tests
-  gtest_main
-  gmock_main
+  CONAN_PKG::gtest
 
 # General
   opts
@@ -41,9 +40,8 @@ target_link_libraries(tests
   utils_version
 
 # Thrid party
-  -lcurl
-  -lboost_program_options
-  -lstdc++fs
+  CONAN_PKG::boost
+  stdc++fs
 )
 
 add_test(
