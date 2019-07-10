@@ -24,9 +24,6 @@ script:
     - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
     - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
     - gcc -v && g++ -v
-    - mkdir build && cd build
-    - conan install .. --build missing -s compiler.libcxx=libstdc++11
-    - ~/.conan/data/cmake_installer/3.14.5/conan/stable/package/44fcf6b9a7fb86b2586303e3db40189d3b511830/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug
-    - ~/.conan/data/cmake_installer/3.14.5/conan/stable/package/44fcf6b9a7fb86b2586303e3db40189d3b511830/bin/cmake --build .
+    - mkdir build && cd build && conan install .. --build missing -s build_type=Debug && conan build ..
     - ./bin/tests
     - ../test/alltest.sh . ./bin/smam

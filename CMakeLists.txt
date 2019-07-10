@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
+message("Building with CMake version " ${CMAKE_VERSION})
+
 project(SMAM)
 
 set(CMAKE_CXX_STANDARD 17)
