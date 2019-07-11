@@ -1,7 +1,7 @@
 #include "common.h"
 
-#include "../smfs.h"
-#include "helpers/report.h"
+#include <commands/helpers/report.h>
+#include <smfs.h>
 
 auto removeAddon(const std::string& addon) noexcept -> Report::Type
 {

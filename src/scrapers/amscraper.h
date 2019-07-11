@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scraper.h"
+#include <scrapers/scraper.h>
 
 class AMScraper final : public Scraper
 {

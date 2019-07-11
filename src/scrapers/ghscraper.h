@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scraper.h"
+#include <scrapers/scraper.h>
 
 class GHScraper final : public Scraper
 {

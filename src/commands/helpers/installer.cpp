@@ -2,18 +2,18 @@
 
 #include <regex>
 
-#include "../../download.h"
-#include "../../smfs.h"
+#include <download.h>
+#include <smfs.h>
 
-#include "../../scrapers/amscraper.h"
-#include "../../scrapers/ghscraper.h"
-#include "../../scrapers/ltscraper.h"
-#include "../../scrapers/scraper.h"
+#include <scrapers/amscraper.h>
+#include <scrapers/ghscraper.h>
+#include <scrapers/ltscraper.h>
+#include <scrapers/scraper.h>
 
-#include "../../utils/archive.h"
-#include "../../utils/misc.h"
-#include "../../utils/printer.h"
-#include "../../utils/version.h"
+#include <utils/archive.h>
+#include <utils/misc.h>
+#include <utils/printer.h>
+#include <utils/version.h>
 
 namespace fs       = std::filesystem;
 using StringVector = std::vector<std::string>;

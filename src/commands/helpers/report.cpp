@@ -1,6 +1,6 @@
 #include "report.h"
 
-#include "../../utils/printer.h"
+#include <utils/printer.h>
 
 using StringVector = std::vector<std::string>;
 

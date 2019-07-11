@@ -1,16 +1,16 @@
 #include "download.h"
 
-#ifdef NDEBUG
-#include <curl/curl.h>
-#else
-#include "../test/curlmock.h"
-#endif
-
 #include <fstream>
 #include <sstream>
 
-#include "utils/misc.h"
-#include "version.hpp"
+#ifdef NDEBUG
+#include <curl/curl.h>
+#else
+#include <curlmock.h>
+#endif
+
+#include <utils/misc.h>
+#include <version.hpp>
 
 namespace
 {

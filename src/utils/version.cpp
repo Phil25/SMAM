@@ -45,7 +45,8 @@ int Utils::Version::compare(const Version& other) const noexcept
 }
 
 auto Utils::Version::biggest(
-    const Utils::StringVector& versions) noexcept -> const std::string&
+    const std::vector<std::string>& versions) noexcept
+    -> const std::string&
 {
     int size = versions.size();
     if (size < 2) return versions[0];

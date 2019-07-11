@@ -1,6 +1,7 @@
 #pragma once
 
-#include "misc.h"
+#include <string>
+#include <vector>
 
 namespace Utils
 {
@@ -13,7 +14,8 @@ public:
     int compare(const Version& other) const noexcept;
 
     // return string representing biggest version value
-    static auto biggest(const StringVector& versions) noexcept
+    static auto biggest(
+        const std::vector<std::string>& versions) noexcept
         -> const std::string&;
 };
 }  // namespace Utils

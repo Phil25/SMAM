@@ -1,8 +1,8 @@
 #include "database.h"
 
-#include <nlohmann/json.hpp>
+#include <download.h>
 
-#include "download.h"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

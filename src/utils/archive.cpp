@@ -1,7 +1,8 @@
 #include "archive.h"
 
-#include <zip.h>
 #include <fstream>
+
+#include <zip.h>
 
 bool Archive::valid(const fs::path& file) noexcept
 {

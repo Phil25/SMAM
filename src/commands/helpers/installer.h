@@ -3,9 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "report.h"
-
-#include "../../database.h"
+#include <commands/helpers/report.h>
+#include <database.h>
 
 /*
  * Helper class for setting up the installation environment and

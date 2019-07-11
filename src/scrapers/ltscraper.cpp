@@ -1,10 +1,9 @@
 #include "ltscraper.h"
 
+#include <download.h>
+#include <utils/printer.h>
+
 #include <pugixml.hpp>
-
-#include "../download.h"
-
-#include "../utils/printer.h"
 
 namespace
 {

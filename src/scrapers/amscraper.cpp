@@ -1,12 +1,13 @@
 #include "amscraper.h"
 
 #include <cassert>
+
+#include <download.h>
+#include <utils/misc.h>
+#include <utils/printer.h>
+#include <utils/version.h>
+
 #include <pugixml.hpp>
-
-#include "../download.h"
-
-#include "../utils/printer.h"
-#include "../utils/version.h"
 
 namespace
 {

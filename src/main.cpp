@@ -1,11 +1,10 @@
 #include "version.hpp"
 
-#include "utils/printer.h"
-
-#include "commands/common.h"  // ExitCode
-
 #include <unistd.h>  // getuid
 #include <filesystem>
+
+#include <commands/common.h>  // ExitCode
+#include <utils/printer.h>
 
 namespace fs = std::filesystem;
 

@@ -1,10 +1,9 @@
 #include "ghscraper.h"
 
+#include <download.h>
+#include <utils/printer.h>
+
 #include <nlohmann/json.hpp>
-
-#include "../download.h"
-
-#include "../utils/printer.h"
 
 using json = nlohmann::json;
 
