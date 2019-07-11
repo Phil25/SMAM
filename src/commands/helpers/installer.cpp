@@ -3,6 +3,7 @@
 #include <regex>
 
 #include "../../download.h"
+#include "../../smfs.h"
 
 #include "../../scrapers/amscraper.h"
 #include "../../scrapers/ghscraper.h"
@@ -12,7 +13,6 @@
 #include "../../utils/archive.h"
 #include "../../utils/misc.h"
 #include "../../utils/printer.h"
-#include "../../utils/smfs.h"
 #include "../../utils/version.h"
 
 namespace fs       = std::filesystem;

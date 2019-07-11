@@ -1,6 +1,6 @@
 #include "common.h"
 
-#include "../utils/smfs.h"
+#include "../smfs.h"
 
 auto Command::info(const Opts& opts) noexcept -> ExitCode
 {

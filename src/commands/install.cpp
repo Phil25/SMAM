@@ -1,8 +1,7 @@
 #include "common.h"
 
+#include "../smfs.h"
 #include "helpers/installer.h"
-
-#include "../utils/smfs.h"
 
 auto Command::install(const Opts& opts) noexcept -> ExitCode
 {

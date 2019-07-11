@@ -3,6 +3,7 @@ add_library(curlmock curlmock.cpp)
 add_executable(tests
   curlmocktest.cpp
   optstest.cpp
+  smfstest.cpp
   utilstest.cpp
   downloadtest.cpp
   databasetest.cpp
@@ -19,6 +20,7 @@ target_link_libraries(tests
   opts
   download
   database
+  smfs
   installer
   curlmock
 
@@ -36,7 +38,6 @@ target_link_libraries(tests
 # Utilities
   utils_misc
   utils_printer
-  utils_smfs
   utils_version
 
 # Thrid party

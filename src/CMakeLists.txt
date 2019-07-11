@@ -18,6 +18,9 @@ add_library(database database.cpp)
 target_link_libraries(database PRIVATE download)
 target_include_directories(database PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
+# SourceMod Filesystem
+add_library(smfs smfs.cpp)
+
 # Commands
 add_subdirectory(commands)
 
