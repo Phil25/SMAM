@@ -1,8 +1,7 @@
 from conans import ConanFile, CMake
 
 class SourceModAddonManager(ConanFile):
-
-    generators = ("cmake", "ycm")
+    generators = "cmake"
     settings = "os", "compiler", "build_type", "arch"
     requires = (
         "cmake_installer/3.14.5@conan/stable",
