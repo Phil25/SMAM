@@ -5,7 +5,46 @@
 
 #include "../src/smfs.h"
 
+#include <nlohmann/json.hpp>
+
+using json   = nlohmann::json;
+namespace fs = SMFS::fs;
+
 constexpr const char* dataFile = ".smamdata";
+
+namespace
+{
+auto make(const std::string&           author      = "",
+          const std::string&           description = "",
+          const std::set<fs::path>&    files       = {},
+          const std::set<std::string>& deps        = {})
+{
+    json addon;
+
+    addon["author"]      = author;
+    addon["description"] = description;
+
+    if (files.size())
+    {
+        addon["files"] = files;
+    }
+    else
+    {
+        addon["files"] = json::array();
+    }
+
+    if (deps.size())
+    {
+        addon["deps"] = deps;
+    }
+    else
+    {
+        addon["deps"] = json::array();
+    }
+
+    return addon;
+}
+}  // namespace
 
 TEST(SMFSTest, PathIsSafe)
 {
@@ -36,7 +75,6 @@ TEST(SMFSTest, PathIsSafe)
 
 TEST(SMFSTest, PathFindRoot)
 {
-    namespace fs = SMFS::fs;
     ASSERT_TRUE(
         fs::create_directories("./mod/addons/sourcemod/plugins"));
 
@@ -62,8 +100,6 @@ TEST(SMFSTest, PathFindRoot)
 
 TEST(SMFSTest, PathRemoveEmpty)
 {
-    namespace fs = SMFS::fs;
-
     fs::create_directories("something/this/way/comes");
     fs::create_directories("something/this/somedir");
     SMFS::Path::removeEmpty("something/this/way/comes");
@@ -83,12 +119,12 @@ TEST(SMFSTest, DataSave)
 {
     EXPECT_TRUE(SMFS::Data::save());
 
-    auto last = SMFS::fs::current_path();
-    SMFS::fs::current_path("/");
+    auto last = fs::current_path();
+    fs::current_path("/");
 
     EXPECT_FALSE(SMFS::Data::save());
 
-    SMFS::fs::current_path(last);
+    fs::current_path(last);
 }
 
 TEST(SMFSTest, DataCacheFile)
@@ -102,8 +138,8 @@ TEST(SMFSTest, DataCacheFile)
     EXPECT_FALSE(SMFS::File::detach("file1", "addon2"));  // wrong addon
     EXPECT_TRUE(SMFS::File::detach("file1", "addon1"));
 
-    EXPECT_EQ(0, SMFS::Addon::files("addon1").size());  // empty addon->
-    EXPECT_FALSE(SMFS::Addon::isInstalled("addon1"));   // not installed
+    EXPECT_EQ(0, SMFS::Addon::files("addon1").size());  // addon empty,
+    EXPECT_TRUE(SMFS::Addon::isInstalled("addon1"));    // but installed
 }
 
 TEST(SMFSTest, DataCacheAddon)
@@ -127,21 +163,29 @@ TEST(SMFSTest, FileCountShared)
     std::ofstream ofs(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
 
-    ofs << "addon1 plugins/bin1.smx\n";
-    ofs << "addon1 gamedata/gd.txt\n";  // shared with rest
-
-    ofs << "addon2 plugins/bin2.smx\n";
-    ofs << "addon2 gamedata/gd.txt\n";  // shared with rest
-    ofs << "addon2 translations/addon2.phrases.txt\n";  // shared with 3
-
-    ofs << "addon3 plugins/bin3.smx\n";
-    ofs << "addon3 gamedata/gd.txt\n";  // shared with rest
-    ofs << "addon3 translations/addon2.phrases.txt";  // shared with 2
+    // clang-format off
+    ofs << json{{"data", {
+        {"addon1", make("", "", {
+            "plugins/bin1.smx",
+            "gamedata/gd.txt",
+        })},
+        {"addon2", make("", "", {
+            "plugins/bin2.smx",
+            "gamedata/gd.txt",
+            "translations/addon2.phrases.txt",
+        })},
+        {"addon3", make("", "", {
+            "plugins/bin3.smx",
+            "gamedata/gd.txt",
+            "translations/addon2.phrases.txt",
+        })},
+    }}};
+    // clang-format on
 
     ofs.close();
 
     ASSERT_TRUE(SMFS::Data::load());
-    ASSERT_TRUE(SMFS::fs::remove(dataFile));
+    ASSERT_TRUE(fs::remove(dataFile));
 
     EXPECT_EQ(SMFS::File::countShared("plugins/bin1.smx"), 1);
     EXPECT_EQ(SMFS::File::countShared("plugins/bin2.smx"), 1);
@@ -157,19 +201,26 @@ TEST(SMFSTest, AddonFiles)
     std::ofstream ofs(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
 
-    ofs << "addon1 plugins/bin1.smx\n";
-    ofs << "addon1 gamedata/gd.txt\n";
-
-    ofs << "addon2 plugins/bin2.smx\n";
-    ofs << "addon2 gamedata/gd.txt\n";
-    ofs << "addon2 translations/phrases.txt";
+    // clang-format off
+    ofs << json{{"data", {
+        {"addon1", make("", "", {
+            "plugins/bin1.smx",
+            "gamedata/gd.txt",
+        })},
+        {"addon2", make("", "", {
+            "plugins/bin2.smx",
+            "gamedata/gd.txt",
+            "translations/phrases.txt",
+        })},
+    }}};
+    // clang-format on
 
     ofs.close();
 
     ASSERT_TRUE(SMFS::Data::load());
-    ASSERT_TRUE(SMFS::fs::remove(dataFile));
+    ASSERT_TRUE(fs::remove(dataFile));
 
-    std::set<SMFS::fs::path> f1, f2;
+    std::set<fs::path> f1, f2;
 
     f1 = {"plugins/bin1.smx", "gamedata/gd.txt"};
     EXPECT_EQ(f1, SMFS::Addon::files("addon1"));
@@ -184,23 +235,32 @@ TEST(SMFSTest, AddonIsInstalled)
     std::ofstream ofs(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
 
-    ofs << "multifile path/to/file1\n";
-    ofs << "multifile path/to/file2\n";
-    ofs << "multifile path/to/file3\n";
-
-    ofs << "spacemultifile \"path/to/file with spaces1\"\n";
-    ofs << "spacemultifile \"path/to/file with spaces2\"\n";
-    ofs << "spacemultifile \"path/to/file with spaces3\"\n";
-
-    ofs << "singlefile path/to/file4\n";
-    ofs << "spacesinglefile \"path/to/file with spaces4\"\n";
-
-    ofs << "nofiles";
+    // clang-format off
+    ofs << json{{"data", {
+        {"multifile", make("", "", {
+            "path/to/file1",
+            "path/to/file2",
+            "path/to/file3",
+        })},
+        {"spacemultifile", make("", "", {
+            "path/to/file1 with spaces1",
+            "path/to/file1 with spaces2",
+            "path/to/file1 with spaces3",
+        })},
+        {"singlefile", make("", "", {
+            "path/to/file4",
+        })},
+        {"spacesinglefile", make("", "", {
+            "path/to/file with spaces4",
+        })},
+        {"nofiles", make()},
+    }}};
+    // clang-format on
 
     ofs.close();
 
     ASSERT_TRUE(SMFS::Data::load());
-    ASSERT_TRUE(SMFS::fs::remove(dataFile));
+    ASSERT_TRUE(fs::remove(dataFile));
 
     EXPECT_TRUE(SMFS::Addon::isInstalled("multifile"));
     EXPECT_TRUE(SMFS::Addon::isInstalled("spacemultifile"));
@@ -208,6 +268,7 @@ TEST(SMFSTest, AddonIsInstalled)
     EXPECT_TRUE(SMFS::Addon::isInstalled("singlefile"));
     EXPECT_TRUE(SMFS::Addon::isInstalled("spacesinglefile"));
 
-    EXPECT_FALSE(SMFS::Addon::isInstalled("nofiles"));
+    EXPECT_TRUE(SMFS::Addon::isInstalled("nofiles"));
+
     EXPECT_FALSE(SMFS::Addon::isInstalled("nothingatall"));
 }

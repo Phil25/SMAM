@@ -4,10 +4,36 @@
 #include <map>
 #include <set>
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 namespace
 {
-// AddonID -> [files]
-std::map<std::string, std::set<SMFS::fs::path>> data;
+struct Addon final
+{
+    std::string              author, description;
+    std::set<SMFS::fs::path> files;
+    std::set<std::string>    deps;
+};
+
+void to_json(json& j, const Addon& a) noexcept
+{
+    j["author"]      = a.author;
+    j["description"] = a.description;
+    j["files"]       = a.files;
+    j["deps"]        = a.deps;
+}
+
+void from_json(const json& j, Addon& a) noexcept
+{
+    j["author"].get_to(a.author);
+    j["description"].get_to(a.description);
+    j["files"].get_to(a.files);
+    j["deps"].get_to(a.deps);
+}
+
+std::map<std::string, Addon> data;
 
 constexpr std::string_view dataFilename = ".smamdata";
 }  // namespace
@@ -62,7 +88,7 @@ bool SMFS::Path::prepare(const fs::path& path) noexcept
 }
 
 /*
- * Return whether owner has read and write permissions in `path`
+ * Return whether owner has read and write permissions in `path`.
  */
 bool SMFS::Path::gotPermissions(const fs::path& path) noexcept
 {
@@ -90,71 +116,29 @@ void SMFS::Path::removeEmpty(fs::path p) noexcept
 }
 
 /*
- * Load installed addons from `dataFile` file into `data` map.
- * Return false if not sufficient permissions for either reading or
- * writing.
- */
-[[nodiscard]] bool SMFS::Data::load() noexcept
-{
-    if (!Path::gotPermissions(fs::current_path())) return false;
-
-    std::ifstream ifs(fs::path{dataFilename});
-    std::string   id;
-    fs::path      file;
-
-    data.clear();
-
-    while (ifs >> id >> file) File::add(file, id);
-    ifs.close();
-
-    return true;
-}
-
-/*
- * Write loaded data from the `data` map into `dataFile` file
- */
-[[nodiscard]] bool SMFS::Data::save() noexcept
-{
-    std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
-    if (!ofs) return false;
-
-    for (const auto& [addon, files] : data)
-    {
-        for (const auto& file : files)
-        {
-            ofs << addon << ' ' << file << '\n';
-        }
-    }
-
-    return true;
-}
-
-/*
- * Add file to specified addon ID's cache
+ * Add file to specified addon ID's cache.
  */
 void SMFS::File::add(const fs::path&    file,
                      const std::string& id) noexcept
 {
-    if (!fs::is_directory(file)) data[id].insert(file);
+    if (!fs::is_directory(file)) data[id].files.insert(file);
 }
 
 /*
  * Detach a file from an addon. In other words, remove it from the
- * cached map of loaded addons. Doesn't remove it from disk
+ * cached data of installed addons. Doesn't remove it from disk.
  */
 bool SMFS::File::detach(const fs::path&    file,
                         const std::string& id) noexcept
 {
     if (!Addon::isInstalled(id)) return false;
 
-    data[id].erase(file);
-    if (!data[id].size()) Addon::erase(id);
-
+    data[id].files.erase(file);
     return true;
 }
 
 /*
- * Remove a file related to an addon from the disk
+ * Remove a file related to an addon from the disk.
  */
 auto SMFS::File::remove(const fs::path& file) noexcept -> DeleteResult
 {
@@ -163,33 +147,36 @@ auto SMFS::File::remove(const fs::path& file) noexcept -> DeleteResult
 
     fs::remove(file);
     Path::removeEmpty(file);
+
     return DeleteResult::OK;
 }
 
 /*
- * Return how many addons share the specified file
+ * Return how many addons share the specified file.
  */
 int SMFS::File::countShared(const fs::path& file) noexcept
 {
     int count = 0;
-    for (const auto& addon : data)
+
+    for (const auto& [_, addon] : data)
     {
-        count += addon.second.count(file);
+        count += addon.files.count(file);
     }
+
     return count;
 }
 
 /*
- * Return set of files associated with an AddonID
+ * Return set of files associated with an AddonID.
  */
 auto SMFS::Addon::files(const std::string& id) noexcept
     -> std::set<fs::path>
 {
-    return isInstalled(id) ? data[id] : std::set<fs::path>{};
+    return isInstalled(id) ? data[id].files : std::set<fs::path>{};
 }
 
 /*
- * Erase an addon from the local cache
+ * Erase an addon from the local cache.
  */
 void SMFS::Addon::erase(const std::string& id) noexcept
 {
@@ -197,7 +184,7 @@ void SMFS::Addon::erase(const std::string& id) noexcept
 }
 
 /*
- * Return whether an addon of the given ID is installed
+ * Return whether an addon of the given ID is installed.
  */
 bool SMFS::Addon::isInstalled(const std::string& id) noexcept
 {
@@ -205,9 +192,56 @@ bool SMFS::Addon::isInstalled(const std::string& id) noexcept
 }
 
 /*
- * Iterate over installed addons
+ * Iterate over installed addons.
  */
 void SMFS::Addon::getInstalled(const EachAddon& cb) noexcept
 {
-    for (const auto& addon : data) cb(addon.first);
+    for (const auto& [id, _] : data) cb(id);
+}
+
+/*
+ * Load installed addons from `dataFile` file into `data` map.
+ * Return false if not sufficient permissions for either reading or
+ * writing.
+ */
+[[nodiscard]] bool SMFS::Data::load() noexcept
+{
+    if (!Path::gotPermissions(fs::current_path())) return false;
+
+    data.clear();
+
+    std::ifstream ifs(fs::path{dataFilename});
+    json          in;
+
+    try
+    {
+        ifs >> in;
+        in["data"].get_to(data);
+    }
+    catch (const json::exception& e)
+    {
+    }
+
+    ifs.close();
+
+    return true;
+}
+
+/*
+ * Write loaded data from the `data` map into `dataFile` file.
+ */
+[[nodiscard]] bool SMFS::Data::save() noexcept
+{
+    std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
+    if (!ofs) return false;
+
+    json out;
+    out["data"] = data;
+    out["hash"] = std::hash<json>{}(out["data"]);
+
+    ofs << out;
+
+    ofs.close();
+
+    return true;
 }

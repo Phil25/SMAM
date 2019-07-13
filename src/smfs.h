@@ -29,12 +29,6 @@ bool gotPermissions(const fs::path& path) noexcept;
 void removeEmpty(fs::path startingFrom) noexcept;
 }  // namespace Path
 
-namespace Data
-{
-[[nodiscard]] bool load() noexcept;
-[[nodiscard]] bool save() noexcept;
-}  // namespace Data
-
 namespace File
 {
 void add(const fs::path& file, const std::string& id) noexcept;
@@ -50,5 +44,11 @@ void erase(const std::string& id) noexcept;
 bool isInstalled(const std::string& id) noexcept;
 void getInstalled(const EachAddon&) noexcept;
 }  // namespace Addon
+
+namespace Data
+{
+[[nodiscard]] bool load() noexcept;
+[[nodiscard]] bool save() noexcept;
+}  // namespace Data
 
 }  // namespace SMFS
