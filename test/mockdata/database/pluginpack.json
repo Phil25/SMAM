@@ -1,0 +1,12 @@
+{
+	"id": "pluginpack",
+	"author": "Somedev",
+	"description": "I want pluginis thriller and sharedthriller.",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1590169",
+	"files": [
+	],
+	"deps": [
+		"thriller",
+		"sharedthriller"
+	]
+}

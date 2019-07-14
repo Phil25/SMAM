@@ -1,8 +1,12 @@
 {
 	"id": "tf2attributes",
+	"author": "FlaminSarge",
+	"description": "Team Fortress 2 attribute management library.",
 	"url": "https://github.com/FlaminSarge/tf2attributes/",
 	"files": [
 		"plugins/;tf2attributes.smx",
 		"gamedata/;https://raw.githubusercontent.com/FlaminSarge/tf2attributes/master/tf2.attributes.txt"
+	],
+	"deps": [
 	]
 }

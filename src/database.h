@@ -9,8 +9,14 @@
 class Database final
 {
 public:
-    // Addon's URL & vector of assoiated Files.
-    using Plan    = std::pair<std::string, std::vector<File>>;
+    struct Addon final
+    {
+        std::string              author, description;
+        std::vector<File>        files;
+        std::vector<std::string> dependencies;
+    };
+
+    using Plan    = std::pair<std::string, Addon>;
     using PlanMap = std::map<std::string, Plan>;
 
 private:

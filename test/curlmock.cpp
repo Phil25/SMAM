@@ -1,6 +1,8 @@
 #include "curlmock.h"
 
 #include <fstream>
+#include <map>
+#include <set>
 #include <sstream>
 
 #ifndef NDELAY
@@ -8,7 +10,7 @@
 #include <thread>
 #endif
 
-#include <map>
+#include <nlohmann/json.hpp>
 
 #ifdef _PROJECT_ROOT
 #define PROJECT_ROOT _PROJECT_ROOT
@@ -20,7 +22,38 @@ std::map<std::string, std::string> tpLink = {
 #include "./mockdata/thirdparty_link.json"
 };
 
-static std::string errmsg;
+using json = nlohmann::json;
+
+namespace
+{
+std::string errmsg;
+
+inline void buildResult(json& result, const std::string& id,
+                        std::set<std::string>& ids) noexcept
+{
+    if (ids.count(id)) return;  // already added
+
+    auto location =
+        PROJECT_ROOT "/test/mockdata/database/" + id + ".json";
+
+    std::ifstream ifs(location, std::ios::in);
+    if (!ifs.is_open()) return;
+
+    auto j = json::parse(ifs);
+    ifs.close();
+
+    ids.insert(id);
+    result.push_back(j);
+
+    if (j.count("deps"))
+    {
+        for (const std::string& dep : j["deps"])
+        {
+            buildResult(result, dep, ids);
+        }
+    }
+}
+}  // namespace
 
 auto CURLMock::fetchData(const std::string& url) noexcept
     -> std::vector<char>
@@ -51,35 +84,20 @@ auto CURLMock::queryDatabase(const std::string& url) noexcept
     -> std::vector<char>
 {
     size_t pos = url.find('=');
-    if (pos == (size_t)std::string::npos) return {};
+    if (pos == (size_t)std::string::npos) return {'[', ']'};
 
-    std::istringstream dataStream(url.substr(++pos));
-    std::string        id, location;
-    std::vector<char>  result{'['};
+    auto data   = std::istringstream(url.substr(++pos));
+    auto ids    = std::set<std::string>();
+    auto id     = std::string();
+    auto result = json::array();
 
-    while (std::getline(dataStream, id, ','))
+    while (std::getline(data, id, ','))
     {
-        location =
-            PROJECT_ROOT "/test/mockdata/database/" + id + ".json";
-        std::ifstream ifs(location, std::ios::in | std::ios::ate);
-        if (!ifs.is_open()) continue;
-
-        auto len      = ifs.tellg();
-        auto prevSize = result.size();
-        result.resize(prevSize + len + 1);  // +1 for comma
-
-        ifs.seekg(0, std::ios::beg);
-        ifs.read(&result[prevSize], len);
-        ifs.close();
-
-        result[result.size() - 1] = ',';
+        buildResult(result, id, ids);
     }
 
-    auto size = result.size();
-    if (size == 1) return {'[', ']'};
-
-    result[size - 1] = ']';  // turn last comma into ]
-    return result;
+    auto str = result.dump();
+    return std::vector<char>{str.begin(), str.end()};
 }
 
 auto curl_easy_init() -> CURL* { return new CURL; }

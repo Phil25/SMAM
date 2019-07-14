@@ -1,5 +1,7 @@
 {
 	"id": "tf2items",
+	"author": "asherkin",
+	"description": "Allows the attributes, level and quality of items to be modified per player as they are given by the server.",
 	"url": "https://builds.limetech.io/?p=tf2items",
 	"files": [
 		"../../;.*"

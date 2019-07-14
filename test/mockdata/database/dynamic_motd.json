@@ -1,5 +1,7 @@
 {
 	"id": "dynamic_motd",
+	"author": "psychonic",
+	"author": "Allows sending of player/server info via GET vars to the MOTD url for easy customization of MOTD per player/server.",
 	"url": "https://forums.alliedmods.net/showpost.php?p=1387386",
 	"files": [
 		"plugins/;dynamic_motd.smx"

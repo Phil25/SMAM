@@ -37,13 +37,24 @@ inline auto toFileVector(const json& files)
     return std::vector<File>{files.begin(), files.end()};
 }
 
+inline auto makeAddon(const json& addonData)
+{
+    Database::Addon addon;
+
+    addon.description = addonData.at("description");
+    addon.author      = addonData.at("author");
+    addon.files       = toFileVector(addonData.at("files"));
+    addonData.at("deps").get_to(addon.dependencies);
+
+    return addon;
+}
+
 /*
  * Construct Database::Plan from nlohmann::json
- * Plan = tuple of addon's URL and its File vector (database.h)
  */
 inline auto makePlan(const json& addon) -> Database::Plan
 {
-    return {addon.at("url"), toFileVector(addon.at("files"))};
+    return {addon.at("url"), makeAddon(addon)};
 }
 }  // namespace
 

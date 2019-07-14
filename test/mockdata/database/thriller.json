@@ -1,5 +1,7 @@
 {
 	"id": "thriller",
+	"author": "pheadxdll",
+	"description": "Disables thriller taunt on Halloween event",
 	"url": "https://forums.alliedmods.net/showpost.php?p=1590169",
 	"files": [
 		"plugins/;thriller.smx",

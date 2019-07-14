@@ -237,9 +237,19 @@ auto Installer::installSingle(const std::string& addon) noexcept
     out(Ch::Info) << Col::green << "Installing " << addon << "..."
                   << Col::reset << cr;
 
+    auto data    = get(addon);
     bool success = true;
 
-    for (const auto& file : getAddonFiles(addon))
+    for (const auto& dep : data.dependencies)
+    {
+        if (installSingle(dep) == Report::Type::Failed)
+        {
+            success = false;
+            break;
+        }
+    }
+
+    for (const auto& file : data.files)
     {
         if (!installFile(file, addon))
         {
@@ -266,23 +276,22 @@ auto Installer::installSingle(const std::string& addon) noexcept
     return Report::Type::Installed;
 }
 
-auto Installer::getAddonFiles(const std::string& id) noexcept
-    -> std::vector<File>
+auto Installer::get(const std::string& id) noexcept -> Database::Addon
 {
-    auto [url, files] = database.get(id);
+    auto [url, addonData] = database.get(id);
 
     if (!url.empty())
     {
-        Scraper::Data data;
+        Scraper::Data scraperData;
 
         if (auto scraper = Scraper::get(url))
         {
-            data = scraper->get()->fetch(url);
+            scraperData = scraper->get()->fetch(url);
         }
 
-        data.url = url;
-        processFiles(files, data);
+        scraperData.url = url;
+        processFiles(addonData.files, scraperData);
     }
 
-    return files;
+    return addonData;
 }

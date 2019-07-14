@@ -1,4 +1,5 @@
 add_library(curlmock curlmock.cpp)
+target_include_directories(curlmock PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 add_executable(tests
   curlmocktest.cpp
@@ -12,6 +13,8 @@ add_executable(tests
   ghscrapertest.cpp
   installertest.cpp
 )
+
+target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 target_link_libraries(tests
   CONAN_PKG::gtest

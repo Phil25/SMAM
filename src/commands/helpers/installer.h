@@ -38,8 +38,7 @@ public:
         -> Report::Type;
 
     /*
-     * Returns the processed files of a specified addon.
+     * Returns the processed data of a specified addon.
      */
-    auto getAddonFiles(const std::string& id) noexcept
-        -> std::vector<File>;
+    auto get(const std::string& id) noexcept -> Database::Addon;
 };

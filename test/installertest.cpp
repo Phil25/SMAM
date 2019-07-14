@@ -19,11 +19,10 @@ std::ostream& operator<<(std::ostream& os, const File& f) noexcept
     return os << f.path << ';' << f.name << " -- " << f.url;
 }
 
-inline auto getFilesOfOne(const std::string& id) noexcept
-    -> std::vector<File>
+inline auto get(const std::string& id) noexcept
 {
     auto i = Installer("localhost:7666", {id}, false);
-    return i.getAddonFiles(id);
+    return i.get(id);
 }
 
 TEST(InstallerTest, Accelerator)
@@ -32,7 +31,7 @@ TEST(InstallerTest, Accelerator)
               "https://builds.limetech.io/files/"
               "accelerator-2.4.3-git127-b302f00-linux.zip"};
 
-    ASSERT_THAT(getFilesOfOne("accelerator"), ElementsAre(f));
+    ASSERT_THAT(get("accelerator").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, AdvancedInfiniteAmmo)
@@ -40,7 +39,7 @@ TEST(InstallerTest, AdvancedInfiniteAmmo)
     File f = {"plugins/;AdvancedInfiniteAmmo.smx",
               "http://www.sourcemod.net/vbcompiler.php?file_id=148649"};
 
-    ASSERT_THAT(getFilesOfOne("advancedinfiniteammo"), ElementsAre(f));
+    ASSERT_THAT(get("advancedinfiniteammo").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, AFKManager)
@@ -53,7 +52,7 @@ TEST(InstallerTest, AFKManager)
                "http://afkmanager.dawgclan.net/translations/"
                "afk_manager.phrases.txt"};
 
-    ASSERT_THAT(getFilesOfOne("afk_manager"), ElementsAre(f1, f2));
+    ASSERT_THAT(get("afk_manager").files, ElementsAre(f1, f2));
 }
 
 TEST(InstallerTest, Connect)
@@ -62,7 +61,7 @@ TEST(InstallerTest, Connect)
               "https://builds.limetech.io/files/"
               "connect-1.2.0-hg38-linux.zip"};
 
-    ASSERT_THAT(getFilesOfOne("connect"), ElementsAre(f));
+    ASSERT_THAT(get("connect").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, DynamicMotd)
@@ -72,7 +71,7 @@ TEST(InstallerTest, DynamicMotd)
               "attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&"
               "attachmentid=160284&d=1485099001"};
 
-    ASSERT_THAT(getFilesOfOne("dynamic_motd"), ElementsAre(f));
+    ASSERT_THAT(get("dynamic_motd").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, FuncommandsX)
@@ -82,7 +81,7 @@ TEST(InstallerTest, FuncommandsX)
               "attachment.php?s=dc5547938c38333b03dff89b0ac17723&"
               "attachmentid=159900&d=1483676185"};
 
-    ASSERT_THAT(getFilesOfOne("funcommandsx"), ElementsAre(f));
+    ASSERT_THAT(get("funcommandsx").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, SteamTools)
@@ -91,7 +90,7 @@ TEST(InstallerTest, SteamTools)
               "https://builds.limetech.io/files/"
               "steamtools-0.10.0-git179-54fdc51-linux.zip"};
 
-    ASSERT_THAT(getFilesOfOne("steamtools"), ElementsAre(f));
+    ASSERT_THAT(get("steamtools").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, TF2Attributes)
@@ -104,7 +103,7 @@ TEST(InstallerTest, TF2Attributes)
                "https://raw.githubusercontent.com/FlaminSarge/"
                "tf2attributes/master/tf2.attributes.txt"};
 
-    ASSERT_THAT(getFilesOfOne("tf2attributes"), ElementsAre(f1, f2));
+    ASSERT_THAT(get("tf2attributes").files, ElementsAre(f1, f2));
 }
 
 TEST(InstallerTest, TF2Items)
@@ -113,7 +112,7 @@ TEST(InstallerTest, TF2Items)
               "https://builds.limetech.io/files/"
               "tf2items-1.6.4-hg279-linux.zip"};
 
-    ASSERT_THAT(getFilesOfOne("tf2items"), ElementsAre(f));
+    ASSERT_THAT(get("tf2items").files, ElementsAre(f));
 }
 
 TEST(InstallerTest, Thriller)
@@ -127,7 +126,7 @@ TEST(InstallerTest, Thriller)
                "attachment.php?s=a59969c161c4e0ac23ef19c7cbb9ee5e&"
                "attachmentid=133555&d=1400274898"};
 
-    ASSERT_THAT(getFilesOfOne("thriller"), ElementsAre(f1, f2));
+    ASSERT_THAT(get("thriller").files, ElementsAre(f1, f2));
 }
 
 TEST(InstallerTest, Updater)
@@ -136,5 +135,5 @@ TEST(InstallerTest, Updater)
               "https://bitbucket.org/GoD_Tony/updater/downloads/"
               "updater.smx"};
 
-    ASSERT_THAT(getFilesOfOne("updater"), ElementsAre(f));
+    ASSERT_THAT(get("updater").files, ElementsAre(f));
 }
