@@ -125,45 +125,46 @@ void SMFS::File::add(const fs::path&    file,
 }
 
 /*
- * Detach a file from an addon. In other words, remove it from the
- * cached data of installed addons. Doesn't remove it from disk.
- */
-bool SMFS::File::detach(const fs::path&    file,
-                        const std::string& id) noexcept
-{
-    if (!Addon::isInstalled(id)) return false;
-
-    data[id].files.erase(file);
-    return true;
-}
-
-/*
  * Remove a file related to an addon from the disk.
  */
 auto SMFS::File::remove(const fs::path& file) noexcept -> DeleteResult
 {
-    if (!fs::exists(file)) return DeleteResult::NotExists;
-    if (File::countShared(file) > 1) return DeleteResult::Shared;
+    const auto& [id, count] = File::find(file);
+
+    switch (count)
+    {
+        case 0: return DeleteResult::NotExists;
+        case 1: break;
+        default: return DeleteResult::Shared;
+    }
 
     fs::remove(file);
     Path::removeEmpty(file);
+    data[id].files.erase(file);
 
     return DeleteResult::OK;
 }
 
 /*
- * Return how many addons share the specified file.
+ * Find which and how many addons owns the specified file if any. If
+ * multiple addons own the file, return the ID of the last one found
+ * (usually is one).
  */
-int SMFS::File::countShared(const fs::path& file) noexcept
+auto SMFS::File::find(const fs::path& file) noexcept -> FindResult
 {
-    int count = 0;
+    std::string lastId;
+    int         count = 0;
 
-    for (const auto& [_, addon] : data)
+    for (const auto& [id, addon] : data)
     {
-        count += addon.files.count(file);
+        if (addon.files.count(file))
+        {
+            ++count;
+            lastId = id;
+        }
     }
 
-    return count;
+    return {lastId, count};
 }
 
 /*

@@ -179,7 +179,8 @@ bool installFile(const File& data, const std::string& id) noexcept
                 return registerFile(extractedFile, id);
             });
 
-        return result && SMFS::File::detach(file, id);
+        return result &&
+               SMFS::File::remove(file) == SMFS::DeleteResult::OK;
     }
 
     return true;

@@ -7,6 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
+using namespace testing;
 using json   = nlohmann::json;
 namespace fs = SMFS::fs;
 
@@ -135,8 +136,7 @@ TEST(SMFSTest, DataCacheFile)
     ASSERT_EQ(1, SMFS::Addon::files("addon1").size());
     EXPECT_EQ("file1", *SMFS::Addon::files("addon1").begin());
 
-    EXPECT_FALSE(SMFS::File::detach("file1", "addon2"));  // wrong addon
-    EXPECT_TRUE(SMFS::File::detach("file1", "addon1"));
+    EXPECT_EQ(SMFS::DeleteResult::OK, SMFS::File::remove("file1"));
 
     EXPECT_EQ(0, SMFS::Addon::files("addon1").size());  // addon empty,
     EXPECT_TRUE(SMFS::Addon::isInstalled("addon1"));    // but installed
@@ -156,9 +156,9 @@ TEST(SMFSTest, DataCacheAddon)
     EXPECT_FALSE(SMFS::Addon::isInstalled("addon1"));   // not installed
 }
 
-// File::remove is checked by Path::removeEmpty + File::countShared
+// File::remove is checked by Path::removeEmpty + File::find
 
-TEST(SMFSTest, FileCountShared)
+TEST(SMFSTest, FileFind)
 {
     std::ofstream ofs(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
@@ -168,16 +168,16 @@ TEST(SMFSTest, FileCountShared)
         {"addon1", make("", "", {
             "plugins/bin1.smx",
             "gamedata/gd.txt",
+            "translations/phrases.txt",
         })},
         {"addon2", make("", "", {
             "plugins/bin2.smx",
             "gamedata/gd.txt",
-            "translations/addon2.phrases.txt",
+            "translations/phrases.txt",
         })},
         {"addon3", make("", "", {
             "plugins/bin3.smx",
             "gamedata/gd.txt",
-            "translations/addon2.phrases.txt",
         })},
     }}};
     // clang-format on
@@ -187,13 +187,12 @@ TEST(SMFSTest, FileCountShared)
     ASSERT_TRUE(SMFS::Data::load());
     ASSERT_TRUE(fs::remove(dataFile));
 
-    EXPECT_EQ(SMFS::File::countShared("plugins/bin1.smx"), 1);
-    EXPECT_EQ(SMFS::File::countShared("plugins/bin2.smx"), 1);
-    EXPECT_EQ(SMFS::File::countShared("plugins/bin3.smx"), 1);
-
-    EXPECT_EQ(SMFS::File::countShared("gamedata/gd.txt"), 3);
-    EXPECT_EQ(
-        SMFS::File::countShared("translations/addon2.phrases.txt"), 2);
+    using namespace SMFS::File;
+    EXPECT_THAT(find("plugins/bin1.smx"), Pair("addon1", 1));
+    EXPECT_THAT(find("plugins/bin2.smx"), Pair("addon2", 1));
+    EXPECT_THAT(find("plugins/bin3.smx"), Pair("addon3", 1));
+    EXPECT_THAT(find("gamedata/gd.txt"), Pair("addon3", 3));
+    EXPECT_THAT(find("translations/phrases.txt"), Pair("addon2", 2));
 }
 
 TEST(SMFSTest, AddonFiles)
