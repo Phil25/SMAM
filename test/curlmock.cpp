@@ -84,7 +84,7 @@ auto CURLMock::queryDatabase(const std::string& url) noexcept
     -> std::vector<char>
 {
     size_t pos = url.find('=');
-    if (pos == (size_t)std::string::npos) return {'[', ']'};
+    if (pos == (size_t)std::string::npos) return {};  // invalid db call
 
     auto data   = std::istringstream(url.substr(++pos));
     auto ids    = std::set<std::string>();

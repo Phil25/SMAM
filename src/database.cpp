@@ -43,8 +43,16 @@ inline auto makeAddon(const json& addonData)
 
     addon.description = addonData.at("description");
     addon.author      = addonData.at("author");
-    addon.files       = toFileVector(addonData.at("files"));
-    addonData.at("deps").get_to(addon.dependencies);
+
+    if (addonData.count("files"))
+    {
+        addon.files = toFileVector(addonData.at("files"));
+    }
+
+    if (addonData.count("deps"))
+    {
+        addonData.at("deps").get_to(addon.dependencies);
+    }
 
     return addon;
 }
