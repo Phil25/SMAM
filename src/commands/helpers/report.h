@@ -13,17 +13,22 @@ class Report final
 public:
     enum class Type
     {
-        Installed,
-        Removed,
-        Skipped,
-        Failed
+        Installed,  // installed
+        Removed,    // removed
+        Skipped,    // already installed
+        Queued,     // already being installed
+        Failed      // failed to install/remove
     };
 
 private:
     std::map<Type, std::vector<std::string>> data;
+    std::vector<std::string>                 remarks;
 
 public:
     void insert(Type type, const std::string& addon) noexcept;
-    void print(Type type) noexcept;
-    void print() noexcept;
+
+    void remark(const std::string&) noexcept;
+
+    void print(Type type) const noexcept;
+    void print() const noexcept;
 };

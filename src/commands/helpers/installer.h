@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -19,16 +20,21 @@ class Installer final
     const StringVector& addons;
 
     bool forceInstall;
+    bool noDeps;
     int  failedCount;
+
+    Report                report;
+    std::set<std::string> pending;
 
 public:
     Installer(const std::string&  databaseUrl,
-              const StringVector& addons, bool forceInstall) noexcept;
+              const StringVector& addons, bool forceInstall,
+              bool noDeps = false) noexcept;
 
     /*
      * Install every addon in the `addons` vector.
      */
-    auto installAll() noexcept -> Report;
+    auto installAll() noexcept -> const Report&;
 
     /*
      * Install a single specific addon that has been precached by the

@@ -17,9 +17,47 @@
 
 namespace fs       = std::filesystem;
 using StringVector = std::vector<std::string>;
+using Type         = Report::Type;
 
 namespace
 {
+using DependencyRemark =
+    std::function<std::string(const std::string&, const std::string&)>;
+
+const std::map<Type, DependencyRemark> remarkMap{
+    {Type::Installed,
+     [](const std::string& a, const std::string& d) {
+         return "Installed " + d + " as dependency of " + a + '.' + cr;
+     }},
+
+    {Type::Skipped,
+     [](const std::string& a, const std::string& d) {
+         return "Dependency " + d + " of " + a + " already satisfied." +
+                cr;
+     }},
+
+    {Type::Failed,
+     [](const std::string& a, const std::string& d) {
+         return "Dependency " + d + " of " + a + " failed to install." +
+                cr;
+     }},
+};
+
+inline auto wrap(const std::string& addon) noexcept
+{
+    return out.parse(Col::green) + addon + out.parse(Col::reset);
+}
+
+inline auto getRemark(Type type, const std::string& addon,
+                      const std::string& dependency) noexcept
+{
+    auto a = wrap(addon);
+    auto d = wrap(dependency);
+
+    return remarkMap.count(type) ? remarkMap.at(type)(a, d)
+                                 : std::string();
+}
+
 /*
  * Return vector of Attachment names matched against `base` regex.
  */
@@ -188,11 +226,12 @@ bool installFile(const File& data, const std::string& id) noexcept
 }  // namespace
 
 Installer::Installer(const std::string&  databaseUrl,
-                     const StringVector& addons,
-                     bool                forceInstall) noexcept
+                     const StringVector& addons, bool forceInstall,
+                     bool noDeps) noexcept
     : database(databaseUrl),
       addons(addons),
       forceInstall(forceInstall),
+      noDeps(noDeps),
       failedCount(0)
 {
     Scraper::make(0, std::make_shared<AMScraper>());
@@ -202,10 +241,8 @@ Installer::Installer(const std::string&  databaseUrl,
     database.precache(addons);
 }
 
-auto Installer::installAll() noexcept -> Report
+auto Installer::installAll() noexcept -> const Report&
 {
-    Report report;
-
     for (const auto& addon : addons)
     {
         report.insert(installSingle(addon), addon);
@@ -218,36 +255,55 @@ auto Installer::installAll() noexcept -> Report
  * Install a single specific addon that has been precached by the
  * database.
  */
-auto Installer::installSingle(const std::string& addon) noexcept
-    -> Report::Type
+auto Installer::installSingle(const std::string& addon) noexcept -> Type
 {
+    if (pending.count(addon))  // already being installed
+    {
+        return Type::Queued;
+    }
+
     if (SMFS::Addon::isInstalled(addon) && !forceInstall)
     {
         out(Ch::Info) << "Already installed: " << addon << cr << cr;
-        return Report::Type::Skipped;
+        return Type::Skipped;
     }
 
     if (!database.isPrecached(addon))
     {
         out(Ch::Error) << Col::red << "Not found: " << addon
                        << Col::reset << cr << cr;
-        return Report::Type::Failed;
+        return Type::Failed;
     }
 
-    out(Ch::Info) << Col::green << "Installing " << addon << "..."
-                  << Col::reset << cr;
-
+    pending.insert(addon);  // circumvent cyclic deps inf loop
     auto data    = get(addon);
     bool success = true;
 
     for (const auto& dep : data.dependencies)
     {
-        if (installSingle(dep) == Report::Type::Failed)
+        if (noDeps)
         {
-            success = false;
-            break;
+            if (!SMFS::Addon::isInstalled(dep))
+            {
+                report.remark("Dependency " + wrap(dep) + " of " +
+                              wrap(addon) + " was not installed.");
+            }
+        }
+        else
+        {
+            auto depResult = installSingle(dep);
+            report.remark(getRemark(depResult, addon, dep));
+
+            if (depResult == Type::Failed)
+            {
+                success = false;
+                break;
+            }
         }
     }
+
+    out(Ch::Info) << Col::green << "Installing " << addon << "..."
+                  << Col::reset << cr;
 
     for (const auto& file : data.files)
     {
@@ -269,11 +325,11 @@ auto Installer::installSingle(const std::string& addon) noexcept
         }
 
         SMFS::Addon::erase(addon);
-        return Report::Type::Failed;
+        return Type::Failed;
     }
 
     out << cr;
-    return Report::Type::Installed;
+    return Type::Installed;
 }
 
 auto Installer::get(const std::string& id) noexcept -> Database::Addon

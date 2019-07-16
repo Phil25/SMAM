@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <ostream>
 
 constexpr char cr = '\n';
 
@@ -58,6 +59,8 @@ public:
         *data[current].out << t;
         return *this;
     }
+
+    auto parse(Col) const noexcept -> std::string;
 };
 
 extern Printer out;  // global console output

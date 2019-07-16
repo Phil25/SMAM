@@ -18,6 +18,7 @@ public:
     bool version() const noexcept;
     bool quiet() const noexcept;
     bool force() const noexcept;
+    bool noDeps() const noexcept;
     bool noColor() const noexcept;
     bool noPrefix() const noexcept;
     bool allowRoot() const noexcept;

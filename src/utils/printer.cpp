@@ -65,8 +65,7 @@ auto Printer::operator<<(const char c) noexcept -> Printer&
 
 auto Printer::operator<<(Col c) noexcept -> Printer&
 {
-    if (c == Col::null || !color) return *this;
-    return *this << "\033[1;" << static_cast<int>(c) << 'm';
+    return *this << parse(c);
 }
 
 auto Printer::operator<<(Ch c) noexcept -> Printer&
@@ -77,6 +76,12 @@ auto Printer::operator<<(Ch c) noexcept -> Printer&
 auto Printer::operator()(Ch c) noexcept -> Printer&
 {
     return this->operator<<(c);
+}
+
+auto Printer::parse(Col c) const noexcept -> std::string
+{
+    if (c == Col::null || !color) return "";
+    return "\033[1;" + std::to_string(static_cast<int>(c)) + 'm';
 }
 
 Printer out;  // instantiate Printer global

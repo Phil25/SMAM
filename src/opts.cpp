@@ -16,6 +16,7 @@ Opts::Opts(int argc, const char* argv[]) noexcept
             ("version,v", "Show version.")
             ("quiet,q", "Do not produce output.")
             ("force,f", "Force command execution.")
+            ("no-deps", "Do not install/remove depenencies.")
             ("no-prefix", "Disable prefixes in output.")
             ("no-color", "Disable color in output.")
             ("allow-running-as-root", "Run SMAM even as root.")
@@ -83,6 +84,8 @@ bool Opts::version() const noexcept { return vm.count("version"); }
 bool Opts::quiet() const noexcept { return vm.count("quiet"); }
 
 bool Opts::force() const noexcept { return vm.count("force"); }
+
+bool Opts::noDeps() const noexcept { return vm.count("no-deps"); }
 
 bool Opts::noColor() const noexcept { return vm.count("no-color"); }
 

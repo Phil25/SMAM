@@ -13,6 +13,7 @@ namespace
 struct Addon final
 {
     std::string              author, description;
+    bool                     installedExplicitly;
     std::set<SMFS::fs::path> files;
     std::set<std::string>    deps;
 };
@@ -21,6 +22,7 @@ void to_json(json& j, const Addon& a) noexcept
 {
     j["author"]      = a.author;
     j["description"] = a.description;
+    j["explicit"]    = a.installedExplicitly;
     j["files"]       = a.files;
     j["deps"]        = a.deps;
 }
@@ -29,6 +31,7 @@ void from_json(const json& j, Addon& a) noexcept
 {
     j["author"].get_to(a.author);
     j["description"].get_to(a.description);
+    j["explicit"].get_to(a.installedExplicitly);
     j["files"].get_to(a.files);
     j["deps"].get_to(a.deps);
 }

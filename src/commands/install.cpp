@@ -33,8 +33,10 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
         return ExitCode::NoPermissions;
     }
 
-    Installer installer(opts.getDbUrl(), addons, opts.force());
-    auto      report = installer.installAll();
+    Installer installer(opts.getDbUrl(), addons, opts.force(),
+                        opts.noDeps());
+
+    const auto& report = installer.installAll();
 
     if (!SMFS::Data::save())
     {
