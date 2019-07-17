@@ -15,10 +15,10 @@ constexpr const char* dataFile = ".smamdata";
 
 namespace
 {
-auto make(const std::string&           author      = "",
-          const std::string&           description = "",
-          const std::set<fs::path>&    files       = {},
-          const std::set<std::string>& deps        = {})
+auto addon(const std::string&           author      = "",
+           const std::string&           description = "",
+           const std::set<fs::path>&    files       = {},
+           const std::set<std::string>& deps        = {})
 {
     json addon;
 
@@ -45,6 +45,14 @@ auto make(const std::string&           author      = "",
     }
 
     return addon;
+}
+
+auto make(const json& data)
+{
+    json j;
+    j["data"] = data;
+    j["hash"] = std::hash<json>{}(j["data"]);
+    return j;
 }
 }  // namespace
 
@@ -165,27 +173,27 @@ TEST(SMFSTest, FileFind)
     ASSERT_TRUE(ofs);
 
     // clang-format off
-    ofs << json{{"data", {
-        {"addon1", make("", "", {
+    ofs << make({
+        {"addon1", addon("", "", {
             "plugins/bin1.smx",
             "gamedata/gd.txt",
             "translations/phrases.txt",
         })},
-        {"addon2", make("", "", {
+        {"addon2", addon("", "", {
             "plugins/bin2.smx",
             "gamedata/gd.txt",
             "translations/phrases.txt",
         })},
-        {"addon3", make("", "", {
+        {"addon3", addon("", "", {
             "plugins/bin3.smx",
             "gamedata/gd.txt",
         })},
-    }}};
+    });
     // clang-format on
 
     ofs.close();
 
-    ASSERT_TRUE(SMFS::Data::load());
+    ASSERT_EQ(SMFS::LoadResult::OK, SMFS::Data::load());
     ASSERT_TRUE(fs::remove(dataFile));
 
     using namespace SMFS::File;
@@ -202,22 +210,22 @@ TEST(SMFSTest, AddonFiles)
     ASSERT_TRUE(ofs);
 
     // clang-format off
-    ofs << json{{"data", {
-        {"addon1", make("", "", {
+    ofs << make({
+        {"addon1", addon("", "", {
             "plugins/bin1.smx",
             "gamedata/gd.txt",
         })},
-        {"addon2", make("", "", {
+        {"addon2", addon("", "", {
             "plugins/bin2.smx",
             "gamedata/gd.txt",
             "translations/phrases.txt",
         })},
-    }}};
+    });
     // clang-format on
 
     ofs.close();
 
-    ASSERT_TRUE(SMFS::Data::load());
+    ASSERT_EQ(SMFS::LoadResult::OK, SMFS::Data::load());
     ASSERT_TRUE(fs::remove(dataFile));
 
     std::set<fs::path> f1, f2;
@@ -237,30 +245,30 @@ TEST(SMFSTest, AddonIsInstalled)
     ASSERT_TRUE(ofs);
 
     // clang-format off
-    ofs << json{{"data", {
-        {"multifile", make("", "", {
+    ofs << make({
+        {"multifile", addon("", "", {
             "path/to/file1",
             "path/to/file2",
             "path/to/file3",
         })},
-        {"spacemultifile", make("", "", {
+        {"spacemultifile", addon("", "", {
             "path/to/file1 with spaces1",
             "path/to/file1 with spaces2",
             "path/to/file1 with spaces3",
         })},
-        {"singlefile", make("", "", {
+        {"singlefile", addon("", "", {
             "path/to/file4",
         })},
-        {"spacesinglefile", make("", "", {
+        {"spacesinglefile", addon("", "", {
             "path/to/file with spaces4",
         })},
-        {"nofiles", make()},
-    }}};
+        {"nofiles", addon()},
+    });
     // clang-format on
 
     ofs.close();
 
-    ASSERT_TRUE(SMFS::Data::load());
+    ASSERT_EQ(SMFS::LoadResult::OK, SMFS::Data::load());
     ASSERT_TRUE(fs::remove(dataFile));
 
     EXPECT_TRUE(SMFS::Addon::isInstalled("multifile"));
