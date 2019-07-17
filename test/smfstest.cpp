@@ -24,6 +24,7 @@ auto make(const std::string&           author      = "",
 
     addon["author"]      = author;
     addon["description"] = description;
+    addon["explicit"]    = true;
 
     if (files.size())
     {
@@ -226,6 +227,7 @@ TEST(SMFSTest, AddonFiles)
 
     f2 = {"plugins/bin2.smx", "gamedata/gd.txt",
           "translations/phrases.txt"};
+
     EXPECT_EQ(f2, SMFS::Addon::files("addon2"));
 }
 
