@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -11,9 +12,9 @@ class Database final
 public:
     struct Addon final
     {
-        std::string              author, description;
-        std::vector<File>        files;
-        std::vector<std::string> dependencies;
+        std::string           author, description;
+        std::vector<File>     files;
+        std::set<std::string> dependencies;
     };
 
     using Plan    = std::pair<std::string, Addon>;

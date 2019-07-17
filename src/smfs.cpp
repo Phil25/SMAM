@@ -29,11 +29,12 @@ void to_json(json& j, const Addon& a) noexcept
 
 void from_json(const json& j, Addon& a) noexcept
 {
-    j["author"].get_to(a.author);
-    j["description"].get_to(a.description);
-    j["explicit"].get_to(a.installedExplicitly);
-    j["files"].get_to(a.files);
-    j["deps"].get_to(a.deps);
+    a.author              = j["author"];
+    a.description         = j["description"];
+    a.installedExplicitly = j["explicit"];
+
+    if (j.count("files")) j["files"].get_to(a.files);
+    if (j.count("deps")) j["deps"].get_to(a.files);
 }
 
 std::map<std::string, Addon> data;
@@ -185,6 +186,42 @@ auto SMFS::Addon::files(const std::string& id) noexcept
 void SMFS::Addon::erase(const std::string& id) noexcept
 {
     data.erase(id);
+}
+
+/*
+ * Set whether the addon has been installed automatically by dependency
+ * resolution (non explicit), or manually by the user (explicit).
+ */
+void SMFS::Addon::markExplicit(const std::string& id) noexcept
+{
+    if (isInstalled(id)) data[id].installedExplicitly = true;
+}
+
+/*
+ * Set the author field of the addon.
+ */
+void SMFS::Addon::author(const std::string& id,
+                         const std::string& author) noexcept
+{
+    if (isInstalled(id)) data[id].author = author;
+}
+
+/*
+ * Set the author field of the addon.
+ */
+void SMFS::Addon::description(const std::string& id,
+                              const std::string& description) noexcept
+{
+    if (isInstalled(id)) data[id].description = description;
+}
+
+/*
+ * Add addon dependency.
+ */
+void SMFS::Addon::deps(const std::string&           id,
+                       const std::set<std::string>& deps) noexcept
+{
+    if (isInstalled(id)) data[id].deps = deps;
 }
 
 /*

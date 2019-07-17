@@ -41,6 +41,10 @@ namespace Addon
 {
 auto files(const std::string& id) noexcept -> std::set<fs::path>;
 void erase(const std::string& id) noexcept;
+void author(const std::string& id, const std::string&) noexcept;
+void description(const std::string& id, const std::string&) noexcept;
+void deps(const std::string& id, const std::set<std::string>&) noexcept;
+void markExplicit(const std::string& id) noexcept;
 bool isInstalled(const std::string& id) noexcept;
 void getInstalled(const EachAddon&) noexcept;
 }  // namespace Addon

@@ -246,6 +246,7 @@ auto Installer::installAll() noexcept -> const Report&
     for (const auto& addon : addons)
     {
         report.insert(installSingle(addon), addon);
+        SMFS::Addon::markExplicit(addon);
     }
 
     return report;
@@ -327,6 +328,10 @@ auto Installer::installSingle(const std::string& addon) noexcept -> Type
         SMFS::Addon::erase(addon);
         return Type::Failed;
     }
+
+    SMFS::Addon::author(addon, data.author);
+    SMFS::Addon::description(addon, data.description);
+    SMFS::Addon::deps(addon, data.dependencies);
 
     out << cr;
     return Type::Installed;
