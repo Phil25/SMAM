@@ -11,7 +11,8 @@ enum ExitCode
     NoCommand,
     UnknownCommand,
     NoAddons,
-    NoSMRoot
+    NoSMRoot,
+    CorruptedCache,
 };
 
 namespace Command
@@ -29,3 +30,11 @@ auto run(const std::string& command, const Opts& opts) noexcept
     -> ExitCode;
 
 }  // namespace Command
+
+namespace Common
+{
+[[nodiscard]] bool noAddons(const std::vector<std::string>&) noexcept;
+[[nodiscard]] bool noSMRoot(const Opts& opts) noexcept;
+[[nodiscard]] auto load() noexcept -> ExitCode;
+[[nodiscard]] bool save() noexcept;
+}  // namespace Common

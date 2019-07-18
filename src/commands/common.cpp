@@ -1,5 +1,9 @@
 #include "common.h"
 
+#include <smfs.h>
+
+#include <filesystem>
+
 const std::map<std::string_view, Command::fptr> Command::map{
     {"install", Command::install},  {"remove", Command::remove},
     {"uninstall", Command::remove}, {"info", Command::info},
@@ -15,4 +19,56 @@ auto Command::run(const std::string& command, const Opts& opts) noexcept
     -> ExitCode
 {
     return map.at(command)(opts);
+}
+
+bool Common::noAddons(const std::vector<std::string>& addons) noexcept
+{
+    if (!addons.empty()) return false;
+
+    out(Ch::Error) << "No addons specified." << cr;
+    return true;
+}
+
+bool Common::noSMRoot(const Opts& opts) noexcept
+{
+    auto dest = opts.getDestination().value_or("");
+    auto root = SMFS::Path::findRoot(dest);
+
+    if (root)
+    {
+        std::filesystem::current_path(root.value());
+        return false;
+    }
+    else
+    {
+        out(Ch::Error) << "SourceMod root not found." << cr;
+        return true;
+    };
+}
+
+auto Common::load() noexcept -> ExitCode
+{
+    switch (SMFS::Data::load())
+    {
+        case SMFS::LoadResult::NoAccess:
+            out(Ch::Error) << "No read/write premissions." << cr;
+            return ExitCode::NoPermissions;
+
+        case SMFS::LoadResult::Corrupted:
+            out(Ch::Error)
+                << "Cache corrupted. Attempting recovery..." << cr;
+            return ExitCode::CorruptedCache;
+
+        default:;  // SMFS::LoadResult::OK
+    }
+
+    return ExitCode::OK;
+}
+
+bool Common::save() noexcept
+{
+    if (SMFS::Data::save()) return true;
+
+    out(Ch::Error) << "Cannot write local addon metadata." << cr;
+    return false;
 }

@@ -27,14 +27,14 @@ void to_json(json& j, const Addon& a) noexcept
     j["deps"]        = a.deps;
 }
 
-void from_json(const json& j, Addon& a) noexcept
+void from_json(const json& j, Addon& a)
 {
-    a.author              = j["author"];
-    a.description         = j["description"];
-    a.installedExplicitly = j["explicit"];
+    a.author              = j.at("author");
+    a.description         = j.at("description");
+    a.installedExplicitly = j.at("explicit");
 
-    if (j.count("files")) j["files"].get_to(a.files);
-    if (j.count("deps")) j["deps"].get_to(a.files);
+    j.at("files").get_to(a.files);
+    j.at("deps").get_to(a.files);
 }
 
 std::map<std::string, Addon> data;
@@ -245,27 +245,42 @@ void SMFS::Addon::getInstalled(const EachAddon& cb) noexcept
  * Return false if not sufficient permissions for either reading or
  * writing.
  */
-[[nodiscard]] bool SMFS::Data::load() noexcept
+[[nodiscard]] auto SMFS::Data::load() noexcept -> LoadResult
 {
-    if (!Path::gotPermissions(fs::current_path())) return false;
+    if (!Path::gotPermissions(fs::current_path()))
+    {
+        return LoadResult::NoAccess;
+    }
 
     data.clear();
 
-    std::ifstream ifs(fs::path{dataFilename});
-    json          in;
+    auto p = fs::path{dataFilename};
+    if (!fs::exists(p)) return LoadResult::OK;
+
+    auto   ifs = std::ifstream(p);
+    json   in;
+    size_t hash;
 
     try
     {
         ifs >> in;
-        in["data"].get_to(data);
+
+        in.at("data").get_to(data);
+        hash = in.at("hash").get<size_t>();
     }
     catch (const json::exception& e)
     {
+        return LoadResult::Corrupted;
+    }
+
+    if (hash != std::hash<json>{}(in["data"]))
+    {
+        return LoadResult::Corrupted;
     }
 
     ifs.close();
 
-    return true;
+    return LoadResult::OK;
 }
 
 /*

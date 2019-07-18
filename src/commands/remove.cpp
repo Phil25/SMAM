@@ -49,41 +49,15 @@ auto removeAddons(const std::vector<std::string>& addons) noexcept
 
 auto Command::remove(const Opts& opts) noexcept -> ExitCode
 {
-    namespace fs = std::filesystem;
-
     auto addons = opts.getAddons();
-    if (addons.empty())
-    {
-        out(Ch::Error) << "No addons specified." << cr;
-        return ExitCode::NoAddons;
-    }
 
-    auto dest = opts.getDestination().value_or("");
-    auto root = SMFS::Path::findRoot(dest);
-
-    if (root)
-    {
-        fs::current_path(root.value());
-    }
-    else
-    {
-        out(Ch::Error) << "SourceMod root not found." << cr;
-        return ExitCode::NoSMRoot;
-    }
-
-    if (!SMFS::Data::load())
-    {
-        out(Ch::Error) << "No read/write premissions." << cr;
-        return ExitCode::NoPermissions;
-    }
+    if (Common::noAddons(addons)) return ExitCode::NoAddons;
+    if (Common::noSMRoot(opts)) return ExitCode::NoSMRoot;
+    if (auto ret = Common::load(); ret) return ret;
 
     auto report = removeAddons(addons);
 
-    if (!SMFS::Data::save())
-    {
-        out(Ch::Error) << "Cannot write local addon metadata." << cr;
-        return ExitCode::WriteError;
-    }
+    if (!Common::save()) return ExitCode::WriteError;
 
     report.print();
 

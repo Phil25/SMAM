@@ -21,6 +21,13 @@ enum class DeleteResult
     NotExists,
 };
 
+enum class LoadResult
+{
+    OK,
+    NoAccess,
+    Corrupted
+};
+
 namespace Path
 {
 bool isSafe(const fs::path&) noexcept;
@@ -51,7 +58,7 @@ void getInstalled(const EachAddon&) noexcept;
 
 namespace Data
 {
-[[nodiscard]] bool load() noexcept;
+[[nodiscard]] auto load() noexcept -> LoadResult;
 [[nodiscard]] bool save() noexcept;
 }  // namespace Data
 

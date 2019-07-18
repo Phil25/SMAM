@@ -4,26 +4,8 @@
 
 auto Command::info(const Opts& opts) noexcept -> ExitCode
 {
-    namespace fs = std::filesystem;
-
-    auto dest = opts.getDestination().value_or("");
-    auto root = SMFS::Path::findRoot(dest);
-
-    if (root)
-    {
-        fs::current_path(root.value());
-    }
-    else
-    {
-        out(Ch::Error) << "SourceMod root not found." << cr;
-        return ExitCode::NoSMRoot;
-    }
-
-    if (!SMFS::Data::load())
-    {
-        out(Ch::Error) << "No read/write premissions." << cr;
-        return ExitCode::NoPermissions;
-    }
+    if (Common::noSMRoot(opts)) return ExitCode::NoSMRoot;
+    if (auto ret = Common::load(); ret) return ret;
 
     const auto& filter = opts.getAddons();
 
