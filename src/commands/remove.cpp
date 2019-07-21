@@ -1,37 +1,26 @@
 #include "common.h"
 
 #include <commands/helpers/report.h>
-#include <smfs.h>
+#include <smfs/addon.h>
 
-auto removeAddon(const std::string& addon) noexcept -> Report::Type
+auto removeAddon(Addon& addon) noexcept -> Report::Type
 {
-    if (!SMFS::Addon::isInstalled(addon))
-    {
-        out(Ch::Warn) << "Addon not installed: " << addon << cr << cr;
-        return Report::Type::Skipped;
-    }
-
-    out(Ch::Info) << Col::yellow << "Removing " << addon << "..."
+    out(Ch::Info) << Col::yellow << "Removing " << addon.id << "..."
                   << Col::reset << cr;
 
-    for (const auto& file : SMFS::Addon::files(addon))
-    {
-        switch (SMFS::File::remove(file))
+    // TODO: make this shorter
+    addon.remove([](const auto& result) {
+        if (result.second.empty())  // no error
         {
-            case SMFS::DeleteResult::NotExists:
-                out() << "Skipping non-existent file: " << file << cr;
-                break;
-
-            case SMFS::DeleteResult::Shared:
-                out() << "Skipping shared file: " << file << cr;
-                break;
-
-            case SMFS::DeleteResult::OK: out() << file << cr; break;
+            out() << "Skipping " << result.second
+                  << " file:" << result.first.get().raw() << cr;
         }
-    }
+        else
+        {
+            out() << result.first.get().raw() << cr;
+        }
+    });
 
-    SMFS::Addon::erase(addon);
-    out << cr;
     return Report::Type::Removed;
 }
 
@@ -39,9 +28,20 @@ auto removeAddons(const std::vector<std::string>& addons) noexcept
 {
     Report report;
 
-    for (const auto& addon : addons)
+    for (const auto& id : addons)
     {
-        report.insert(removeAddon(addon), addon);
+        if (auto addon = Addon::get(id))  // addon installed
+        {
+            removeAddon(*addon.value());
+            report.insert(Report::Type::Removed, id);
+        }
+        else
+        {
+            out(Ch::Warn) << "Addon not installed: " << id << cr;
+            report.insert(Report::Type::Skipped, id);
+        }
+
+        out << cr;
     }
 
     return report;

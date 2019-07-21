@@ -27,52 +27,13 @@ inline auto makeUrl(const std::string&              dbUrl,
     url.pop_back();  // remove last comma
     return url;
 }
-
-/*
- * Parse nlohmann::json as a File vector. Implicity converting
- * std::string types.
- */
-inline auto toFileVector(const json& files)
-{
-    return std::vector<File>{files.begin(), files.end()};
-}
-
-inline auto makeAddon(const json& addonData)
-{
-    Database::Addon addon;
-
-    addon.description = addonData.at("description");
-    addon.author      = addonData.at("author");
-
-    if (addonData.count("files"))
-    {
-        addon.files = toFileVector(addonData.at("files"));
-    }
-
-    if (addonData.count("deps"))
-    {
-        addonData.at("deps").get_to(addon.dependencies);
-    }
-
-    return addon;
-}
-
-/*
- * Construct Database::Plan from nlohmann::json
- */
-inline auto makePlan(const json& addon) -> Database::Plan
-{
-    return {addon.at("url"), makeAddon(addon)};
-}
 }  // namespace
-
-Database::Plan Database::nullPlan = {"", {}};
 
 Database::Database(const std::string& dbUrl) noexcept : dbUrl(dbUrl) {}
 
 /*
- * Precache data of specified addon IDs into a Database
- * held map variable `pracached,` mapping ID strings to Plan.
+ * Cache data of specified addon IDs into a Database held map variable
+ * `cached,` mapping ID strings to PlanRef.
  *
  * This must be called before actually getting the Plan.
  * The reason being that only the caller knows which addons to
@@ -89,9 +50,10 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
     {
         json root = json::parse(Download::page(url));
 
-        for (const auto& addon : root)
+        for (const auto& j : root)
         {
-            cached[addon.at("id")] = makePlan(addon);
+            auto addon = std::make_shared<Addon>(j.get<Addon>());
+            cached[j.at("id")] = {j.at("url"), addon};
         }
     }
     catch (const json::exception& e)
@@ -100,20 +62,17 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
 }
 
 /*
- * Return whether an addon was cached. If false, this usually means
- * that it has not been found in the remote database.
+ * Return std::optional<PlanRef> of a particiular addon ID. Assuming
+ * it's cached. Otherwise, a nullopt is returned.
  */
-bool Database::isPrecached(const std::string& id) const noexcept
+auto Database::get(const std::string& id) const noexcept -> PlanOpt
 {
-    return cached.count(id);
-}
-
-/*
- * Return Plan of a particiular addon ID. Assuming it's cached.
- * Otherwise, a tuple of empty URL and vector will be returned.
- */
-auto Database::get(const std::string& id) const noexcept -> const Plan&
-{
-    auto it = cached.find(id);
-    return it == cached.end() ? nullPlan : it->second;
+    if (auto it = cached.find(id); it == cached.end())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return it->second;
+    }
 }

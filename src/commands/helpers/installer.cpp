@@ -1,9 +1,13 @@
 #include "installer.h"
 
+#include <filesystem>
+#include <functional>
 #include <regex>
 
 #include <download.h>
-#include <smfs.h>
+
+#include <smfs/addon.h>
+#include <smfs/path.h>
 
 #include <scrapers/amscraper.h>
 #include <scrapers/ghscraper.h>
@@ -58,178 +62,13 @@ inline auto getRemark(Type type, const std::string& addon,
                                  : std::string();
 }
 
-/*
- * Return vector of Attachment names matched against `base` regex.
- */
-inline auto findMatches(const std::string&   base,
-                        const Scraper::Data& data) noexcept
-    -> StringVector
-{
-    StringVector filtered;
-
-    try
-    {
-        const std::regex re(base);
-
-        for (const auto& [name, url] : data)
-        {
-            if (std::regex_match(name, re))
-            {
-                filtered.push_back(name);
-            }
-        }
-    }
-    catch (const std::regex_error& e)
-    {
-        out(Ch::Error) << "Invalid regex: \"" << base << '\"' << cr;
-    }
-
-    return filtered;
-}
-
-/*
- * Process File vector altering its instances based on addon's URL
- * and Attachments (map of file names from addon's URL to their
- * individual download URLs; ./scrapers/scraper.h).
- * Attachments are received from a Scraper and can be an empty
- * object.
- *
- * The purpose is to obtain FileVector, each instance having
- * appropriate File::name (instead of ex. a link or regex string),
- * and File::url (URL from which the file can be downloaded).
- *
- * In most situations only File::url gets altered. In case of
- * File::name's containing a link or regex, both fields are altered.
- *
- * This function will do the following for each File instance:
- *
- * - Check if File also appears in Attachments.
- *   If so, it is assumed that the name is correct. URL is set.
- *
- * - Check if File::name is a link.
- *   If so, it is assumed that it ends in the actual file name.
- *   Name and URL are set.
- *
- * - Check if matches in Attachments can be found when File
- *   name is treated as a regex string.
- *   If multiple matches are found, it is assumed that Attachments
- *   consist of similar files with a version number in the name of
- *   each. (file-2.3.txt, file-2.4.txt, file-2.4.1.txt, etc...) File
- *   name is set to the one containing the largest version number.
- *   File URL is set to the Attachment URL.
- *
- * - Otherwise (the general case) it is assumed that the File
- *   download URL can be obtained by combining the addon's base URL
- *   and the File name. URL is set.
- */
-inline void processFiles(std::vector<File>&   files,
-                         const Scraper::Data& data) noexcept
-{
-    for (File& file : files)
-    {
-        auto attachment = data.find(file.name);
-        if (attachment != data.end())  // found
-        {
-            file.url = attachment->second;
-            continue;
-        }
-
-        if (Utils::isLink(file.name))  // specified file is a link
-        {
-            size_t pos = file.name.rfind('/');
-            if (pos != std::string::npos)
-            {
-                file.url  = file.name;
-                file.name = file.name.substr(++pos);
-            }
-
-            continue;
-        }
-
-        auto names = findMatches(file.name, data);
-
-        if (!names.empty())
-        {
-            std::string name = Utils::Version::biggest(names);
-            attachment       = data.find(name);
-
-            if (attachment != data.end())
-            {
-                file.name = name;
-                file.url  = attachment->second;
-                continue;
-            }
-        }
-
-        if (data.website == Scraper::Data::Website::AlliedModders)
-        {
-            file.invalidate();
-        }
-        else
-        {
-            file.url = data.url + file.name;
-        }
-    }
-}
-
-bool registerFile(const fs::path&    file,
-                  const std::string& addon) noexcept
-{
-    if (!SMFS::Path::prepare(file.parent_path()))
-    {
-        out(Ch::Warn) << "Ignoring " << file << cr;
-        return false;
-    }
-
-    bool exists = fs::exists(file);
-    out(exists ? Ch::Warn : Ch::Std)
-        << (exists ? "Overwriting " : "") << file << cr;
-
-    SMFS::File::add(file, addon);
-    return true;
-}
-
-bool installFile(const File& data, const std::string& id) noexcept
-{
-    if (!data.valid())
-    {
-        out(Ch::Error) << "Invalid file: " << data.name << cr;
-        return false;
-    }
-
-    fs::path file = data.path;
-    file /= data.name;
-
-    if (!registerFile(file, id)) return false;
-
-    if (auto error = Download::file(data.url, file); !error.empty())
-    {
-        out(Ch::Error) << error << cr;
-        return false;
-    }
-
-    if (Archive::valid(file))
-    {
-        out(Ch::Info) << "Extracting " << data.name << "..." << cr;
-
-        bool result = Archive::extract(
-            file, [&id](const fs::path& extractedFile) {
-                return registerFile(extractedFile, id);
-            });
-
-        return result &&
-               SMFS::File::remove(file) == SMFS::DeleteResult::OK;
-    }
-
-    return true;
-}
 }  // namespace
 
 Installer::Installer(const std::string&  databaseUrl,
-                     const StringVector& addons, bool forceInstall,
+                     const StringVector& ids, bool forceInstall,
                      bool noDeps) noexcept
     : database(databaseUrl),
-      addons(addons),
+      ids(ids),
       forceInstall(forceInstall),
       noDeps(noDeps),
       failedCount(0)
@@ -238,15 +77,22 @@ Installer::Installer(const std::string&  databaseUrl,
     Scraper::make(1, std::make_shared<LTScraper>());
     Scraper::make(2, std::make_shared<GHScraper>());
 
-    database.precache(addons);
+    database.precache(ids);
 }
 
 auto Installer::installAll() noexcept -> const Report&
 {
-    for (const auto& addon : addons)
+    for (const auto& id : ids)
     {
-        report.insert(installSingle(addon), addon);
-        SMFS::Addon::markExplicit(addon);
+        auto result = installSingle(id);
+        report.insert(result, id);
+
+        if (result == Type::Installed)
+        {
+            Addon::get(id).value()->markExplicit();
+        }
+
+        out << cr;
     }
 
     return report;
@@ -256,44 +102,47 @@ auto Installer::installAll() noexcept -> const Report&
  * Install a single specific addon that has been precached by the
  * database.
  */
-auto Installer::installSingle(const std::string& addon) noexcept -> Type
+auto Installer::installSingle(const std::string& id) noexcept -> Type
 {
-    if (pending.count(addon))  // already being installed
+    if (pending.count(id))  // already being installed
     {
         return Type::Queued;
     }
 
-    if (SMFS::Addon::isInstalled(addon) && !forceInstall)
+    if (Addon::isInstalled(id) && !forceInstall)
     {
-        out(Ch::Info) << "Already installed: " << addon << cr << cr;
+        out(Ch::Info) << "Already installed: " << id << cr;
         return Type::Skipped;
     }
 
-    if (!database.isPrecached(addon))
+    auto planOpt = database.get(id);
+
+    if (!planOpt.has_value())
     {
-        out(Ch::Error) << Col::red << "Not found: " << addon
-                       << Col::reset << cr << cr;
+        out(Ch::Error) << Col::red << "Not found: " << id << Col::reset
+                       << cr;
         return Type::Failed;
     }
 
-    pending.insert(addon);  // circumvent cyclic deps inf loop
-    auto data    = get(addon);
+    pending.insert(id);  // circumvent cyclic deps inf loop
+    auto data    = get(planOpt.value().first);
+    auto addon   = planOpt.value().second;
     bool success = true;
 
-    for (const auto& dep : data.dependencies)
+    for (const auto& dep : addon->dependencies)
     {
         if (noDeps)
         {
-            if (!SMFS::Addon::isInstalled(dep))
+            if (!Addon::isInstalled(dep))
             {
                 report.remark("Dependency " + wrap(dep) + " of " +
-                              wrap(addon) + " was not installed.");
+                              wrap(id) + " is not installed.");
             }
         }
         else
         {
             auto depResult = installSingle(dep);
-            report.remark(getRemark(depResult, addon, dep));
+            report.remark(getRemark(depResult, id, dep));
 
             if (depResult == Type::Failed)
             {
@@ -303,56 +152,37 @@ auto Installer::installSingle(const std::string& addon) noexcept -> Type
         }
     }
 
-    out(Ch::Info) << Col::green << "Installing " << addon << "..."
+    out(Ch::Info) << Col::green << "Installing " << id << "..."
                   << Col::reset << cr;
 
-    for (const auto& file : data.files)
-    {
-        if (!installFile(file, addon))
-        {
-            success = false;
-            break;
-        }
-    }
+    success &= addon->install(data);
 
     if (!success)
     {
         out(Ch::Error) << Col::red << "Failed to install " << addon
                        << Col::reset << cr << cr;
 
-        for (const auto& file : SMFS::Addon::files(addon))
-        {
-            SMFS::File::remove(file);
-        }
-
-        SMFS::Addon::erase(addon);
+        addon->remove();
         return Type::Failed;
     }
-
-    SMFS::Addon::author(addon, data.author);
-    SMFS::Addon::description(addon, data.description);
-    SMFS::Addon::deps(addon, data.dependencies);
 
     out << cr;
     return Type::Installed;
 }
 
-auto Installer::get(const std::string& id) noexcept -> Database::Addon
+auto Installer::get(const std::string& url) noexcept -> Scraper::Data
 {
-    auto [url, addonData] = database.get(id);
+    Scraper::Data data;
 
     if (!url.empty())
     {
-        Scraper::Data scraperData;
-
         if (auto scraper = Scraper::get(url))
         {
-            scraperData = scraper->get()->fetch(url);
+            data = scraper->get()->fetch(url);
         }
 
-        scraperData.url = url;
-        processFiles(addonData.files, scraperData);
+        data.url = url;
     }
 
-    return addonData;
+    return data;
 }

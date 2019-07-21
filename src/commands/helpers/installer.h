@@ -17,7 +17,7 @@ class Installer final
 
     Database database;
 
-    const StringVector& addons;
+    const StringVector& ids;
 
     bool forceInstall;
     bool noDeps;
@@ -27,9 +27,8 @@ class Installer final
     std::set<std::string> pending;
 
 public:
-    Installer(const std::string&  databaseUrl,
-              const StringVector& addons, bool forceInstall,
-              bool noDeps = false) noexcept;
+    Installer(const std::string& databaseUrl, const StringVector& ids,
+              bool forceInstall, bool noDeps = false) noexcept;
 
     /*
      * Install every addon in the `addons` vector.
@@ -46,5 +45,5 @@ public:
     /*
      * Returns the processed data of a specified addon.
      */
-    auto get(const std::string& id) noexcept -> Database::Addon;
+    auto get(const std::string& url) noexcept -> Scraper::Data;
 };

@@ -1,6 +1,7 @@
 #include "common.h"
 
-#include <smfs.h>
+#include <smfs/addon.h>
+#include <smfs/path.h>
 
 #include <filesystem>
 
@@ -32,7 +33,7 @@ bool Common::noAddons(const std::vector<std::string>& addons) noexcept
 bool Common::noSMRoot(const Opts& opts) noexcept
 {
     auto dest = opts.getDestination().value_or("");
-    auto root = SMFS::Path::findRoot(dest);
+    auto root = Utils::Path::findRoot(dest);
 
     if (root)
     {
@@ -48,13 +49,13 @@ bool Common::noSMRoot(const Opts& opts) noexcept
 
 auto Common::load() noexcept -> ExitCode
 {
-    switch (SMFS::Data::load())
+    switch (Addon::load())
     {
-        case SMFS::LoadResult::NoAccess:
+        case Addon::LoadResult::NoAccess:
             out(Ch::Error) << "No read/write premissions." << cr;
             return ExitCode::NoPermissions;
 
-        case SMFS::LoadResult::Corrupted:
+        case Addon::LoadResult::Corrupted:
             out(Ch::Error)
                 << "Cache corrupted. Attempting recovery..." << cr;
             return ExitCode::CorruptedCache;
@@ -67,7 +68,7 @@ auto Common::load() noexcept -> ExitCode
 
 bool Common::save() noexcept
 {
-    if (SMFS::Data::save()) return true;
+    if (Addon::save()) return true;
 
     out(Ch::Error) << "Cannot write local addon metadata." << cr;
     return false;

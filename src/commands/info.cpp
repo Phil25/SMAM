@@ -1,6 +1,6 @@
 #include "common.h"
 
-#include <smfs.h>
+#include <smfs/addon.h>
 
 auto Command::info(const Opts& opts) noexcept -> ExitCode
 {
@@ -13,28 +13,31 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
     {
         out(Ch::Info) << "Installed addons:" << cr;
 
-        SMFS::Addon::getInstalled([](const std::string& addon) {
-            out() << addon << " (" << SMFS::Addon::files(addon).size()
+        Addon::forEach([](const auto& addon) {
+            out() << addon << " (" << addon->getFileCount()
                   << " file(s))" << cr;
         });
 
         return ExitCode::OK;
     }
 
-    for (const auto& addon : filter)
+    for (const auto& id : filter)
     {
-        if (!SMFS::Addon::isInstalled(addon))
+        auto addonOpt = Addon::get(id);
+
+        if (!addonOpt)
         {
-            out(Ch::Warn) << "Not installed: " << addon << cr;
+            out(Ch::Warn) << "Not installed: " << id << cr;
             continue;
         }
 
-        const auto& files = SMFS::Addon::files(addon);
+        auto addon = addonOpt.value();
 
-        out(Ch::Info) << Col::green << addon << Col::reset << " ("
-                      << files.size() << ')' << cr;
+        out(Ch::Info) << Col::green << id << Col::reset << " ("
+                      << addon->getFileCount() << ')' << cr;
 
-        for (const auto& file : files) out() << file << cr;
+        addon->forEachFile(
+            [](const auto& file) { out() << file.raw() << cr; });
     }
 
     return ExitCode::OK;
