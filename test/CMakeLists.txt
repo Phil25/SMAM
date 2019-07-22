@@ -4,6 +4,7 @@ target_include_directories(curlmock PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCP
 add_executable(tests
   curlmocktest.cpp
   optstest.cpp
+  filetest.cpp
   smfstest.cpp
   utilstest.cpp
   downloadtest.cpp
@@ -23,7 +24,9 @@ target_link_libraries(tests
   opts
   download
   database
-  smfs
+  addon
+  file
+  path
   installer
   curlmock
 

@@ -19,7 +19,7 @@ inline auto findMatches(const std::string&   base,
     {
         const std::regex re(base);
 
-        for (const auto& [name, url] : data)
+        for (const auto& [name, _] : data)
         {
             if (std::regex_match(name, re))
             {
@@ -42,23 +42,29 @@ void File::init(const std::string& data) noexcept
 
     path = data.substr(0, at);
     name = data.substr(at + 1);
+
+    if (path.at(path.size() - 1) == '/') path.pop_back();
 }
+
+auto File::getPath() const noexcept -> std::string { return path; }
+
+auto File::getName() const noexcept -> std::string { return name; }
+
+auto File::getUrl() const noexcept -> std::string { return url; }
 
 auto File::raw() const noexcept -> std::string
 {
     return path + '/' + name;
 }
 
-auto File::getUrl() const noexcept -> std::string { return url; }
-
-void File::evaluate(const Scraper::Data& data) noexcept
+bool File::evaluate(const Scraper::Data& data) noexcept
 {
     auto attachment = data.find(name);
 
     if (attachment != data.end())  // found
     {
         url = attachment->second;
-        return;
+        return true;
     }
 
     if (Utils::isLink(name))  // specified file is a link
@@ -70,33 +76,32 @@ void File::evaluate(const Scraper::Data& data) noexcept
             name = name.substr(++pos);
         }
 
-        return;
+        return true;
     }
 
     auto names = findMatches(name, data);
 
     if (!names.empty())
     {
-        std::string name = Utils::Version::biggest(names);
-        attachment       = data.find(name);
+        std::string best = Utils::Version::biggest(names);
+        attachment       = data.find(best);
 
         if (attachment != data.end())
         {
-            name = name;
+            name = best;
             url  = attachment->second;
 
-            return;
+            return true;
         }
     }
 
     if (data.website == Scraper::Data::Website::AlliedModders)
     {
-        // file.invalidate(); TODO
+        return false;
     }
-    else
-    {
-        url += name;
-    }
+
+    url += name;
+    return true;
 }
 
 File::operator std::filesystem::path() const { return raw(); }
@@ -104,6 +109,11 @@ File::operator std::filesystem::path() const { return raw(); }
 bool File::operator==(const File& other) const noexcept
 {
     return raw() == other.raw();
+}
+
+bool File::operator!=(const File& other) const noexcept
+{
+    return !operator==(other);
 }
 
 void from_json(const json& j, File& file)

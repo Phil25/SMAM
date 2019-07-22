@@ -9,14 +9,16 @@
 
 class File final
 {
-    std::string name, path, url;
+    std::string path, name, url;
 
     void init(const std::string& data) noexcept;
 
 public:
-    auto raw() const noexcept -> std::string;
-
+    auto getPath() const noexcept -> std::string;
+    auto getName() const noexcept -> std::string;
     auto getUrl() const noexcept -> std::string;
+
+    auto raw() const noexcept -> std::string;
 
     /*
      * Evaluate file instance altering its fields based on data
@@ -29,6 +31,9 @@ public:
      *
      * In most situations only `url` gets altered. In case if `name`
      * contains a link or regex, both fields are altered.
+     *
+     * Returns whether evaluation was successful, which is every case
+     * except invalid file name for AlliedModders post.
      *
      * This function will do the following for this instance:
      *
@@ -51,7 +56,7 @@ public:
      *   download URL can be obtained by combining the addon's base URL
      *   and the File name. URL is set.
      */
-    void evaluate(const Scraper::Data&) noexcept;
+    [[nodiscard]] bool evaluate(const Scraper::Data&) noexcept;
 
     /*
      * Implicit conversion to std::filesystem::path
@@ -59,6 +64,7 @@ public:
     operator std::filesystem::path() const;
 
     bool operator==(const File& other) const noexcept;
+    bool operator!=(const File& other) const noexcept;
 
     friend void from_json(const nlohmann::json&, File&);
     friend void to_json(nlohmann::json&, const File&) noexcept;

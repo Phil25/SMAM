@@ -97,8 +97,7 @@ bool Addon::install(const Scraper::Data& data) noexcept
 {
     for (File& file : files)
     {
-        file.evaluate(data);
-        if (!fetch(file, *this)) return false;
+        if (!file.evaluate(data) || !fetch(file, *this)) return false;
     }
 
     addToInstalled();
