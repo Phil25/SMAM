@@ -22,6 +22,8 @@ class Addon final : public std::enable_shared_from_this<Addon>
     using EachFile       = std::function<void(File&)>;
     using EachFileRemove = std::function<void(const FileTuple&)>;
 
+    using InstalledMap = std::map<std::string, std::shared_ptr<Addon>>;
+
 public:
     enum class LoadResult
     {
@@ -31,33 +33,29 @@ public:
     };
 
 private:
-    static std::map<std::string, std::shared_ptr<Addon>> installed;
+    static InstalledMap installed;
 
-    std::vector<File> files;
-    bool              installedExplicitly;
-
-public:
-    const std::string id;
-
-    std::string           author, description;
+    std::string           id, author, description;
+    bool                  installedExplicitly;
+    std::vector<File>     files;
     std::set<std::string> dependencies;
 
-    Addon(const std::string& id, const std::vector<File>& files,
-          const std::string&           author       = "",
-          const std::string&           description  = "",
-          const std::set<std::string>& dependencies = {});
-
-    ~Addon() noexcept;
+public:
+    auto getId() const noexcept -> std::string;
+    auto getAuthor() const noexcept -> std::string;
+    auto getDescription() const noexcept -> std::string;
+    bool isExplicit() const noexcept;
+    auto getDeps() const noexcept -> const std::set<std::string>&;
+    bool isInstalled() const noexcept;
+    auto getFileCount() const noexcept -> size_t;
 
     bool install(const Scraper::Data&) noexcept;
+    void addToInstalled() noexcept;
+    void markExplicit() noexcept;
+
     void remove() noexcept;
     void remove(const EachFileRemove&) noexcept;
     void detach(const File&) noexcept;
-
-    void markExplicit() noexcept;
-    bool isExplicit() const noexcept;
-    bool isInstalled() const noexcept;
-    auto getFileCount() const noexcept -> size_t;
 
     void forEachFile(const EachFile&) noexcept;
 
@@ -70,15 +68,9 @@ public:
     [[nodiscard]] static auto load() noexcept -> LoadResult;
     [[nodiscard]] static bool save() noexcept;
 
-    friend nlohmann::adl_serializer<Addon>;
+    friend void from_json(const nlohmann::json&, Addon&);
+    friend void to_json(nlohmann::json&, const Addon&) noexcept;
 };
 
-namespace nlohmann
-{
-template <>
-struct adl_serializer<Addon>
-{
-    static auto from_json(const nlohmann::json& j) -> Addon;
-    static void to_json(json& j, const Addon&) noexcept;
-};
-}  // namespace nlohmann
+void from_json(const nlohmann::json&, Addon&);
+void to_json(nlohmann::json&, const Addon&) noexcept;

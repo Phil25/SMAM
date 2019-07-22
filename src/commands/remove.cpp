@@ -5,8 +5,8 @@
 
 auto removeAddon(Addon& addon) noexcept -> Report::Type
 {
-    out(Ch::Info) << Col::yellow << "Removing " << addon.id << "..."
-                  << Col::reset << cr;
+    out(Ch::Info) << Col::yellow << "Removing " << addon.getId()
+                  << "..." << Col::reset << cr;
 
     // TODO: make this shorter
     addon.remove([](const auto& result) {

@@ -9,9 +9,8 @@
 #include <utils/archive.h>
 #include <utils/printer.h>
 
-namespace fs          = std::filesystem;
-using json            = nlohmann::json;
-using AddonSerializer = nlohmann::adl_serializer<Addon>;
+namespace fs = std::filesystem;
+using json   = nlohmann::json;
 
 namespace
 {
@@ -62,8 +61,6 @@ inline bool fetch(const File& file, Addon& addon) noexcept
                 return prepare(extractedFile, addon);
             });
 
-        fs::remove(path);
-        Utils::Path::removeEmpty(path);
         removeFile(path);
         addon.detach(file);
 
@@ -74,20 +71,27 @@ inline bool fetch(const File& file, Addon& addon) noexcept
 }
 }  // namespace
 
-std::map<std::string, std::shared_ptr<Addon>> Addon::installed;
+Addon::InstalledMap Addon::installed;
 
-Addon::Addon(const std::string& id, const std::vector<File>& files,
-             const std::string& author, const std::string& description,
-             const std::set<std::string>& dependencies)
-    : id(id),
-      files(files),
-      author(author),
-      description(description),
-      dependencies(dependencies)
+auto Addon::getId() const noexcept -> std::string { return id; }
+
+auto Addon::getAuthor() const noexcept -> std::string { return author; }
+
+auto Addon::getDescription() const noexcept -> std::string
 {
+    return description;
 }
 
-Addon::~Addon() noexcept {}
+bool Addon::isExplicit() const noexcept { return installedExplicitly; }
+
+auto Addon::getDeps() const noexcept -> const std::set<std::string>&
+{
+    return dependencies;
+}
+
+bool Addon::isInstalled() const noexcept { return isInstalled(id); }
+
+size_t Addon::getFileCount() const noexcept { return files.size(); }
 
 bool Addon::install(const Scraper::Data& data) noexcept
 {
@@ -97,13 +101,21 @@ bool Addon::install(const Scraper::Data& data) noexcept
         if (!fetch(file, *this)) return false;
     }
 
-    installed[id] = shared_from_this();  // TODO: emplace
+    addToInstalled();
     return false;
 }
 
+void Addon::addToInstalled() noexcept
+{
+    installed[id] = shared_from_this();  // TODO: emplace?
+}
+
 /*
- * Erase an addon from the local cache.
+ * Set that the addon has been installed manually by the user
+ * (explicit), and not automatically by dependency resolution.
  */
+void Addon::markExplicit() noexcept { installedExplicitly = true; }
+
 void Addon::remove() noexcept
 {
     remove([](const auto&) {});  // TODO: empty lambda literal?
@@ -123,6 +135,7 @@ void Addon::remove(const EachFileRemove& cb) noexcept
 
         cb({file, ""});
         removeFile(file);
+        // no need to detach as whole addon gets purged
     });
 
     installed.erase(id);
@@ -140,18 +153,6 @@ void Addon::detach(const File& file) noexcept
     }
 }
 
-/*
- * Set that the addon has been installed manually by the user
- * (explicit), and not automatically by dependency resolution.
- */
-void Addon::markExplicit() noexcept { installedExplicitly = true; }
-
-bool Addon::isExplicit() const noexcept { return installedExplicitly; }
-
-bool Addon::isInstalled() const noexcept { return isInstalled(id); }
-
-size_t Addon::getFileCount() const noexcept { return files.size(); }
-
 void Addon::forEachFile(const EachFile& cb) noexcept
 {
     for (auto& file : files) cb(file);
@@ -163,9 +164,6 @@ auto Addon::get(const std::string& id) noexcept -> AddonOpt
     return std::nullopt;
 }
 
-/*
- * Return set of files associated with an AddonID.
- */
 bool Addon::isInstalled(const std::string& id) noexcept
 {
     return installed.count(id);
@@ -192,11 +190,6 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     return set;
 }
 
-/*
- * Load installed addons from `dataFile` file into `data` map.
- * Return false if not sufficient permissions for either reading or
- * writing.
- */
 [[nodiscard]] auto Addon::load() noexcept -> LoadResult
 {
     if (!Utils::Path::gotPermissions(fs::current_path()))
@@ -209,7 +202,8 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     auto p = fs::path{dataFilename};
     if (!fs::exists(p)) return LoadResult::OK;
 
-    auto   ifs = std::ifstream(p);
+    auto   ifs    = std::ifstream(p);
+    auto   addons = std::vector<Addon>();
     json   in;
     size_t hash;
 
@@ -217,7 +211,7 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     {
         ifs >> in;
 
-        in.at("data").get_to(installed);
+        in.at("data").get_to(addons);
         hash = in.at("hash").get<size_t>();
     }
     catch (const json::exception& e)
@@ -230,21 +224,23 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
         return LoadResult::Corrupted;
     }
 
-    ifs.close();
+    for (auto& addon : addons) addon.addToInstalled();
 
+    ifs.close();
     return LoadResult::OK;
 }
 
-/*
- * Write loaded data from the `data` map into `dataFile` file.
- */
 [[nodiscard]] bool Addon::save() noexcept
 {
     std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
     if (!ofs) return false;
 
+    std::vector<Addon> addons;
+
+    for (auto& [_, addon] : installed) addons.push_back(*addon);
+
     json out;
-    out["data"] = installed;
+    out["data"] = addons;
     out["hash"] = std::hash<json>{}(out["data"]);
 
     ofs << out;
@@ -254,23 +250,31 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     return true;
 }
 
-auto AddonSerializer::from_json(const json& j) -> Addon
+void from_json(const json& j, Addon& addon)
 {
-    return {j.at("id").get<std::string>(),
-            j.at("files").get<std::vector<File>>(),
-            j.at("author").get<std::string>(),
-            j.at("description").get<std::string>(),
-            j.at("deps").get<std::set<std::string>>()};
+    addon.id          = j.at("id").get<std::string>();
+    addon.author      = j.at("author").get<std::string>();
+    addon.description = j.at("description").get<std::string>();
+
+    addon.installedExplicitly = j.value("explicit", false);
+
+    try  // it's ok for these fields not to exist
+    {
+        j.at("files").get_to(addon.files);
+        j.at("deps").get_to(addon.dependencies);
+    }
+    catch (const json::exception&)
+    {
+    }
 }
 
-void AddonSerializer::to_json(json& j, const Addon& addon) noexcept
+void to_json(json& j, const Addon& addon) noexcept
 {
     /*j.emplace("id", addon.id);  // TODO change to emplace if ok
     j.emplace("author", addon.author);
     j.emplace("description", addon.description);
     j.emplace("files", addon.files);
     j.emplace("deps", addon.dependencies);*/
-
     j["id"]          = addon.id;
     j["author"]      = addon.author;
     j["description"] = addon.description;

@@ -11,9 +11,9 @@ class File final
 {
     std::string name, path, url;
 
-public:
-    File(const std::string& data) noexcept;
+    void init(const std::string& data) noexcept;
 
+public:
     auto raw() const noexcept -> std::string;
 
     auto getUrl() const noexcept -> std::string;
@@ -59,14 +59,10 @@ public:
     operator std::filesystem::path() const;
 
     bool operator==(const File& other) const noexcept;
+
+    friend void from_json(const nlohmann::json&, File&);
+    friend void to_json(nlohmann::json&, const File&) noexcept;
 };
 
-namespace nlohmann
-{
-template <>
-struct adl_serializer<File>
-{
-    static auto from_json(const nlohmann::json& j) noexcept -> File;
-    static void to_json(json& j, const File&) noexcept;
-};
-}  // namespace nlohmann
+void from_json(const nlohmann::json&, File&);
+void to_json(nlohmann::json&, const File&) noexcept;

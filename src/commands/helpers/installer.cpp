@@ -129,7 +129,8 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
     auto addon   = planOpt.value().second;
     bool success = true;
 
-    for (const auto& dep : addon->dependencies)
+    // TODO: move to Addon, delete Addon::getDeps
+    for (const auto& dep : addon->getDeps())
     {
         if (noDeps)
         {

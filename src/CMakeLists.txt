@@ -15,17 +15,20 @@ endif()
 
 # Database
 add_library(database database.cpp)
-target_link_libraries(database PRIVATE download)
+target_link_libraries(database PRIVATE download addon) # TODO: check if addon needed
 target_include_directories(database PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 # Commands
 add_subdirectory(commands)
 
-# Utilities
-add_subdirectory(utils)
+# SourceMod Filesystem
+add_subdirectory(smfs)
 
 # Scrapers
 add_subdirectory(scrapers)
+
+# Utilities
+add_subdirectory(utils)
 
 # Main
 add_executable(smam main.cpp)

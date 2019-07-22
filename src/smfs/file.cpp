@@ -5,8 +5,7 @@
 #include <utils/misc.h>
 #include <utils/version.h>
 
-using json           = nlohmann::json;
-using FileSerializer = nlohmann::adl_serializer<File>;
+using json = nlohmann::json;
 
 /*
  * Return vector of Attachment names matched against `base` regex.
@@ -35,7 +34,7 @@ inline auto findMatches(const std::string&   base,
     return filtered;
 }
 
-File::File(const std::string& data) noexcept
+void File::init(const std::string& data) noexcept
 {
     auto at = data.find_first_of(';');
 
@@ -107,12 +106,9 @@ bool File::operator==(const File& other) const noexcept
     return raw() == other.raw();
 }
 
-auto FileSerializer::from_json(const json& j) noexcept -> File
+void from_json(const json& j, File& file)
 {
-    return {j.get<std::string>()};
+    file.init(j.get<std::string>());
 }
 
-void FileSerializer::to_json(json& j, const File& file) noexcept
-{
-    j = file.raw();
-}
+void to_json(json& j, const File& file) noexcept { j = file.raw(); }
