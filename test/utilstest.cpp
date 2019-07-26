@@ -1,34 +1,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../src/utils/file.hpp"
 #include "../src/utils/misc.h"
 #include "../src/utils/version.h"
 
 using namespace testing;
-
-TEST(UtilsTest, FileConstruction)
-{
-    File f1("some/dir/;filename.txt");
-    EXPECT_EQ("some/dir/", f1.path);
-    EXPECT_EQ("filename.txt", f1.name);
-    EXPECT_TRUE(f1.valid());
-
-    File f2("some/dir/;");
-    EXPECT_TRUE(f2.path.empty());
-    EXPECT_TRUE(f2.name.empty());
-    EXPECT_FALSE(f2.valid());
-
-    File f3(";/filename.txt");
-    EXPECT_TRUE(f3.path.empty());
-    EXPECT_TRUE(f3.name.empty());
-    EXPECT_FALSE(f3.valid());
-
-    File f4("some/dir/filename.txt");
-    EXPECT_TRUE(f4.path.empty());
-    EXPECT_TRUE(f4.name.empty());
-    EXPECT_FALSE(f4.valid());
-}
 
 TEST(UtilsTest, ToLines)
 {
@@ -83,10 +59,12 @@ TEST(UtilsTest, VersionBiggest)
 
 TEST(UtilsTest, VersionBiggestName)
 {
-    EXPECT_EQ("name_2.51-1.zip", Utils::Version::biggest({
-                                     "name_2.51-0.zip",
-                                     "name_2.51-1.zip",
-                                     "name_1.52.zip",
-                                     "name_1.99-1.zip",
-                                 }));
+    auto biggest = Utils::Version::biggest({
+        "name_2.51-0.zip",
+        "name_2.51-1.zip",
+        "name_1.52.zip",
+        "name_1.99-1.zip",
+    });
+
+    EXPECT_EQ("name_2.51-1.zip", biggest);
 }
