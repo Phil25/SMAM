@@ -5,7 +5,8 @@ add_executable(tests
   curlmocktest.cpp
   optstest.cpp
   filetest.cpp
-  smfstest.cpp
+  pathtest.cpp
+  addontest.cpp
   utilstest.cpp
   downloadtest.cpp
   databasetest.cpp
@@ -45,10 +46,6 @@ target_link_libraries(tests
   utils_misc
   utils_printer
   utils_version
-
-# Thrid party
-  CONAN_PKG::boost
-  stdc++fs
 )
 
 add_test(

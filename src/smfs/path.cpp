@@ -4,7 +4,7 @@
  * Make sure the path doesn't escape up to 2 directories
  * before the current path.
  */
-bool Utils::Path::isSafe(const fs::path& path) noexcept
+bool Path::isSafe(const fs::path& path) noexcept
 {
     static const fs::path back = "..";
 
@@ -21,7 +21,7 @@ bool Utils::Path::isSafe(const fs::path& path) noexcept
  * Finds SourceMod root ([...]/mod/addons/sourcemod)
  * from the ./mod directory or above.
  */
-auto Utils::Path::findRoot(const fs::path& st) noexcept -> MaybePath
+auto Path::findRoot(const fs::path& st) noexcept -> MaybePath
 {
     auto cur  = fs::canonical(fs::exists(st) ? st : fs::current_path()),
          root = cur.root_path();
@@ -42,7 +42,7 @@ auto Utils::Path::findRoot(const fs::path& st) noexcept -> MaybePath
  * Safely prepare directories for a file of an addon, preveting
  * the file.path to go beyond the allowed directory structure.
  */
-bool Utils::Path::prepare(const fs::path& path) noexcept
+bool Path::prepare(const fs::path& path) noexcept
 {
     if (!Path::isSafe(path)) return false;
     create_directories(path);
@@ -52,7 +52,7 @@ bool Utils::Path::prepare(const fs::path& path) noexcept
 /*
  * Return whether owner has read and write permissions in `path`.
  */
-bool Utils::Path::gotPermissions(const fs::path& path) noexcept
+bool Path::gotPermissions(const fs::path& path) noexcept
 {
     auto perms = fs::status(path).permissions();
     return (perms & fs::perms::owner_read) != fs::perms::none &&
@@ -64,7 +64,7 @@ bool Utils::Path::gotPermissions(const fs::path& path) noexcept
  * iterating into shallower directories. This path should always
  * be (in practice) relative to the SourceMod root directory.
  */
-void Utils::Path::removeEmpty(fs::path p) noexcept
+void Path::removeEmpty(fs::path p) noexcept
 {
     while (!p.empty())
     {

@@ -1,7 +1,7 @@
 project(SMAM_src_cmd)
 
 add_library(cmd_common common.cpp)
-target_link_libraries(cmd_common PRIVATE opts stdc++fs addon)
+target_link_libraries(cmd_common PRIVATE opts addon)
 
 add_library(cmd_install install.cpp)
 target_link_libraries(cmd_install PRIVATE cmd_common installer)

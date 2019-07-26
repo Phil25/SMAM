@@ -65,12 +65,6 @@ TEST(FileTest, Comparison)
     EXPECT_NE(file2, file3);
 }
 
-/*
- * TODO: evaluate for:
- * * EvalueateFallbackGeneral
- * * EvalueateFallbackAlliedModders
- */
-
 TEST(FileTest, EvaluateAttachment)
 {
     auto plugin   = json("plugins/;plugin.smx").get<File>();

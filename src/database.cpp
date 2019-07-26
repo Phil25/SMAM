@@ -52,7 +52,7 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
 
         for (const auto& j : root)
         {
-            auto addon = std::make_shared<Addon>(j.get<Addon>());
+            auto addon         = j.get<std::shared_ptr<Addon>>();
             cached[j.at("id")] = {j.at("url"), addon};
         }
     }

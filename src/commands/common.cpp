@@ -33,7 +33,7 @@ bool Common::noAddons(const std::vector<std::string>& addons) noexcept
 bool Common::noSMRoot(const Opts& opts) noexcept
 {
     auto dest = opts.getDestination().value_or("");
-    auto root = Utils::Path::findRoot(dest);
+    auto root = Path::findRoot(dest);
 
     if (root)
     {

@@ -35,23 +35,30 @@ public:
 private:
     static InstalledMap installed;
 
-    std::string           id, author, description;
+    const std::string id;
+
+    std::string           author, description;
     bool                  installedExplicitly;
     std::vector<File>     files;
     std::set<std::string> dependencies;
 
 public:
+    Addon(const std::string& id);
+    Addon(const Addon&) = delete;
+
     auto getId() const noexcept -> std::string;
     auto getAuthor() const noexcept -> std::string;
     auto getDescription() const noexcept -> std::string;
+
     bool isExplicit() const noexcept;
+    void markExplicit() noexcept;
+
     auto getDeps() const noexcept -> const std::set<std::string>&;
-    bool isInstalled() const noexcept;
-    auto getFileCount() const noexcept -> size_t;
+    auto getFiles() const noexcept -> const std::vector<File>&;
 
     bool install(const Scraper::Data&) noexcept;
     void addToInstalled() noexcept;
-    void markExplicit() noexcept;
+    bool isInstalled() const noexcept;
 
     void remove() noexcept;
     void remove(const EachFileRemove&) noexcept;
@@ -65,12 +72,16 @@ public:
     static void forEach(const EachAddon&) noexcept;
     static auto findByFile(const File& file) noexcept -> AddonSet;
 
+    static void               clear() noexcept;
     [[nodiscard]] static auto load() noexcept -> LoadResult;
     [[nodiscard]] static bool save() noexcept;
 
-    friend void from_json(const nlohmann::json&, Addon&);
-    friend void to_json(nlohmann::json&, const Addon&) noexcept;
+    friend void from_json(const nlohmann::json&,
+                          std::shared_ptr<Addon>&);
+
+    friend void to_json(nlohmann::json&,
+                        const std::shared_ptr<Addon>&) noexcept;
 };
 
-void from_json(const nlohmann::json&, Addon&);
-void to_json(nlohmann::json&, const Addon&) noexcept;
+void from_json(const nlohmann::json&, std::shared_ptr<Addon>&);
+void to_json(nlohmann::json&, const std::shared_ptr<Addon>&) noexcept;

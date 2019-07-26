@@ -20,12 +20,12 @@ constexpr std::string_view dataFilenameBak = ".smamdata.json.bak";
 inline void removeFile(const fs::path& file) noexcept
 {
     fs::remove(file);
-    Utils::Path::removeEmpty(file);
+    Path::removeEmpty(file);
 }
 
 inline bool prepare(const fs::path& path, const Addon& addon) noexcept
 {
-    if (Utils::Path::prepare(path.parent_path()))
+    if (Path::prepare(path.parent_path()))
     {
         out(Ch::Warn) << "Ignoring " << path << cr;
         return false;
@@ -73,6 +73,8 @@ inline bool fetch(const File& file, Addon& addon) noexcept
 
 Addon::InstalledMap Addon::installed;
 
+Addon::Addon(const std::string& id) : id(id) {}
+
 auto Addon::getId() const noexcept -> std::string { return id; }
 
 auto Addon::getAuthor() const noexcept -> std::string { return author; }
@@ -84,14 +86,21 @@ auto Addon::getDescription() const noexcept -> std::string
 
 bool Addon::isExplicit() const noexcept { return installedExplicitly; }
 
+/*
+ * Set that the addon has been installed manually by the user
+ * (explicit), and not automatically by dependency resolution.
+ */
+void Addon::markExplicit() noexcept { installedExplicitly = true; }
+
 auto Addon::getDeps() const noexcept -> const std::set<std::string>&
 {
     return dependencies;
 }
 
-bool Addon::isInstalled() const noexcept { return isInstalled(id); }
-
-size_t Addon::getFileCount() const noexcept { return files.size(); }
+auto Addon::getFiles() const noexcept -> const std::vector<File>&
+{
+    return files;
+}
 
 bool Addon::install(const Scraper::Data& data) noexcept
 {
@@ -106,14 +115,10 @@ bool Addon::install(const Scraper::Data& data) noexcept
 
 void Addon::addToInstalled() noexcept
 {
-    installed[id] = shared_from_this();  // TODO: emplace?
+    installed.emplace(id, shared_from_this());
 }
 
-/*
- * Set that the addon has been installed manually by the user
- * (explicit), and not automatically by dependency resolution.
- */
-void Addon::markExplicit() noexcept { installedExplicitly = true; }
+bool Addon::isInstalled() const noexcept { return isInstalled(id); }
 
 void Addon::remove() noexcept
 {
@@ -189,9 +194,11 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     return set;
 }
 
-[[nodiscard]] auto Addon::load() noexcept -> LoadResult
+void Addon::clear() noexcept { installed.clear(); }
+
+auto Addon::load() noexcept -> LoadResult
 {
-    if (!Utils::Path::gotPermissions(fs::current_path()))
+    if (!Path::gotPermissions(fs::current_path()))
     {
         return LoadResult::NoAccess;
     }
@@ -202,7 +209,7 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     if (!fs::exists(p)) return LoadResult::OK;
 
     auto   ifs    = std::ifstream(p);
-    auto   addons = std::vector<Addon>();
+    auto   addons = std::vector<std::shared_ptr<Addon>>();
     json   in;
     size_t hash;
 
@@ -223,20 +230,20 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
         return LoadResult::Corrupted;
     }
 
-    for (auto& addon : addons) addon.addToInstalled();
+    for (auto& addon : addons) addon->addToInstalled();
 
     ifs.close();
     return LoadResult::OK;
 }
 
-[[nodiscard]] bool Addon::save() noexcept
+bool Addon::save() noexcept
 {
     std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
     if (!ofs) return false;
 
-    std::vector<Addon> addons;
+    std::vector<std::shared_ptr<Addon>> addons;
 
-    for (auto& [_, addon] : installed) addons.push_back(*addon);
+    for (auto& [_, addon] : installed) addons.push_back(addon);
 
     json out;
     out["data"] = addons;
@@ -249,34 +256,30 @@ auto Addon::findByFile(const File& file) noexcept -> AddonSet
     return true;
 }
 
-void from_json(const json& j, Addon& addon)
+void from_json(const json& j, std::shared_ptr<Addon>& addon)
 {
-    addon.id          = j.at("id").get<std::string>();
-    addon.author      = j.at("author").get<std::string>();
-    addon.description = j.at("description").get<std::string>();
+    addon = std::make_shared<Addon>(j.at("id"));
 
-    addon.installedExplicitly = j.value("explicit", false);
+    addon->author              = j.at("author");
+    addon->description         = j.at("description");
+    addon->installedExplicitly = j.value("explicit", false);
 
     try  // it's ok for these fields not to exist
     {
-        j.at("files").get_to(addon.files);
-        j.at("deps").get_to(addon.dependencies);
+        j.at("files").get_to(addon->files);
+        j.at("deps").get_to(addon->dependencies);
     }
     catch (const json::exception&)
     {
     }
 }
 
-void to_json(json& j, const Addon& addon) noexcept
+void to_json(json& j, const std::shared_ptr<Addon>& addon) noexcept
 {
-    /*j.emplace("id", addon.id);  // TODO change to emplace if ok
-    j.emplace("author", addon.author);
-    j.emplace("description", addon.description);
-    j.emplace("files", addon.files);
-    j.emplace("deps", addon.dependencies);*/
-    j["id"]          = addon.id;
-    j["author"]      = addon.author;
-    j["description"] = addon.description;
-    j["files"]       = addon.files;
-    j["deps"]        = addon.dependencies;
+    j.emplace("id", addon->id);
+    j.emplace("author", addon->author);
+    j.emplace("description", addon->description);
+    j.emplace("explicit", addon->installedExplicitly);
+    j.emplace("files", addon->files);
+    j.emplace("deps", addon->dependencies);
 }

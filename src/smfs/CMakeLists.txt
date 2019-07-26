@@ -6,8 +6,7 @@ target_link_libraries(addon PRIVATE utils_archive utils_printer path file) # TOD
 
 # Path
 add_library(path path.cpp)
-target_link_libraries(path PRIVATE stdc++fs)
 
 # File
 add_library(file file.cpp)
-target_link_libraries(path PRIVATE utils_misc utils_version scraper) # TODO: check if scraper needed
+target_link_libraries(file PRIVATE utils_misc utils_version scraper) # TODO: check if scraper needed
