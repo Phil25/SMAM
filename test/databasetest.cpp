@@ -19,77 +19,71 @@ TEST_F(DatabaseTest, PositiveSingle)
 {
     db.precache({"accelerator"});
 
-    const auto& [url, data] = db.get("accelerator");
+    auto plan = db.get("accelerator");
+    ASSERT_TRUE(plan.has_value());
+
+    const auto& [url, addon] = plan.value();
 
     ASSERT_FALSE(url.empty());
     EXPECT_EQ("https://builds.limetech.io/?p=accelerator", url);
 
-    ASSERT_EQ(1, data.files.size());
-    EXPECT_EQ("../../", data.files[0].path);
-    EXPECT_EQ(".*", data.files[0].name);
+    const auto& files = addon->getFiles();
+    ASSERT_EQ(1, files.size());
+    EXPECT_EQ("../..", files[0].getPath());
+    EXPECT_EQ(".*", files[0].getName());
 }
 
 TEST_F(DatabaseTest, PositiveMultiple)
 {
     db.precache({"accelerator", "thriller"});
 
-    const auto& [url1, data1] = db.get("accelerator");
-    EXPECT_FALSE(url1.empty());
-    EXPECT_FALSE(data1.files.empty());
+    auto plan1 = db.get("accelerator");
+    auto plan2 = db.get("thriller");
 
-    const auto& [url2, data2] = db.get("thriller");
+    ASSERT_TRUE(plan1.has_value());
+    ASSERT_TRUE(plan2.has_value());
+
+    const auto& [url1, addon1] = plan1.value();
+    const auto& [url2, addon2] = plan2.value();
+
+    EXPECT_FALSE(url1.empty());
+    EXPECT_FALSE(addon1->getFiles().empty());
+
     EXPECT_FALSE(url2.empty());
-    EXPECT_FALSE(data2.files.empty());
+    EXPECT_FALSE(addon2->getFiles().empty());
 }
 
 TEST_F(DatabaseTest, NegativeSingle)
 {
     db.precache({"invalid"});
-
-    const auto& [url, data] = db.get("invalid");
-    EXPECT_TRUE(url.empty());
-    EXPECT_TRUE(data.files.empty());
+    EXPECT_FALSE(db.get("invalid").has_value());
 }
 
 TEST_F(DatabaseTest, NegativeMultiple)
 {
     db.precache({"invalid", "alsoinvalid"});
-
-    const auto& [url1, data1] = db.get("invalid");
-    EXPECT_TRUE(url1.empty());
-    EXPECT_TRUE(data1.files.empty());
-
-    const auto& [url2, data2] = db.get("alsoinvalid");
-    EXPECT_TRUE(url2.empty());
-    EXPECT_TRUE(data2.files.empty());
+    EXPECT_FALSE(db.get("invalid").has_value());
+    EXPECT_FALSE(db.get("alsoinvalid").has_value());
 }
 
 TEST_F(DatabaseTest, PositiveNegativeMix)
 {
     db.precache({"invalid", "accelerator", "alsoinvalid"});
 
-    const auto& [url1, data1] = db.get("invalid");
-    EXPECT_TRUE(url1.empty());
-    EXPECT_TRUE(data1.files.empty());
+    EXPECT_FALSE(db.get("invalid").has_value());
+    EXPECT_FALSE(db.get("alsoinvalid").has_value());
 
-    const auto& [url2, data2] = db.get("accelerator");
-    EXPECT_FALSE(url2.empty());
-    EXPECT_FALSE(data2.files.empty());
+    const auto& plan = db.get("accelerator");
+    ASSERT_TRUE(plan.has_value());
 
-    const auto& [url3, data3] = db.get("alsoinvalid");
-    EXPECT_TRUE(url3.empty());
-    EXPECT_TRUE(data3.files.empty());
+    const auto& [url, addon] = plan.value();
+    EXPECT_FALSE(url.empty());
+    EXPECT_FALSE(addon->getFiles().empty());
 }
 
 TEST_F(DatabaseTest, NotPrecached)
 {
     db.precache({"accelerator"});
-
-    const auto& [url1, data1] = db.get("accelerator");
-    EXPECT_FALSE(url1.empty());
-    EXPECT_FALSE(data1.files.empty());
-
-    const auto& [url2, data2] = db.get("thriller");
-    EXPECT_TRUE(url2.empty());
-    EXPECT_TRUE(data2.files.empty());
+    EXPECT_TRUE(db.get("accelerator").has_value());
+    EXPECT_FALSE(db.get("thriller").has_value());
 }
