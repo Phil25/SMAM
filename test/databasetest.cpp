@@ -29,8 +29,8 @@ TEST_F(DatabaseTest, PositiveSingle)
 
     const auto& files = addon->getFiles();
     ASSERT_EQ(1, files.size());
-    EXPECT_EQ("../..", files[0].getPath());
-    EXPECT_EQ(".*", files[0].getName());
+    EXPECT_EQ("../..", files[0]->getPath());
+    EXPECT_EQ(".*", files[0]->getName());
 }
 
 TEST_F(DatabaseTest, PositiveMultiple)

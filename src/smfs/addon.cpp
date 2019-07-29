@@ -38,10 +38,10 @@ inline bool prepare(const fs::path& path, const Addon& addon) noexcept
     return true;
 }
 
-inline bool fetch(const File& file, Addon& addon) noexcept
+inline bool fetch(const File::Ptr& file, Addon& addon) noexcept
 {
-    auto path = fs::path{file};
-    auto url  = file.getUrl();
+    auto path = fs::path{*file};
+    auto url  = file->getUrl();
 
     if (!prepare(path, addon)) return false;
 
@@ -97,16 +97,16 @@ auto Addon::getDeps() const noexcept -> const std::set<std::string>&
     return dependencies;
 }
 
-auto Addon::getFiles() const noexcept -> const std::vector<File>&
+auto Addon::getFiles() const noexcept -> const std::vector<File::Ptr>&
 {
     return files;
 }
 
 bool Addon::install(const Scraper::Data& data) noexcept
 {
-    for (File& file : files)
+    for (auto& file : files)
     {
-        if (!file.evaluate(data) || !fetch(file, *this)) return false;
+        if (!file->evaluate(data) || !fetch(file, *this)) return false;
     }
 
     addToInstalled();
@@ -122,30 +122,30 @@ bool Addon::isInstalled() const noexcept { return isInstalled(id); }
 
 void Addon::remove() noexcept
 {
-    remove([](const auto&) {});  // TODO: empty lambda literal?
+    remove([](const auto&, const auto&) {});
 }
 
 void Addon::remove(const EachFileRemove& cb) noexcept
 {
-    forEachFile([&cb](const File& file) {
+    forEachFile([&cb](auto& file) {
         auto addons = findByFile(file);
 
         switch (addons.size())  // how many addons own this file
         {
-            case 0: cb({file, "nonexistent"}); return;
+            case 0: cb(file, "nonexistent"); return;
             case 1: break;  // only this one
-            default: cb({file, "shared"}); return;
+            default: cb(file, "shared"); return;
         }
 
-        cb({file, ""});
-        removeFile(file);
+        cb(file, "");
+        removeFile(*file);
         // no need to detach as whole addon gets purged
     });
 
     installed.erase(id);
 }
 
-void Addon::detach(const File& file) noexcept
+void Addon::detach(const File::Ptr& file) noexcept
 {
     for (auto it = files.cbegin(); it != files.cend(); ++it)
     {
@@ -178,7 +178,7 @@ void Addon::forEach(const EachAddon& cb) noexcept
     for (const auto& [_, addon] : installed) cb(addon);
 }
 
-auto Addon::findByFile(const File& file) noexcept -> AddonSet
+auto Addon::findByFile(const File::Ptr& file) noexcept -> AddonSet
 {
     AddonSet set;
 
@@ -256,7 +256,7 @@ bool Addon::save() noexcept
     return true;
 }
 
-void from_json(const json& j, std::shared_ptr<Addon>& addon)
+void from_json(const json& j, Addon::Ptr& addon)
 {
     addon = std::make_shared<Addon>(j.at("id"));
 
@@ -274,7 +274,7 @@ void from_json(const json& j, std::shared_ptr<Addon>& addon)
     }
 }
 
-void to_json(json& j, const std::shared_ptr<Addon>& addon) noexcept
+void to_json(json& j, const Addon::Ptr& addon) noexcept
 {
     j.emplace("id", addon->id);
     j.emplace("author", addon->author);

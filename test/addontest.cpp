@@ -13,11 +13,16 @@ using json = nlohmann::json;
 
 constexpr const char* dataFile = ".smamdata.json";
 
+inline auto get(const std::string& file)
+{
+    return json(file).get<File::Ptr>();
+}
+
 TEST(AddonTest, DeserializeFullLocal)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
 
     // clang-format off
     auto addon = json{
@@ -25,7 +30,7 @@ TEST(AddonTest, DeserializeFullLocal)
             {"author", "Somedev"},
             {"description", "Test addon"},
             {"explicit", true},
-            {"files", {plugin.raw(), gamedata.raw(), source.raw()}},
+            {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
         }.get<std::shared_ptr<Addon>>();
     // clang-format on
@@ -44,10 +49,6 @@ TEST(AddonTest, DeserializeFullLocal)
 
 TEST(AddonTest, DeserializePartialLocal)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
-
     // clang-format off
     auto addon = json{
             {"id", "test"},
@@ -67,9 +68,9 @@ TEST(AddonTest, DeserializePartialLocal)
 
 TEST(AddonTest, DeserializeFullRemote)
 {
-    auto plugin   = json("plugins/;bin.smx").get<File>();
-    auto gamedata = json("gamedata/;data.txt").get<File>();
-    auto source   = json("scripting/;bin.sp").get<File>();
+    auto plugin   = get("plugins/;bin.smx");
+    auto gamedata = get("gamedata/;data.txt");
+    auto source   = get("scripting/;bin.sp");
 
     // clang-format off
     auto addon = json{
@@ -77,7 +78,7 @@ TEST(AddonTest, DeserializeFullRemote)
             {"author", "Somedev"},
             {"description", "Test addon"},
             {"explicit", true},
-            {"files", {plugin.raw(), gamedata.raw(), source.raw()}},
+            {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
         }.get<std::shared_ptr<Addon>>();
     // clang-format on
@@ -96,10 +97,6 @@ TEST(AddonTest, DeserializeFullRemote)
 
 TEST(AddonTest, DeserializePartialRemote)
 {
-    auto plugin   = json("plugins/;bin.smx").get<File>();
-    auto gamedata = json("gamedata/;data.txt").get<File>();
-    auto source   = json("scripting/;bin.sp").get<File>();
-
     // clang-format off
     auto addon = json{
             {"id", "test"},
@@ -119,9 +116,9 @@ TEST(AddonTest, DeserializePartialRemote)
 
 TEST(AddonTest, SerializeFull)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
 
     // clang-format off
     auto addon = json{
@@ -129,7 +126,7 @@ TEST(AddonTest, SerializeFull)
             {"author", "Somedev"},
             {"description", "Test addon"},
             {"explicit", true},
-            {"files", {plugin.raw(), gamedata.raw(), source.raw()}},
+            {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
         }.get<std::shared_ptr<Addon>>();
     // clang-format on
@@ -141,7 +138,7 @@ TEST(AddonTest, SerializeFull)
     EXPECT_EQ("Test addon", j["description"]);
     EXPECT_TRUE(j["explicit"]);
 
-    std::vector<File> files;
+    std::vector<File::Ptr> files;
     j["files"].get_to(files);
     EXPECT_THAT(files, ElementsAre(plugin, gamedata, source));
 
@@ -153,10 +150,6 @@ TEST(AddonTest, SerializeFull)
 
 TEST(AddonTest, SerializePartial)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
-
     // clang-format off
     auto addon = json{
             {"id", "test"},
@@ -180,16 +173,16 @@ TEST(AddonTest, SerializePartial)
 
 TEST(AddonTest, Detach)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
 
     // clang-format off
     auto a = json{
             {"id", "test"},
             {"author", "Somedev"},
             {"description", "Test addon"},
-            {"files", {plugin.raw(), gamedata.raw(), source.raw()}},
+            {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
         }.get<std::shared_ptr<Addon>>();
     // clang-format on
 
@@ -222,23 +215,23 @@ TEST(AddonTest, Detach)
 
 TEST(AddonTest, FindByFile)
 {
-    auto plugin   = json("plugins/bin.smx").get<File>();
-    auto gamedata = json("gamedata/data.txt").get<File>();
-    auto source   = json("scripting/bin.sp").get<File>();
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
 
     // clang-format off
     auto a1 = json{
         {"id", "test"},
         {"author", "Somedev"},
         {"description", "Test addon"},
-        {"files", {plugin.raw(), gamedata.raw()}},
+        {"files", {plugin->raw(), gamedata->raw()}},
     }.get<std::shared_ptr<Addon>>();
 
     auto a2 = json{
         {"id", "test2"},
         {"author", "Somedev"},
         {"description", "Test addon2"},
-        {"files", {gamedata.raw(), source.raw()}},
+        {"files", {gamedata->raw(), source->raw()}},
     }.get<std::shared_ptr<Addon>>();
     // clang-format on
 

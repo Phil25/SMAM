@@ -34,7 +34,7 @@ inline auto findMatches(const std::string&   base,
     return filtered;
 }
 
-void File::init(const std::string& data) noexcept
+File::File(const std::string& data) noexcept
 {
     auto at = data.find_first_of(';');
 
@@ -106,19 +106,22 @@ bool File::evaluate(const Scraper::Data& data) noexcept
 
 File::operator std::filesystem::path() const { return raw(); }
 
-bool File::operator==(const File& other) const noexcept
+bool operator==(const File::Ptr& f1, const File::Ptr& f2) noexcept
 {
-    return raw() == other.raw();
+    return f1->raw() == f2->raw();
 }
 
-bool File::operator!=(const File& other) const noexcept
+bool operator!=(const File::Ptr& f1, const File::Ptr& f2) noexcept
 {
-    return !operator==(other);
+    return !operator==(f1, f2);
 }
 
-void from_json(const json& j, File& file)
+void from_json(const json& j, File::Ptr& file)
 {
-    file.init(j.get<std::string>());
+    file = std::make_shared<File>(j);
 }
 
-void to_json(json& j, const File& file) noexcept { j = file.raw(); }
+void to_json(json& j, const File::Ptr& file) noexcept
+{
+    j = file->raw();
+}

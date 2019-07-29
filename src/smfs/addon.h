@@ -11,16 +11,17 @@
 
 class Addon final : public std::enable_shared_from_this<Addon>
 {
-    using AddonPtr = std::shared_ptr<Addon>;
-    using AddonSet = std::set<AddonPtr>;
-    using AddonOpt = std::optional<AddonPtr>;
+    using Ptr      = std::shared_ptr<Addon>;
+    using AddonSet = std::set<Ptr>;
+    using AddonOpt = std::optional<Ptr>;
 
-    using FileRef   = std::reference_wrapper<const File>;
-    using FileTuple = std::pair<FileRef, std::string>;
+    using FileTuple = std::pair<File::Ptr, std::string>;
 
-    using EachAddon      = std::function<void(AddonPtr)>;
-    using EachFile       = std::function<void(File&)>;
-    using EachFileRemove = std::function<void(const FileTuple&)>;
+    using EachAddon = std::function<void(Ptr)>;
+    using EachFile  = std::function<void(const File::Ptr&)>;
+
+    using EachFileRemove =
+        std::function<void(const File::Ptr&, const std::string& error)>;
 
     using InstalledMap = std::map<std::string, std::shared_ptr<Addon>>;
 
@@ -37,10 +38,10 @@ private:
 
     const std::string id;
 
-    std::string           author, description;
-    bool                  installedExplicitly;
-    std::vector<File>     files;
-    std::set<std::string> dependencies;
+    std::string            author, description;
+    bool                   installedExplicitly;
+    std::vector<File::Ptr> files;
+    std::set<std::string>  dependencies;
 
 public:
     Addon(const std::string& id);
@@ -54,7 +55,7 @@ public:
     void markExplicit() noexcept;
 
     auto getDeps() const noexcept -> const std::set<std::string>&;
-    auto getFiles() const noexcept -> const std::vector<File>&;
+    auto getFiles() const noexcept -> const std::vector<File::Ptr>&;
 
     bool install(const Scraper::Data&) noexcept;
     void addToInstalled() noexcept;
@@ -62,7 +63,7 @@ public:
 
     void remove() noexcept;
     void remove(const EachFileRemove&) noexcept;
-    void detach(const File&) noexcept;
+    void detach(const File::Ptr&) noexcept;
 
     void forEachFile(const EachFile&) noexcept;
 
@@ -70,18 +71,15 @@ public:
     static bool isInstalled(const std::string& id) noexcept;
 
     static void forEach(const EachAddon&) noexcept;
-    static auto findByFile(const File& file) noexcept -> AddonSet;
+    static auto findByFile(const File::Ptr& file) noexcept -> AddonSet;
 
     static void               clear() noexcept;
     [[nodiscard]] static auto load() noexcept -> LoadResult;
     [[nodiscard]] static bool save() noexcept;
 
-    friend void from_json(const nlohmann::json&,
-                          std::shared_ptr<Addon>&);
-
-    friend void to_json(nlohmann::json&,
-                        const std::shared_ptr<Addon>&) noexcept;
+    friend void from_json(const nlohmann::json&, Ptr&);
+    friend void to_json(nlohmann::json&, const Ptr&) noexcept;
 };
 
-void from_json(const nlohmann::json&, std::shared_ptr<Addon>&);
-void to_json(nlohmann::json&, const std::shared_ptr<Addon>&) noexcept;
+void from_json(const nlohmann::json&, Addon::Ptr&);
+void to_json(nlohmann::json&, const Addon::Ptr&) noexcept;

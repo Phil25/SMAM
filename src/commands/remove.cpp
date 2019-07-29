@@ -8,17 +8,10 @@ auto removeAddon(Addon& addon) noexcept -> Report::Type
     out(Ch::Info) << Col::yellow << "Removing " << addon.getId()
                   << "..." << Col::reset << cr;
 
-    // TODO: make this shorter
-    addon.remove([](const auto& result) {
-        if (result.second.empty())  // no error
-        {
-            out() << "Skipping " << result.second
-                  << " file:" << result.first.get().raw() << cr;
-        }
-        else
-        {
-            out() << result.first.get().raw() << cr;
-        }
+    addon.remove([](const auto& file, const auto& error) {
+        out();  // create newline
+        if (!error.empty()) out << "Skipping " << error << " file: ";
+        out << file->raw() << cr;
     });
 
     return Report::Type::Removed;

@@ -11,9 +11,11 @@ class File final
 {
     std::string path, name, url;
 
-    void init(const std::string& data) noexcept;
-
 public:
+    using Ptr = std::shared_ptr<File>;
+
+    File(const std::string& data) noexcept;
+
     auto getPath() const noexcept -> std::string;
     auto getName() const noexcept -> std::string;
     auto getUrl() const noexcept -> std::string;
@@ -62,13 +64,10 @@ public:
      * Implicit conversion to std::filesystem::path
      */
     operator std::filesystem::path() const;
-
-    bool operator==(const File& other) const noexcept;
-    bool operator!=(const File& other) const noexcept;
-
-    friend void from_json(const nlohmann::json&, File&);
-    friend void to_json(nlohmann::json&, const File&) noexcept;
 };
 
-void from_json(const nlohmann::json&, File&);
-void to_json(nlohmann::json&, const File&) noexcept;
+bool operator==(const File::Ptr& f1, const File::Ptr& f2) noexcept;
+bool operator!=(const File::Ptr& f1, const File::Ptr& f2) noexcept;
+
+void from_json(const nlohmann::json&, File::Ptr&);
+void to_json(nlohmann::json&, const File::Ptr&) noexcept;

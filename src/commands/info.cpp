@@ -37,7 +37,7 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
                       << addon->getFiles().size() << ')' << cr;
 
         addon->forEachFile(
-            [](const auto& file) { out() << file.raw() << cr; });
+            [](const auto& file) { out() << file->raw() << cr; });
     }
 
     return ExitCode::OK;
