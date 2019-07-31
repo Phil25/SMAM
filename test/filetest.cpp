@@ -219,3 +219,18 @@ TEST(FileTest, EvaluateFallbackAlliedModdersNotFound)
 
     EXPECT_FALSE(bin->evaluate(data));
 }
+
+TEST(FileTest, InvalidArgument)
+{
+    EXPECT_THROW(get(";bin.smx"), std::invalid_argument);
+    EXPECT_THROW(get("plugins/;"), std::invalid_argument);
+    EXPECT_THROW(get("bin.smx"), std::invalid_argument);
+    EXPECT_THROW(get("/bin.smx"), std::invalid_argument);
+    EXPECT_THROW(get("plugins/"), std::invalid_argument);
+    EXPECT_THROW(get("aa;"), std::invalid_argument);
+    EXPECT_THROW(get(";aa"), std::invalid_argument);
+    EXPECT_THROW(get(""), std::invalid_argument);
+    EXPECT_THROW(get("a/"), std::invalid_argument);
+    EXPECT_THROW(get("/a"), std::invalid_argument);
+    EXPECT_THROW(get("aa"), std::invalid_argument);
+}

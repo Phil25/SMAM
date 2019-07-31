@@ -14,7 +14,7 @@ class File final
 public:
     using Ptr = std::shared_ptr<File>;
 
-    File(const std::string& data) noexcept;
+    File(const std::string& data);
 
     auto getPath() const noexcept -> std::string;
     auto getName() const noexcept -> std::string;

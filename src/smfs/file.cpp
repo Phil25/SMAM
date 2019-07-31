@@ -34,14 +34,29 @@ inline auto findMatches(const std::string&   base,
     return filtered;
 }
 
-File::File(const std::string& data) noexcept
+File::File(const std::string& data)
 {
-    auto at = data.find_first_of(';');
+    auto sz = data.size();
+    if (sz < 3)
+    {
+        throw std::invalid_argument("Invalid file: " + data);
+    }
 
+    auto at = data.find_first_of(';');
     if (at == std::string::npos) at = data.find_last_of('/');
+
+    if (at == std::string::npos || at == 0 || at == sz - 1)
+    {
+        throw std::invalid_argument("Invalid file: " + data);
+    }
 
     path = data.substr(0, at);
     name = data.substr(at + 1);
+
+    if (!path.size() || !name.size())
+    {
+        throw std::invalid_argument("Invalid file: " + data);
+    }
 
     if (path.at(path.size() - 1) == '/') path.pop_back();
 }
