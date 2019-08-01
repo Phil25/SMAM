@@ -4,16 +4,14 @@
 
 SourceMod Addon Manager (SMAM) is an automatic installer for [SourceMod](https://www.sourcemod.net/about.php) addons (plugins or extensions).
 
+The idea is to provide the community with automatic addon management, while at the same time not requiring developers to update their mean of distribution (AlliedModders, GitHub, or some other place). To achieve that, SMAM communicates with a web application, SMAMDB, hosted over at [smamdb.net](https://smamdb.net). SMAMDB is nothing more than a database holding information about where to download and install the specified addon files. SMAMDB is open source and can be viewed at [its GitHub page](https://github.com/Phil25/SMAMDB). And, if you're interested, you may read more about it on [its wiki](https://github.com/Phil25/SMAMDB/wiki).
+
 # Table of Contents
-* [Idea](#idea-)
 * [Features](#features-)
 * [Security](#security-)
 * [Installing](#installing-)
 * [Examples](#examples-)
 * [Help Menu](#help-menu-)
-
-# Idea [^](#table-of-contents)
-The idea of SMAM is to provide the community with automatic addon management, while at the same time not requiring developers to update their mean of distribution (AlliedModders, GitHub, or some other place). To achieve that, SMAM communicates with a web application, SMAMDB, hosted over at [smamdb.net](https://smamdb.net). SMAMDB is nothing more than a database holding information about where to download and install the specified addon files. SMAMDB is open source and can be viewed at [its GitHub page](https://github.com/Phil25/SMAMDB). And, if you're interested, you may read more about it on [its wiki](https://github.com/Phil25/SMAMDB/wiki).
 
 # Features [^](#table-of-contents)
 SMAM is a server-side tool that allows you to, per server directory:
@@ -40,11 +38,12 @@ command | action
 `smam remove tf2items` | remove tf2items
 `smam info` | view addons installed by SMAM
 `smam info tf2items` | view information about a specific addon installed by SMAM
-`smam install rtd` | `TODO: dependency resolution` install rtd and tf2attributes (its dependency)
-`smam install rtd --no-deps` | `TODO: dependency resolution` install rtd only, without tf2attributes (its dependency)
+`smam install rtd` | install rtd and tf2attributes (its dependency)
+`smam install rtd --no-deps` | install rtd only, without tf2attributes (its dependency)
 `smam install tf2items -f` | force installing tf2items, overwrites files even if tf2items is already installed
 `smam install tf2items -q --log ./file.log` | install tf2items quietly, log output in `./file.log`
 `smam install tf2items -d /path/to/server/` | install tf2items in a specified server structure (`(mod)/addons/`)
+`smam install rtd -d user@192.168.1.10:/path/to/server/` | `upcoming` install rtd on a remote server through ssh
 `smam install mytestplugin --db-url localhost:8080` | install a plugin, information about which is fetched from `localhost:8080`
 
 # Help Menu [^](#table-of-contents)
