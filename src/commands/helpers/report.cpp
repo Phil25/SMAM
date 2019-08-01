@@ -6,18 +6,27 @@ using StringVector = std::vector<std::string>;
 
 namespace
 {
+using Type = Report::Type;
+
 struct PrinterData final
 {
-    std::string prefix;
+    std::string prefix, remark;
     Col         color;
 };
 
-const std::map<Report::Type, PrinterData> printer{
-    {Report::Type::Installed, {"> Installed: ", Col::green}},
-    {Report::Type::Removed, {"> Removed: ", Col::green}},
-    {Report::Type::Skipped, {"> Skipped: ", Col::yellow}},
-    {Report::Type::Failed, {"> Failed: ", Col::red}},
+const std::map<Type, PrinterData> printer{
+    {Type::Installed, {"Installed", "installed", Col::green}},
+    {Type::Removed, {"Removed", "removed", Col::green}},
+    {Type::Skipped, {"Skipped", "already installed", Col::yellow}},
+    {Type::Queued, {"Queued", "already being installed", Col::yellow}},
+    {Type::Ignored, {"Ignored", "is not installed", Col::yellow}},
+    {Type::Failed, {"Failed", "failed to install", Col::red}},
 };
+
+inline auto wrap(const std::string& addon) noexcept
+{
+    return out.parse(Col::green) + addon + out.parse(Col::reset);
+}
 }  // namespace
 
 void Report::insert(Type type, const std::string& addon) noexcept
@@ -25,9 +34,11 @@ void Report::insert(Type type, const std::string& addon) noexcept
     data[type].push_back(addon);
 }
 
-void Report::remark(const std::string& remark) noexcept
+void Report::remark(const std::string& id, const std::string& dep,
+                    Type type) noexcept
 {
-    if (!remark.empty()) remarks.push_back(remark);
+    remarks.emplace_back("Dependency " + wrap(dep) + " of " + wrap(id) +
+                         ' ' + printer.at(type).remark + '.');
 }
 
 void Report::print(Type type) const noexcept
@@ -36,7 +47,7 @@ void Report::print(Type type) const noexcept
 
     auto toPrint = printer.at(type);
 
-    out() << toPrint.color << toPrint.prefix;
+    out() << toPrint.color << "> " << toPrint.prefix << ": ";
 
     for (const auto& addon : data.at(type))
     {
@@ -53,8 +64,5 @@ void Report::print() const noexcept
     if (!remarks.size()) return;
 
     out(Ch::Info) << "Remarks:" << cr;
-    for (const auto& remark : remarks)
-    {
-        out() << remark << cr;
-    }
+    for (const auto& remark : remarks) out() << remark << cr;
 }

@@ -17,6 +17,7 @@ public:
         Removed,    // removed
         Skipped,    // already installed
         Queued,     // already being installed
+        Ignored,    // depenency forcefully not installed
         Failed      // failed to install/remove
     };
 
@@ -27,7 +28,8 @@ private:
 public:
     void insert(Type type, const std::string& addon) noexcept;
 
-    void remark(const std::string&) noexcept;
+    void remark(const std::string& id, const std::string& dependency,
+                Type type) noexcept;
 
     void print(Type type) const noexcept;
     void print() const noexcept;

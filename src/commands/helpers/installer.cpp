@@ -23,47 +23,6 @@ namespace fs       = std::filesystem;
 using StringVector = std::vector<std::string>;
 using Type         = Report::Type;
 
-namespace
-{
-using DependencyRemark =
-    std::function<std::string(const std::string&, const std::string&)>;
-
-const std::map<Type, DependencyRemark> remarkMap{
-    {Type::Installed,
-     [](const std::string& a, const std::string& d) {
-         return "Installed " + d + " as dependency of " + a + '.' + cr;
-     }},
-
-    {Type::Skipped,
-     [](const std::string& a, const std::string& d) {
-         return "Dependency " + d + " of " + a + " already satisfied." +
-                cr;
-     }},
-
-    {Type::Failed,
-     [](const std::string& a, const std::string& d) {
-         return "Dependency " + d + " of " + a + " failed to install." +
-                cr;
-     }},
-};
-
-inline auto wrap(const std::string& addon) noexcept
-{
-    return out.parse(Col::green) + addon + out.parse(Col::reset);
-}
-
-inline auto getRemark(Type type, const std::string& addon,
-                      const std::string& dependency) noexcept
-{
-    auto a = wrap(addon);
-    auto d = wrap(dependency);
-
-    return remarkMap.count(type) ? remarkMap.at(type)(a, d)
-                                 : std::string();
-}
-
-}  // namespace
-
 Installer::Installer(const std::string&  databaseUrl,
                      const StringVector& ids, bool forceInstall,
                      bool noDeps) noexcept
@@ -136,14 +95,13 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
         {
             if (!Addon::isInstalled(dep))
             {
-                report.remark("Dependency " + wrap(dep) + " of " +
-                              wrap(id) + " is not installed.");
+                report.remark(id, dep, Type::Ignored);
             }
         }
         else
         {
             auto depResult = installSingle(dep);
-            report.remark(getRemark(depResult, id, dep));
+            report.remark(id, dep, depResult);
 
             if (depResult == Type::Failed)
             {
