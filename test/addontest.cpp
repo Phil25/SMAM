@@ -18,6 +18,28 @@ inline auto get(const std::string& file)
     return json(file).get<File::Ptr>();
 }
 
+inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
+{
+    auto files = std::vector<File::Ptr>();
+
+    addon->forEachFile(
+        [&files](const auto& file) { files.push_back(file); });
+
+    return files;
+}
+
+inline auto getDeps(const std::shared_ptr<Addon>& addon) noexcept
+{
+    auto deps = std::vector<std::string>();
+
+    addon->forEachDep([&deps](const auto& dep) {
+        deps.push_back(dep);
+        return true;
+    });
+
+    return deps;
+}
+
 TEST(AddonTest, DeserializeFullLocal)
 {
     auto plugin   = get("plugins/bin.smx");
@@ -40,10 +62,9 @@ TEST(AddonTest, DeserializeFullLocal)
     EXPECT_EQ("Test addon", addon->getDescription());
     EXPECT_TRUE(addon->isExplicit());
 
-    EXPECT_THAT(addon->getFiles(),
-                ElementsAre(plugin, gamedata, source));
+    EXPECT_THAT(getFiles(addon), ElementsAre(plugin, gamedata, source));
 
-    EXPECT_THAT(addon->getDeps(),
+    EXPECT_THAT(getDeps(addon),
                 UnorderedElementsAre("someplugin", "someextension"));
 }
 
@@ -62,8 +83,8 @@ TEST(AddonTest, DeserializePartialLocal)
     EXPECT_EQ("Test addon", addon->getDescription());
     EXPECT_FALSE(addon->isExplicit());
 
-    EXPECT_THAT(addon->getFiles(), IsEmpty());
-    EXPECT_THAT(addon->getDeps(), IsEmpty());
+    EXPECT_THAT(getFiles(addon), IsEmpty());
+    EXPECT_THAT(getDeps(addon), IsEmpty());
 }
 
 TEST(AddonTest, DeserializeFullRemote)
@@ -88,10 +109,9 @@ TEST(AddonTest, DeserializeFullRemote)
     EXPECT_EQ("Test addon", addon->getDescription());
     EXPECT_TRUE(addon->isExplicit());
 
-    EXPECT_THAT(addon->getFiles(),
-                ElementsAre(plugin, gamedata, source));
+    EXPECT_THAT(getFiles(addon), ElementsAre(plugin, gamedata, source));
 
-    EXPECT_THAT(addon->getDeps(),
+    EXPECT_THAT(getDeps(addon),
                 UnorderedElementsAre("someplugin", "someextension"));
 }
 
@@ -110,8 +130,8 @@ TEST(AddonTest, DeserializePartialRemote)
     EXPECT_EQ("Test addon", addon->getDescription());
     EXPECT_FALSE(addon->isExplicit());
 
-    EXPECT_THAT(addon->getFiles(), IsEmpty());
-    EXPECT_THAT(addon->getDeps(), IsEmpty());
+    EXPECT_THAT(getFiles(addon), IsEmpty());
+    EXPECT_THAT(getDeps(addon), IsEmpty());
 }
 
 TEST(AddonTest, SerializeFull)
@@ -186,31 +206,31 @@ TEST(AddonTest, Detach)
         }.get<std::shared_ptr<Addon>>();
     // clang-format on
 
-    EXPECT_THAT(a->getFiles(), ElementsAre(plugin, gamedata, source));
+    EXPECT_THAT(getFiles(a), ElementsAre(plugin, gamedata, source));
 
     a->detach(gamedata);
-    EXPECT_THAT(a->getFiles(), ElementsAre(plugin, source));
+    EXPECT_THAT(getFiles(a), ElementsAre(plugin, source));
 
     a->detach(gamedata);
-    EXPECT_THAT(a->getFiles(), ElementsAre(plugin, source));
+    EXPECT_THAT(getFiles(a), ElementsAre(plugin, source));
 
     a->detach(plugin);
-    EXPECT_THAT(a->getFiles(), ElementsAre(source));
+    EXPECT_THAT(getFiles(a), ElementsAre(source));
 
     a->detach(plugin);
-    EXPECT_THAT(a->getFiles(), ElementsAre(source));
+    EXPECT_THAT(getFiles(a), ElementsAre(source));
 
     a->detach(gamedata);
-    EXPECT_THAT(a->getFiles(), ElementsAre(source));
+    EXPECT_THAT(getFiles(a), ElementsAre(source));
 
     a->detach(source);
-    EXPECT_THAT(a->getFiles(), IsEmpty());
+    EXPECT_THAT(getFiles(a), IsEmpty());
 
     a->detach(plugin);
-    EXPECT_THAT(a->getFiles(), IsEmpty());
+    EXPECT_THAT(getFiles(a), IsEmpty());
 
     a->detach(source);
-    EXPECT_THAT(a->getFiles(), IsEmpty());
+    EXPECT_THAT(getFiles(a), IsEmpty());
 }
 
 TEST(AddonTest, FindByFile)

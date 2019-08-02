@@ -19,6 +19,7 @@ class Addon final : public std::enable_shared_from_this<Addon>
 
     using EachAddon = std::function<void(Ptr)>;
     using EachFile  = std::function<void(const File::Ptr&)>;
+    using EachDep   = std::function<bool(const std::string&)>;
 
     using EachFileRemove =
         std::function<void(const File::Ptr&, const std::string& error)>;
@@ -50,12 +51,10 @@ public:
     auto getId() const noexcept -> std::string;
     auto getAuthor() const noexcept -> std::string;
     auto getDescription() const noexcept -> std::string;
+    auto fileCount() const noexcept -> size_t;
 
     bool isExplicit() const noexcept;
     void markExplicit() noexcept;
-
-    auto getDeps() const noexcept -> const std::set<std::string>&;
-    auto getFiles() const noexcept -> const std::vector<File::Ptr>&;
 
     bool install(const Scraper::Data&) noexcept;
     void addToInstalled() noexcept;
@@ -66,6 +65,7 @@ public:
     void detach(const File::Ptr&) noexcept;
 
     void forEachFile(const EachFile&) noexcept;
+    bool forEachDep(const EachDep&) noexcept;
 
     static auto get(const std::string& id) noexcept -> AddonOpt;
     static bool isInstalled(const std::string& id) noexcept;

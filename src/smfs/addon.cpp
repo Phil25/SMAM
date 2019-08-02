@@ -84,6 +84,11 @@ auto Addon::getDescription() const noexcept -> std::string
     return description;
 }
 
+auto Addon::fileCount() const noexcept -> size_t
+{
+    return files.size();
+}
+
 bool Addon::isExplicit() const noexcept { return installedExplicitly; }
 
 /*
@@ -91,16 +96,6 @@ bool Addon::isExplicit() const noexcept { return installedExplicitly; }
  * (explicit), and not automatically by dependency resolution.
  */
 void Addon::markExplicit() noexcept { installedExplicitly = true; }
-
-auto Addon::getDeps() const noexcept -> const std::set<std::string>&
-{
-    return dependencies;
-}
-
-auto Addon::getFiles() const noexcept -> const std::vector<File::Ptr>&
-{
-    return files;
-}
 
 bool Addon::install(const Scraper::Data& data) noexcept
 {
@@ -160,6 +155,16 @@ void Addon::detach(const File::Ptr& file) noexcept
 void Addon::forEachFile(const EachFile& cb) noexcept
 {
     for (auto& file : files) cb(file);
+}
+
+bool Addon::forEachDep(const EachDep& cb) noexcept
+{
+    for (auto& dep : dependencies)
+    {
+        if (!cb(dep)) return false;
+    }
+
+    return true;
 }
 
 auto Addon::get(const std::string& id) noexcept -> AddonOpt

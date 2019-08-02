@@ -14,8 +14,8 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
         out(Ch::Info) << "Installed addons:" << cr;
 
         Addon::forEach([](const auto& addon) {
-            out() << addon << " (" << addon->getFiles().size()
-                  << " file(s))" << cr;
+            out() << addon << " (" << addon->fileCount() << " file(s))"
+                  << cr;
         });
 
         return ExitCode::OK;
@@ -34,7 +34,7 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
         auto addon = addonOpt.value();
 
         out(Ch::Info) << Col::green << id << Col::reset << " ("
-                      << addon->getFiles().size() << ')' << cr;
+                      << addon->fileCount() << ')' << cr;
 
         addon->forEachFile(
             [](const auto& file) { out() << file->raw() << cr; });

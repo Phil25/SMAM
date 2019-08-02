@@ -84,14 +84,11 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
     }
 
     pending.insert(id);  // circumvent cyclic deps inf loop
-    auto data    = get(planOpt.value().first);
-    auto addon   = planOpt.value().second;
-    bool success = true;
+    auto data  = get(planOpt.value().first);
+    auto addon = planOpt.value().second;
 
-    // TODO: move to Addon, delete Addon::getDeps
-    for (const auto& dep : addon->getDeps())
-    {
-        if (noDeps)
+    bool success = addon->forEachDep([&](const auto& dep) {
+        if (noDeps)  // don't automatically install dependencies
         {
             if (!Addon::isInstalled(dep))
             {
@@ -103,13 +100,11 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
             auto depResult = installSingle(dep);
             report.remark(id, dep, depResult);
 
-            if (depResult == Type::Failed)
-            {
-                success = false;
-                break;
-            }
+            if (depResult == Type::Failed) return false;
         }
-    }
+
+        return true;
+    });
 
     out(Ch::Info) << Col::green << "Installing " << id << "..."
                   << Col::reset << cr;
