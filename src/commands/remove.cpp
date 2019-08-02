@@ -1,7 +1,7 @@
 #include "common.h"
 
-#include <commands/helpers/report.h>
 #include <smfs/addon.h>
+#include <utils/report.h>
 
 auto removeAddon(Addon& addon) noexcept -> Report::Type
 {

@@ -13,7 +13,6 @@ add_executable(tests
   amscrapertest.cpp
   ltscrapertest.cpp
   ghscrapertest.cpp
-  installertest.cpp
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
@@ -28,7 +27,6 @@ target_link_libraries(tests
   addon
   file
   path
-  installer
   curlmock
 
 # Commands
