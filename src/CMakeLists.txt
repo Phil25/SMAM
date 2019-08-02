@@ -15,8 +15,7 @@ endif()
 
 # Database
 add_library(database database.cpp)
-target_link_libraries(database PRIVATE download addon) # TODO: check if addon needed
-target_include_directories(database PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
+target_link_libraries(database PRIVATE download addon)
 
 # Commands
 add_subdirectory(commands)
