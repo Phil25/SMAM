@@ -151,6 +151,7 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
             if (depResult == Type::Failed) return false;
         }
 
+        out << cr;
         return true;
     });
 
@@ -161,14 +162,13 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
 
     if (!success)
     {
-        out(Ch::Error) << Col::red << "Failed to install " << addon
-                       << Col::reset << cr << cr;
+        out(Ch::Error) << Col::red << "Failed to install " << id
+                       << Col::reset << cr;
 
         addon->remove();
         return Type::Failed;
     }
 
-    out << cr;
     return Type::Installed;
 }
 

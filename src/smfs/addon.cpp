@@ -23,9 +23,9 @@ inline void removeFile(const fs::path& file) noexcept
     Path::removeEmpty(file);
 }
 
-inline bool prepare(const fs::path& path, const Addon& addon) noexcept
+bool prepare(const fs::path& path, const Addon& addon) noexcept
 {
-    if (Path::prepare(path.parent_path()))
+    if (!Path::prepare(path.parent_path()))
     {
         out(Ch::Warn) << "Ignoring " << path << cr;
         return false;
@@ -38,7 +38,7 @@ inline bool prepare(const fs::path& path, const Addon& addon) noexcept
     return true;
 }
 
-inline bool fetch(const File::Ptr& file, Addon& addon) noexcept
+bool fetch(const File::Ptr& file, Addon& addon) noexcept
 {
     auto path = fs::path{*file};
     auto url  = file->getUrl();
@@ -105,7 +105,7 @@ bool Addon::install(const Scraper::Data& data) noexcept
     }
 
     addToInstalled();
-    return false;
+    return true;
 }
 
 void Addon::addToInstalled() noexcept
