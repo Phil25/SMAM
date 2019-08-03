@@ -11,18 +11,18 @@ addons:
         sources:
             - ubuntu-toolchain-r-test
         packages:
-            - gcc-8
-            - g++-8
+            - gcc-9
+            - g++-9
         update: true
 
 install:
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
     - pip install conan
     - conan user
 
 script:
-    - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
-    - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
+    - sudo ln -s /usr/bin/gcc-9 /usr/local/bin/gcc
+    - sudo ln -s /usr/bin/g++-9 /usr/local/bin/g++
     - gcc -v && g++ -v
     - mkdir build && cd build && conan install .. --build missing -s build_type=Debug && conan build ..
     - ./bin/tests
