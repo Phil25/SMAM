@@ -52,8 +52,8 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
 
         for (const auto& j : root)
         {
-            auto addon         = j.get<std::shared_ptr<Addon>>();
-            cached[j.at("id")] = {j.at("url"), addon};
+            auto addon = j.get<std::shared_ptr<Addon>>();
+            cached.emplace(j.at("id"), Plan{j.at("url"), addon});
         }
     }
     catch (const json::exception& e)
@@ -67,12 +67,10 @@ void Database::precache(const std::vector<std::string>& ids) noexcept
  */
 auto Database::get(const std::string& id) const noexcept -> PlanOpt
 {
-    if (auto it = cached.find(id); it == cached.end())
-    {
-        return std::nullopt;
-    }
-    else
+    if (auto it = cached.find(id); it != cached.end())
     {
         return it->second;
     }
+
+    return std::nullopt;
 }

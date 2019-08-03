@@ -10,15 +10,11 @@
 
 class Database final
 {
-public:
     using Plan    = std::pair<std::string, std::shared_ptr<Addon>>;
     using PlanOpt = std::optional<Plan>;
-    using PlanMap = std::map<std::string, Plan>;
 
-private:
-    const std::string dbUrl;
-
-    PlanMap cached;
+    const std::string           dbUrl;
+    std::map<std::string, Plan> cached;
 
 public:
     Database(const std::string& dbUrl) noexcept;

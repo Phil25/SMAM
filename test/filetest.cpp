@@ -168,6 +168,34 @@ TEST(FileTest, EvaluateRegexComplex)
 
 TEST(FileTest, EvaluateFallbackGeneral)
 {
+    auto bin = get("plugins;bin.smx");
+    auto tr  = get("translations;tr.txt");
+
+    ASSERT_EQ("plugins", bin->getPath());
+    ASSERT_EQ("bin.smx", bin->getName());
+    ASSERT_EQ("", bin->getUrl());
+
+    ASSERT_EQ("translations", tr->getPath());
+    ASSERT_EQ("tr.txt", tr->getName());
+    ASSERT_EQ("", tr->getUrl());
+
+    auto data = Scraper::Data{};
+    data.url  = "https://down.com/files";
+
+    ASSERT_TRUE(bin->evaluate(data));
+    ASSERT_TRUE(tr->evaluate(data));
+
+    EXPECT_EQ("plugins", bin->getPath());
+    EXPECT_EQ("bin.smx", bin->getName());
+    EXPECT_EQ("https://down.com/files/bin.smx", bin->getUrl());
+
+    EXPECT_EQ("translations", tr->getPath());
+    EXPECT_EQ("tr.txt", tr->getName());
+    EXPECT_EQ("https://down.com/files/tr.txt", tr->getUrl());
+}
+
+TEST(FileTest, EvaluateFallbackAllLinks)
+{
     auto bin = get("p/;http://d.com/plugins/bin.smx");
     auto tr  = get("t/;http://d.com/translations/tr.txt");
 

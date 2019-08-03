@@ -112,10 +112,13 @@ bool File::evaluate(const Scraper::Data& data) noexcept
 
     if (data.website == Scraper::Data::Website::AlliedModders)
     {
-        return false;
+        return false;  // no fallback method when scraping forums
     }
 
-    url += name;
+    auto sep = std::string();
+    if (data.url[data.url.size() - 1] != '/') sep = "/";
+
+    url = data.url + sep + name;
     return true;
 }
 
