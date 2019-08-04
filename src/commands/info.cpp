@@ -36,8 +36,10 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
         out(Ch::Info) << Col::green << id << Col::reset << " ("
                       << addon->fileCount() << ')' << cr;
 
-        addon->forEachFile(
-            [](const auto& file) { out() << file->raw() << cr; });
+        addon->forEachFile([](const auto& file) {
+            out() << file->raw() << cr;
+            return true;
+        });
     }
 
     return ExitCode::OK;

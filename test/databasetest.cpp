@@ -11,8 +11,10 @@ inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
 {
     auto files = std::vector<File::Ptr>();
 
-    addon->forEachFile(
-        [&files](const auto& file) { files.push_back(file); });
+    addon->forEachFile([&files](const auto& file) {
+        files.push_back(file);
+        return true;
+    });
 
     return files;
 }

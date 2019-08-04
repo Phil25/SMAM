@@ -18,7 +18,7 @@ class Addon final : public std::enable_shared_from_this<Addon>
     using FileTuple = std::pair<File::Ptr, std::string>;
 
     using EachAddon = std::function<void(Ptr)>;
-    using EachFile  = std::function<void(const File::Ptr&)>;
+    using EachFile  = std::function<bool(const File::Ptr&)>;
     using EachDep   = std::function<bool(const std::string&)>;
 
     using EachFileRemove =
@@ -64,7 +64,8 @@ public:
     void remove(const EachFileRemove&) noexcept;
     void detach(const File::Ptr&) noexcept;
 
-    void forEachFile(const EachFile&) noexcept;
+    void appendFiles(const std::vector<File::Ptr>&) noexcept;
+    bool forEachFile(const EachFile&) noexcept;
     bool forEachDep(const EachDep&) noexcept;
 
     static auto get(const std::string& id) noexcept -> AddonOpt;

@@ -9,4 +9,6 @@ auto page(const std::string& url, const std::string& from = "",
 
 auto file(const std::string& url, const std::string& dest) noexcept
     -> std::string;
+
+void placeFiles() noexcept;
 };  // namespace Download

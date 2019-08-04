@@ -38,12 +38,16 @@ bool prepare(const fs::path& path, const Addon& addon) noexcept
     return true;
 }
 
-bool fetch(const File::Ptr& file, Addon& addon) noexcept
+bool fetch(const File::Ptr& file, const Addon& addon) noexcept
 {
     auto path = fs::path{*file};
     auto url  = file->getUrl();
 
-    if (!prepare(path, addon)) return false;
+    if (!prepare(path, addon))
+    {
+        out(Ch::Error) << "Invalid file format: " << path << cr;
+        return false;
+    }
 
     if (auto error = Download::file(url, path); !error.empty())
     {
@@ -51,23 +55,39 @@ bool fetch(const File::Ptr& file, Addon& addon) noexcept
         return false;
     }
 
-    if (Archive::valid(path))
-    {
+    return true;
+}
+
+bool extractArchives(Addon& addon) noexcept
+{
+    auto extracted = std::vector<File::Ptr>();
+
+    bool success = addon.forEachFile([&](const auto& file) {
+        auto path = fs::path{*file};
+        if (!Archive::valid(path)) return true;
+
         out(Ch::Info) << "Extracting " << path.filename() << "..."
                       << cr;
 
-        bool result =
-            Archive::extract(path, [&addon](const auto& extractedFile) {
-                return prepare(extractedFile, addon);
+        bool res =
+            Archive::extract(path, [&](const auto& extractedFile) {
+                if (!prepare(extractedFile, addon)) return false;
+
+                extracted.push_back(
+                    std::make_shared<File>(extractedFile));
+
+                return true;
             });
 
         removeFile(path);
         addon.detach(file);
 
-        return result;
-    }
+        return res;
+    });
 
-    return true;
+    addon.appendFiles(extracted);
+
+    return success;
 }
 }  // namespace
 
@@ -104,6 +124,10 @@ bool Addon::install(const Scraper::Data& data) noexcept
         if (!file->evaluate(data) || !fetch(file, *this)) return false;
     }
 
+    Download::placeFiles();
+
+    if (!extractArchives(*this)) return false;
+
     addToInstalled();
     return true;
 }
@@ -127,14 +151,16 @@ void Addon::remove(const EachFileRemove& cb) noexcept
 
         switch (addons.size())  // how many addons own this file
         {
-            case 0: cb(file, "nonexistent"); return;
+            case 0: cb(file, "nonexistent"); return true;
             case 1: break;  // only this one
-            default: cb(file, "shared"); return;
+            default: cb(file, "shared"); return true;
         }
 
         cb(file, "");
         removeFile(*file);
         // no need to detach as whole addon gets purged
+
+        return true;
     });
 
     installed.erase(id);
@@ -152,9 +178,19 @@ void Addon::detach(const File::Ptr& file) noexcept
     }
 }
 
-void Addon::forEachFile(const EachFile& cb) noexcept
+void Addon::appendFiles(const std::vector<File::Ptr>& vec) noexcept
 {
-    for (auto& file : files) cb(file);
+    files.insert(files.end(), vec.begin(), vec.end());
+}
+
+bool Addon::forEachFile(const EachFile& cb) noexcept
+{
+    for (auto& file : files)
+    {
+        if (!cb(file)) return false;
+    }
+
+    return true;
 }
 
 bool Addon::forEachDep(const EachDep& cb) noexcept
@@ -187,7 +223,7 @@ auto Addon::findByFile(const File::Ptr& file) noexcept -> AddonSet
 {
     AddonSet set;
 
-    forEach([&set, &file](auto addon) {
+    forEach([&set, &file](const auto& addon) {
         const auto& files = addon->files;
 
         if (std::find(files.begin(), files.end(), file) != files.end())

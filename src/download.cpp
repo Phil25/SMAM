@@ -1,7 +1,10 @@
 #include "download.h"
 
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #ifdef NDEBUG
 #include <curl/curl.h>
@@ -14,6 +17,19 @@
 
 namespace
 {
+std::vector<std::pair<std::string, std::string>> downloadedFiles;
+constexpr auto opts = std::filesystem::copy_options::overwrite_existing;
+
+inline auto tempDir() noexcept
+{
+    namespace fs     = std::filesystem;
+    static auto temp = fs::temp_directory_path() / "smam";
+
+    if (!fs::exists(temp)) fs::create_directories(temp);
+
+    return temp;
+}
+
 /*
  * Write downloaded data into an ostream
  */
@@ -92,11 +108,35 @@ auto Download::file(const std::string& url,
         return curl_easy_strerror(res);
     }
 
-    std::ofstream ofs(dest);
+    auto name = dest;
+    std::replace(name.begin(), name.end(), '/', '-');
+    std::replace(name.begin(), name.end(), '.', 'a');
+
+    std::ofstream ofs(tempDir() / name);
     ofs << oss.str();
+
+    downloadedFiles.emplace_back(name, dest);
 
     ofs.close();
     curl_easy_cleanup(curl);
 
     return {};
+}
+
+void Download::placeFiles() noexcept
+{
+    namespace fs = std::filesystem;
+    auto temp    = tempDir();
+
+    for (const auto& [file, dest] : downloadedFiles)
+    {
+        auto path = temp / file;
+        if (fs::exists(path))
+        {
+            fs::copy_file(path, dest, opts);
+        }
+    }
+
+    fs::remove_all(temp);
+    downloadedFiles.clear();
 }
