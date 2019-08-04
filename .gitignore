@@ -1,11 +1,10 @@
-# ignore build
+# ignore build directories
 build*/
 release*/
 debug*/
 
-# ignore everything in thirdparty
-thirdparty/*
-!thirparty/CMakeLists.txt
-
 # ignore CMake-generated version.hpp
 src/version.hpp
+
+# pytest stuff
+__pycache__
