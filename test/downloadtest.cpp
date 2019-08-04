@@ -6,21 +6,12 @@
 
 #define NDELAY  // disable callback delay for curlmock
 
+#include <filesystem>
 #include <fstream>
+
 #include "../src/download.h"
 
-int getFileSize(const char* path) noexcept
-{
-    std::ifstream ifs(path, std::ios::ate);
-    int           size = ifs.tellg();
-    ifs.close();
-    return size;
-}
-
-bool fileExists(const char* path) noexcept
-{
-    return std::ifstream(path).good();
-}
+namespace fs = std::filesystem;
 
 TEST(DownloadTest, TF2Items)
 {
@@ -71,8 +62,16 @@ TEST(DownloadTest, TF2ItemsFiles)
                                "tf2items-1.6.4-hg279-linux.zip",
                                "tf2items-1.6.4-hg279-linux.zip")
                     .empty());
-    ASSERT_TRUE(fileExists("tf2items-1.6.4-hg279-linux.zip"));
-    EXPECT_EQ(77707, getFileSize("tf2items-1.6.4-hg279-linux.zip"));
+
+    ASSERT_TRUE(fs::exists("/tmp/smam/tf2items-1a6a4-hg279-linuxazip"));
+    EXPECT_EQ(77707, fs::file_size(
+                         "/tmp/smam/tf2items-1a6a4-hg279-linuxazip"));
+
+    Download::placeFiles();
+    EXPECT_FALSE(fs::exists("/tmp/smam/"));
+
+    ASSERT_TRUE(fs::exists("tf2items-1.6.4-hg279-linux.zip"));
+    EXPECT_EQ(77707, fs::file_size("tf2items-1.6.4-hg279-linux.zip"));
 }
 
 TEST(DownloadTest, ThrillerFiles)
@@ -81,8 +80,9 @@ TEST(DownloadTest, ThrillerFiles)
                                "vbcompiler.php?file_id=128466",
                                "thriller.smx")
                     .empty());
-    ASSERT_TRUE(fileExists("thriller.smx"));
-    EXPECT_EQ(3691, getFileSize("thriller.smx"));
+
+    ASSERT_TRUE(fs::exists("/tmp/smam/thrillerasmx"));
+    EXPECT_EQ(3691, fs::file_size("/tmp/smam/thrillerasmx"));
 
     ASSERT_TRUE(Download::file(
                     "https://forums.alliedmods.net/"
@@ -90,8 +90,18 @@ TEST(DownloadTest, ThrillerFiles)
                     "attachmentid=133555&d=1400274898",
                     "thriller.plugin.txt")
                     .empty());
-    ASSERT_TRUE(fileExists("thriller.plugin.txt"));
-    EXPECT_EQ(656, getFileSize("thriller.plugin.txt"));
+
+    ASSERT_TRUE(fs::exists("/tmp/smam/thrillerapluginatxt"));
+    EXPECT_EQ(656, fs::file_size("/tmp/smam/thrillerapluginatxt"));
+
+    Download::placeFiles();
+    EXPECT_FALSE(fs::exists("/tmp/smam/"));
+
+    ASSERT_TRUE(fs::exists("thriller.smx"));
+    EXPECT_EQ(3691, fs::file_size("thriller.smx"));
+
+    ASSERT_TRUE(fs::exists("thriller.plugin.txt"));
+    EXPECT_EQ(656, fs::file_size("thriller.plugin.txt"));
 }
 
 TEST(DownloadTest, TF2AttributesFiles)
@@ -101,21 +111,32 @@ TEST(DownloadTest, TF2AttributesFiles)
                        "releases/download/v1.2.1/tf2attributes.smx",
                        "tf2attributes.smx")
             .empty());
-    ASSERT_TRUE(fileExists("tf2attributes.smx"));
-    EXPECT_EQ(12701, getFileSize("tf2attributes.smx"));
+
+    ASSERT_TRUE(fs::exists("/tmp/smam/tf2attributesasmx"));
+    EXPECT_EQ(12701, fs::file_size("/tmp/smam/tf2attributesasmx"));
 
     ASSERT_TRUE(
         Download::file("https://raw.githubusercontent.com/FlaminSarge/"
                        "tf2attributes/master/tf2.attributes.txt",
                        "tf2.attributes.txt")
             .empty());
-    ASSERT_TRUE(fileExists("tf2.attributes.txt"));
-    EXPECT_EQ(3287, getFileSize("tf2.attributes.txt"));
+
+    ASSERT_TRUE(fs::exists("/tmp/smam/tf2aattributesatxt"));
+    EXPECT_EQ(3287, fs::file_size("/tmp/smam/tf2aattributesatxt"));
+
+    Download::placeFiles();
+    EXPECT_FALSE(fs::exists("/tmp/smam/"));
+
+    ASSERT_TRUE(fs::exists("tf2attributes.smx"));
+    EXPECT_EQ(12701, fs::file_size("tf2attributes.smx"));
+
+    ASSERT_TRUE(fs::exists("tf2.attributes.txt"));
+    EXPECT_EQ(3287, fs::file_size("tf2.attributes.txt"));
 }
 
 TEST(DownloadTest, InvalidLink)
 {
     ASSERT_FALSE(
         Download::file("invalid link", "somefile.bin").empty());
-    EXPECT_FALSE(fileExists("somefile.bin"));
+    EXPECT_FALSE(fs::exists("somefile.bin"));
 }
