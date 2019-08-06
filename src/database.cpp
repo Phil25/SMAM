@@ -40,37 +40,48 @@ Database::Database(const std::string& dbUrl) noexcept : dbUrl(dbUrl) {}
  * anticipate and it's better to fetch them in one larger call than
  * multiple small ones.
  */
-void Database::precache(const std::vector<std::string>& ids) noexcept
+bool Database::precache(const std::vector<std::string>& ids) noexcept
 {
-    if (ids.empty()) return;
+    if (ids.empty()) return true;  // do nothing
 
     auto url = makeUrl(dbUrl, ids);
 
-    try
-    {
-        json root = json::parse(Download::page(url));
+    auto root = json::parse(Download::page(url), nullptr, false);
+    if (root.is_discarded()) return false;
 
-        for (const auto& j : root)
+    for (const auto& j : root)
+    {
+        auto id = j.value("id", "");
+        if (id.empty()) continue;
+
+        try
         {
             auto addon = j.get<std::shared_ptr<Addon>>();
-            cached.emplace(j.at("id"), Plan{j.at("url"), addon});
+            cached.emplace(id, Plan{j.at("url"), addon});
+        }
+        catch (const json::exception& e)
+        {
+            cached.emplace(id, e.what());
+        }
+        catch (const std::invalid_argument& e)
+        {
+            cached.emplace(id, e.what());
         }
     }
-    catch (const json::exception& e)
-    {
-    }
+
+    return true;
 }
 
 /*
  * Return std::optional<PlanRef> of a particiular addon ID. Assuming
  * it's cached. Otherwise, a nullopt is returned.
  */
-auto Database::get(const std::string& id) const noexcept -> PlanOpt
+auto Database::get(const std::string& id) const noexcept -> PlanVar
 {
     if (auto it = cached.find(id); it != cached.end())
     {
         return it->second;
     }
 
-    return std::nullopt;
+    return "not found";
 }

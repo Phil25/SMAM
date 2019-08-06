@@ -84,7 +84,10 @@ Installer::Installer(const std::string&  databaseUrl,
     Scraper::make(1, std::make_shared<LTScraper>());
     Scraper::make(2, std::make_shared<GHScraper>());
 
-    database.precache(ids);
+    if (!database.precache(ids))
+    {
+        out(Ch::Error) << "Parsing remote failed." << cr;
+    }
 }
 
 auto Installer::installAll() noexcept -> const Report&
@@ -122,18 +125,21 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
         return Type::Skipped;
     }
 
-    auto planOpt = database.get(id);
+    auto planVar = database.get(id);
 
-    if (!planOpt.has_value())
+    if (std::holds_alternative<std::string>(planVar))  // holds error
     {
-        out(Ch::Error) << Col::red << "Not found: " << id << Col::reset
+        out(Ch::Error) << Col::red << '(' << id << ") "
+                       << std::get<std::string>(planVar) << Col::reset
                        << cr;
         return Type::Failed;
     }
 
     pending.insert(id);  // circumvent cyclic deps inf loop
-    auto data  = get(planOpt.value().first);
-    auto addon = planOpt.value().second;
+
+    auto plan  = std::get<Database::Plan>(planVar);
+    auto data  = get(plan.first);
+    auto addon = plan.second;
 
     bool success = addon->forEachDep([&](const auto& dep) {
         if (noDeps)  // don't automatically install dependencies

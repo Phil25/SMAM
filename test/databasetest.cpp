@@ -32,9 +32,9 @@ TEST_F(DatabaseTest, PositiveSingle)
     db.precache({"accelerator"});
 
     auto plan = db.get("accelerator");
-    ASSERT_TRUE(plan.has_value());
+    ASSERT_TRUE(std::holds_alternative<Database::Plan>(plan));
 
-    const auto& [url, addon] = plan.value();
+    const auto& [url, addon] = std::get<Database::Plan>(plan);
 
     ASSERT_FALSE(url.empty());
     EXPECT_EQ("https://builds.limetech.io/?p=accelerator", url);
@@ -52,11 +52,11 @@ TEST_F(DatabaseTest, PositiveMultiple)
     auto plan1 = db.get("accelerator");
     auto plan2 = db.get("thriller");
 
-    ASSERT_TRUE(plan1.has_value());
-    ASSERT_TRUE(plan2.has_value());
+    ASSERT_TRUE(std::holds_alternative<Database::Plan>(plan1));
+    ASSERT_TRUE(std::holds_alternative<Database::Plan>(plan2));
 
-    const auto& [url1, addon1] = plan1.value();
-    const auto& [url2, addon2] = plan2.value();
+    const auto& [url1, addon1] = std::get<Database::Plan>(plan1);
+    const auto& [url2, addon2] = std::get<Database::Plan>(plan2);
 
     EXPECT_FALSE(url1.empty());
     EXPECT_FALSE(getFiles(addon1).empty());
@@ -68,27 +68,43 @@ TEST_F(DatabaseTest, PositiveMultiple)
 TEST_F(DatabaseTest, NegativeSingle)
 {
     db.precache({"invalid"});
-    EXPECT_FALSE(db.get("invalid").has_value());
+    auto plan = db.get("invalid");
+
+    EXPECT_FALSE(std::holds_alternative<Database::Plan>(plan));
+    ASSERT_TRUE(std::holds_alternative<std::string>(plan));
+
+    EXPECT_EQ("not found", std::get<std::string>(plan));
 }
 
 TEST_F(DatabaseTest, NegativeMultiple)
 {
     db.precache({"invalid", "alsoinvalid"});
-    EXPECT_FALSE(db.get("invalid").has_value());
-    EXPECT_FALSE(db.get("alsoinvalid").has_value());
+
+    auto plan1 = db.get("invalid");
+    auto plan2 = db.get("alsoinvalid");
+
+    EXPECT_FALSE(std::holds_alternative<Database::Plan>(plan1));
+    EXPECT_FALSE(std::holds_alternative<Database::Plan>(plan2));
+
+    ASSERT_TRUE(std::holds_alternative<std::string>(plan1));
+    ASSERT_TRUE(std::holds_alternative<std::string>(plan2));
+
+    EXPECT_EQ("not found", std::get<std::string>(plan1));
+    EXPECT_EQ("not found", std::get<std::string>(plan2));
 }
 
 TEST_F(DatabaseTest, PositiveNegativeMix)
 {
-    db.precache({"invalid", "accelerator", "alsoinvalid"});
+    db.precache({"invalid", "accelerator", "badadd"});
 
-    EXPECT_FALSE(db.get("invalid").has_value());
-    EXPECT_FALSE(db.get("alsoinvalid").has_value());
+    EXPECT_TRUE(std::holds_alternative<std::string>(db.get("invalid")));
+    EXPECT_TRUE(std::holds_alternative<std::string>(db.get("badadd")));
 
     const auto& plan = db.get("accelerator");
-    ASSERT_TRUE(plan.has_value());
 
-    const auto& [url, addon] = plan.value();
+    ASSERT_TRUE(std::holds_alternative<Database::Plan>(plan));
+
+    const auto& [url, addon] = std::get<Database::Plan>(plan);
     EXPECT_FALSE(url.empty());
     EXPECT_FALSE(getFiles(addon).empty());
 }
@@ -96,6 +112,26 @@ TEST_F(DatabaseTest, PositiveNegativeMix)
 TEST_F(DatabaseTest, NotPrecached)
 {
     db.precache({"accelerator"});
-    EXPECT_TRUE(db.get("accelerator").has_value());
-    EXPECT_FALSE(db.get("thriller").has_value());
+
+    auto plan1 = db.get("accelerator");
+    auto plan2 = db.get("thriller");
+
+    EXPECT_TRUE(std::holds_alternative<Database::Plan>(plan1));
+    EXPECT_FALSE(std::holds_alternative<std::string>(plan1));
+
+    EXPECT_FALSE(std::holds_alternative<Database::Plan>(plan2));
+    EXPECT_TRUE(std::holds_alternative<std::string>(plan2));
+}
+
+TEST_F(DatabaseTest, BadFileAddon)
+{
+    db.precache({"badfileaddon"});
+
+    auto plan = db.get("badfileaddon");
+
+    EXPECT_FALSE(std::holds_alternative<Database::Plan>(plan));
+    ASSERT_TRUE(std::holds_alternative<std::string>(plan));
+
+    EXPECT_EQ("Invalid file: plugins.thriller.smx",
+              std::get<std::string>(plan));
 }

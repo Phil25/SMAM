@@ -27,7 +27,7 @@ bool prepare(const fs::path& path, const Addon& addon) noexcept
 {
     if (!Path::prepare(path.parent_path()))
     {
-        out(Ch::Warn) << "Ignoring " << path << cr;
+        out(Ch::Error) << "Dangerous file: " << path << cr;
         return false;
     }
 
@@ -43,11 +43,7 @@ bool fetch(const File::Ptr& file, const Addon& addon) noexcept
     auto path = fs::path{*file};
     auto url  = file->getUrl();
 
-    if (!prepare(path, addon))
-    {
-        out(Ch::Error) << "Invalid file format: " << path << cr;
-        return false;
-    }
+    if (!prepare(path, addon)) return false;
 
     if (auto error = Download::file(url, path); !error.empty())
     {

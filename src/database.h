@@ -1,25 +1,25 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
+#include <variant>
 
 #include <smfs/addon.h>
 
 class Database final
 {
-    using Plan    = std::pair<std::string, std::shared_ptr<Addon>>;
-    using PlanOpt = std::optional<Plan>;
+public:
+    using Plan = std::pair<std::string, std::shared_ptr<Addon>>;
 
-    const std::string           dbUrl;
-    std::map<std::string, Plan> cached;
+private:
+    using PlanVar = std::variant<Plan, std::string>;  // potential error
+
+    const std::string dbUrl;
+
+    std::map<std::string, PlanVar> cached;
 
 public:
     Database(const std::string& dbUrl) noexcept;
 
-    void precache(const std::vector<std::string>& ids) noexcept;
+    bool precache(const std::vector<std::string>& ids) noexcept;
 
-    auto get(const std::string& id) const noexcept -> PlanOpt;
+    auto get(const std::string& id) const noexcept -> PlanVar;
 };
