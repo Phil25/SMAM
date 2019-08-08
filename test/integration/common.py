@@ -50,3 +50,7 @@ class SMAM:
             assert self.exists(filename)
             assert self.isfile(filename)
             assert size == self.getsize(filename)
+
+    def check_not_installed(self, addon, files):
+        for filename in files:
+            assert not self.exists(filename)

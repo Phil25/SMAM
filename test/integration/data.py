@@ -59,6 +59,29 @@ INSTALL_DATA = {
     ]
 }
 
+BAD_INSTALL_DATA = {
+    'badaddon': [
+        '../../../baddir/thriller.smx',
+        '../../../mod2/addons/sourcemod/data/thriller.plugin.txt'
+    ],
+    'badthriller': [
+        'plugins/thriller.smx',
+        'gamedata/invalid.plugin.txt'
+    ],
+    'badaddon_no_id': [
+        'plugins/thriller.smx',
+        'gamedata/thriller.plugin.txt'
+    ],
+    'badaddon_no_author': [
+        'plugins/thriller.smx',
+        'gamedata/thriller.plugin.txt'
+    ],
+    'badaddon_no_description': [
+        'plugins/thriller.smx',
+        'gamedata/thriller.plugin.txt'
+    ],
+}
+
 DEPENDENCY_DATA = {
     'wants_rtd': ['rtd', 'tf2attributes'],
     'rtd': ['tf2attributes'],

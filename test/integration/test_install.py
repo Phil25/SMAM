@@ -1,5 +1,5 @@
 import pytest
-from data import INSTALL_DATA
+from data import INSTALL_DATA, BAD_INSTALL_DATA
 
 pytest.register_assert_rewrite('common')
 from common import SMAM
@@ -10,14 +10,8 @@ def test_install(addon):
         smam.exec('install ' + addon)
         smam.check_installed(addon, INSTALL_DATA[addon])
 
-def test_badaddon():
+@pytest.mark.parametrize('addon', BAD_INSTALL_DATA)
+def test_install_fail(addon):
     with SMAM() as smam:
-        smam.exec('install badaddon')
-        assert not smam.isfile('../../../baddir/thriller.smx')
-        assert not smam.isfile('../../../mod2/addons/sourcemod/data/thriller.plugin.txt')
-
-def test_badthriller():
-    with SMAM() as smam:
-        smam.exec('install badthriller')
-        assert not smam.isfile('plugins/thriller.smx')
-        assert not smam.isfile('gamedata/invalid.plugin.txt')
+        smam.exec('install ' + addon)
+        smam.check_not_installed(addon, BAD_INSTALL_DATA[addon])
