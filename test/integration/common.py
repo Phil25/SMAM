@@ -1,8 +1,9 @@
-import subprocess
+from subprocess import Popen, PIPE
 import os
 import shutil
 
 BINARY = './bin/smam'
+
 
 class SMAM:
 
@@ -31,7 +32,9 @@ class SMAM:
         cmds = [self.binary] + cmd.split() + ['-d', self.destination]
         columns = shutil.get_terminal_size().columns
         print('\n\033[95m\033[1m' + ' '.join(cmds).center(columns, '-') + '\033[0m')
-        return subprocess.run(cmds)
+        process = Popen(cmds)
+        process.communicate() # wait for finish
+        return process.returncode
 
     def exists(self, f):
         return os.path.exists(self.smroot + f)
