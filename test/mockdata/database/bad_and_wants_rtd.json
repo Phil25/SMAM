@@ -1,0 +1,13 @@
+{
+	"id": "bad_and_wants_rtd",
+	"author": "Baddev",
+	"description": "I want a good plugin but am bad",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1590169",
+	"files": [
+		"../../../baddir/;thriller.smx",
+		".././.././../mod2/addons/sourcemod/data/;thriller.plugin.txt"
+	],
+	"deps": [
+		"rtd"
+	]
+}

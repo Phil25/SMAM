@@ -44,3 +44,9 @@ class SMAM:
 
     def getsize(self, f):
         return os.path.getsize(self.smroot + f)
+
+    def check_installed(self, addon, files):
+        for (filename, size) in files:
+            assert self.exists(filename)
+            assert self.isfile(filename)
+            assert size == self.getsize(filename)

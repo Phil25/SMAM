@@ -1,0 +1,13 @@
+{
+	"id": "wants_multiple",
+	"author": "SomeDev",
+	"description": "I want afk_manager and tf2items",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1387386",
+	"files": [
+		"plugins/;dynamic_motd.smx"
+	],
+	"deps": [
+		"afk_manager",
+		"tf2items"
+	]
+}
