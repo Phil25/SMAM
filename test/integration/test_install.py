@@ -8,10 +8,10 @@ from common import SMAM
 def test_install(addon):
     with SMAM() as smam:
         smam.exec('install ' + addon)
-        smam.check_installed(addon, INSTALL_DATA[addon])
+        smam.check_installed(INSTALL_DATA[addon])
 
 @pytest.mark.parametrize('addon', BAD_INSTALL_DATA)
 def test_install_fail(addon):
     with SMAM() as smam:
         smam.exec('install ' + addon)
-        smam.check_not_installed(addon, BAD_INSTALL_DATA[addon])
+        smam.check_not_installed(BAD_INSTALL_DATA[addon])

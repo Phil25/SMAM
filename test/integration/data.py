@@ -29,6 +29,9 @@ INSTALL_DATA = {
         ['plugins/thriller.smx', 3691],
         ['gamedata/thriller.plugin.txt', 656]
     ],
+    'sharedthriller': [
+        ['gamedata/thriller.plugin.txt', 656]
+    ],
     'rtd': [
         ['configs/rtd2_perks.default.cfg', 30829],
         ['plugins/rtd.smx', 124057],

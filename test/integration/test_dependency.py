@@ -8,10 +8,10 @@ from common import SMAM
 def test_dependency(addon):
     with SMAM() as smam:
         smam.exec('install ' + addon)
-        smam.check_installed(addon, INSTALL_DATA[addon])
+        smam.check_installed(INSTALL_DATA[addon])
 
         for dep in DEPENDENCY_DATA[addon]:
-            smam.check_installed(dep, INSTALL_DATA[dep])
+            smam.check_installed(INSTALL_DATA[dep])
 
 @pytest.mark.parametrize('addon', DEPENDENCY_DATA)
 def test_dependency_no_deps(addon):
@@ -20,11 +20,10 @@ def test_dependency_no_deps(addon):
 
     with SMAM() as smam:
         smam.exec('install ' + addon + ' --no-deps')
-        smam.check_installed(addon, INSTALL_DATA[addon])
+        smam.check_installed(INSTALL_DATA[addon])
 
         for dep in DEPENDENCY_DATA[addon]:
-            for (filename, size) in INSTALL_DATA[dep]:
-                assert not smam.isfile(filename)
+            smam.check_not_installed(INSTALL_DATA[dep])
 
 def test_dependency_bad_addon():
     with SMAM() as smam:
