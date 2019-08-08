@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../src/utils/misc.h"
-#include "../src/utils/version.h"
+#include "../../src/utils/misc.h"
+#include "../../src/utils/version.h"
 
 using namespace testing;
 

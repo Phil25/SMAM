@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/opts.h"
+#include "../../src/opts.h"
 
 /*
  * Convert string into command line options and return Opts object,

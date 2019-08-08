@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/scrapers/scraper.h"
+#include "../../src/scrapers/scraper.h"
 
 inline void compare(const Scraper::Data& expected,
                     const Scraper::Data& actual) noexcept

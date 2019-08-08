@@ -9,7 +9,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "../src/download.h"
+#include "../../src/download.h"
 
 namespace fs = std::filesystem;
 

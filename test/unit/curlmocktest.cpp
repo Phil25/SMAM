@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "curlmock.h"
+#include "../curlmock.h"
 
 #include <fstream>
 

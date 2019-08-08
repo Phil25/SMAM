@@ -4,7 +4,7 @@
 #undef NDEBUG  // make downloader use curlmock
 #endif
 
-#include "../src/scrapers/ghscraper.h"
+#include "../../src/scrapers/ghscraper.h"
 
 static GHScraper scraper;
 using Data = Scraper::Data;

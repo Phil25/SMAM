@@ -1,4 +1,4 @@
-#include "../src/smfs/addon.h"
+#include "../../src/smfs/addon.h"
 
 #include <fstream>
 #include <functional>

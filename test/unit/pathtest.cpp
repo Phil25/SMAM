@@ -1,4 +1,4 @@
-#include "../src/smfs/path.h"
+#include "../../src/smfs/path.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

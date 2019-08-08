@@ -4,8 +4,8 @@
 #undef NDEBUG  // make downloader use curlmock
 #endif
 
-#include "../src/database.h"
-#include "../src/download.h"
+#include "../../src/database.h"
+#include "../../src/download.h"
 
 inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
 {

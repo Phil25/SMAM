@@ -2,17 +2,17 @@ add_library(curlmock curlmock.cpp)
 target_include_directories(curlmock PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 add_executable(tests
-  curlmocktest.cpp
-  optstest.cpp
-  filetest.cpp
-  pathtest.cpp
-  addontest.cpp
-  utilstest.cpp
-  downloadtest.cpp
-  databasetest.cpp
-  amscrapertest.cpp
-  ltscrapertest.cpp
-  ghscrapertest.cpp
+  unit/curlmocktest.cpp
+  unit/optstest.cpp
+  unit/filetest.cpp
+  unit/pathtest.cpp
+  unit/addontest.cpp
+  unit/utilstest.cpp
+  unit/downloadtest.cpp
+  unit/databasetest.cpp
+  unit/amscrapertest.cpp
+  unit/ltscrapertest.cpp
+  unit/ghscrapertest.cpp
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
