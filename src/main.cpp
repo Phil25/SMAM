@@ -1,12 +1,9 @@
 #include "version.hpp"
 
 #include <unistd.h>  // getuid
-#include <filesystem>
 
 #include <commands/common.h>  // ExitCode
 #include <utils/printer.h>
-
-namespace fs = std::filesystem;
 
 int main(int argc, const char* argv[])
 {
@@ -20,7 +17,6 @@ int main(int argc, const char* argv[])
 
     if (opts.version())
     {
-        out.setPrefix(false);
         out << Version::full() << cr;
         return ExitCode::OK;
     }
