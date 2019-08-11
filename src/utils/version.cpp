@@ -1,6 +1,5 @@
 #include "version.h"
 
-#include <algorithm>
 #include <sstream>
 
 Utils::Version::Version(std::string version) noexcept

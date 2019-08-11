@@ -5,10 +5,8 @@
 
 namespace Utils
 {
-using StringVector = std::vector<std::string>;
-
 // split string to vector by newlines
-auto toLines(const std::string&) noexcept -> StringVector;
+auto toLines(const std::string&) noexcept -> std::vector<std::string>;
 
 // returns whether given string is a link
 bool isLink(const std::string&) noexcept;

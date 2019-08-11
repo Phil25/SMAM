@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
-#include <sstream>
-#include <vector>
 
 #ifdef NDEBUG
 #include <curl/curl.h>

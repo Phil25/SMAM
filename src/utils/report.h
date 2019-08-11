@@ -27,11 +27,11 @@ private:
     std::vector<std::string>                 remarks;
 
 public:
-    void insert(Type type, const std::string& addon) noexcept;
+    void insert(Type, const std::string& addon) noexcept;
 
     void remark(const std::string& id, const std::string& dependency,
-                Type type) noexcept;
+                Type) noexcept;
 
-    void print(Type type) const noexcept;
+    void print(Type) const noexcept;
     void print() const noexcept;
 };

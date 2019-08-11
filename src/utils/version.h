@@ -7,7 +7,7 @@ namespace Utils
 {
 class Version final
 {
-    std::vector<int> nums = {};
+    std::vector<int> nums;
 
 public:
     Version(std::string version) noexcept;

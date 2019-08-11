@@ -2,8 +2,6 @@
 
 #include <utils/printer.h>
 
-using StringVector = std::vector<std::string>;
-
 namespace
 {
 using Type = Report::Type;

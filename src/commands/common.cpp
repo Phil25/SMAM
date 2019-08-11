@@ -3,8 +3,6 @@
 #include <smfs/addon.h>
 #include <smfs/path.h>
 
-#include <filesystem>
-
 const std::map<std::string_view, Command::fptr> Command::map{
     {"install", Command::install},  {"remove", Command::remove},
     {"uninstall", Command::remove}, {"info", Command::info},

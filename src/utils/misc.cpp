@@ -2,7 +2,8 @@
 
 #include <sstream>
 
-auto Utils::toLines(const std::string& data) noexcept -> StringVector
+auto Utils::toLines(const std::string& data) noexcept
+    -> std::vector<std::string>
 {
     std::istringstream       dataStream(data);
     std::string              line;
