@@ -3,42 +3,35 @@
 #include <smfs/addon.h>
 #include <utils/report.h>
 
-auto removeAddon(Addon& addon) noexcept -> Report::Type
+class Remover final
 {
-    out(Ch::Info) << Col::yellow << "Removing " << addon.getId()
-                  << "..." << Col::reset << cr;
+    using Type         = Report::Type;
+    using StringVector = std::vector<std::string>;
 
-    addon.remove([](const auto& file, const auto& error) {
-        out();  // create newline
-        if (!error.empty()) out << "Skipping " << error << " file: ";
-        out << file->raw() << cr;
-    });
+    const StringVector& ids;
 
-    return Report::Type::Removed;
-}
+    bool forceRemove;
+    bool noDeps;
 
-auto removeAddons(const std::vector<std::string>& addons) noexcept
-{
     Report report;
 
-    for (const auto& id : addons)
-    {
-        if (auto addon = Addon::get(id))  // addon installed
-        {
-            removeAddon(*addon.value());
-            report.insert(Report::Type::Removed, id);
-        }
-        else
-        {
-            out(Ch::Warn) << "Addon not installed: " << id << cr;
-            report.insert(Report::Type::Skipped, id);
-        }
+public:
+    Remover(const StringVector& addons, bool forceRemove,
+            bool noDeps = false) noexcept;
 
-        out << cr;
-    }
+    /*
+     * Remove every addon in the `addons` vector.
+     */
+    auto removeAll() noexcept -> Report;
 
-    return report;
-}
+private:
+    /*
+     * Remove a single specific addon that has been precached by the
+     * database.
+     */
+    auto removeSingle(const std::string& addon) noexcept
+        -> Report::Type;
+};
 
 auto Command::remove(const Opts& opts) noexcept -> ExitCode
 {
@@ -48,11 +41,81 @@ auto Command::remove(const Opts& opts) noexcept -> ExitCode
     if (Common::noSMRoot(opts)) return ExitCode::NoSMRoot;
     if (auto ret = Common::load(); ret) return ret;
 
-    auto report = removeAddons(addons);
+    auto remover = Remover(addons, opts.force(), opts.noDeps());
+
+    const auto& report = remover.removeAll();
 
     if (!Common::save()) return ExitCode::WriteError;
+
+    out(Ch::Info) << "Removal complete." << cr;
 
     report.print();
 
     return ExitCode::OK;
+}
+
+Remover::Remover(const StringVector& ids, bool forceRemove,
+                 bool noDeps) noexcept
+    : ids(ids), forceRemove(forceRemove), noDeps(noDeps)
+{
+}
+
+auto Remover::removeAll() noexcept -> Report
+{
+    for (const auto& id : ids)
+    {
+        if (auto addon = Addon::get(id))  // addon installed
+        {
+            removeSingle(id);
+            report.insert(Type::Removed, id);
+        }
+        else
+        {
+            out(Ch::Warn) << "Addon not installed: " << id << cr;
+            report.insert(Type::Skipped, id);
+        }
+
+        out << cr;
+    }
+
+    return report;
+}
+
+auto Remover::removeSingle(const std::string& id) noexcept -> Type
+{
+    assert(Addon::get(id).has_value());  // checked before call
+
+    auto addon = Addon::get(id).value();
+
+    out(Ch::Info) << Col::yellow << "Removing " << addon->getId()
+                  << "..." << Col::reset << cr;
+
+    addon->remove([](const auto& file, const auto& error) {
+        out();  // create newline
+        if (!error.empty()) out << "Skipping " << error << " file: ";
+        out << file->raw() << cr;
+    });
+
+    addon->forEachDep([&](const auto& depId) {
+        if (addon->findByDep(depId).size() > 0) return true;
+
+        if (auto dep = Addon::get(depId))
+        {
+            if (!dep.value()->isExplicit())
+            {
+                if (noDeps)
+                {
+                    report.remark(id, depId, Type::Dangling);
+                    return true;
+                }
+
+                out << cr;
+                report.remark(id, depId, removeSingle(depId));
+            }
+        }
+
+        return true;
+    });
+
+    return Type::Removed;
 }

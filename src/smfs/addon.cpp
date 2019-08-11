@@ -231,6 +231,17 @@ auto Addon::findByFile(const File::Ptr& file) noexcept -> AddonSet
     return set;
 }
 
+auto Addon::findByDep(const std::string& dep) noexcept -> AddonSet
+{
+    AddonSet set;
+
+    forEach([&set, &dep](const auto& addon) {
+        if (addon->dependencies.count(dep)) set.insert(addon);
+    });
+
+    return set;
+}
+
 void Addon::clear() noexcept { installed.clear(); }
 
 auto Addon::load() noexcept -> LoadResult

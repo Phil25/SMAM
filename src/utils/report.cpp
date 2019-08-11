@@ -19,7 +19,8 @@ const std::map<Type, PrinterData> printer{
     {Type::Removed, {"Removed", "removed", Col::green}},
     {Type::Skipped, {"Skipped", "already installed", Col::yellow}},
     {Type::Queued, {"Queued", "already being installed", Col::yellow}},
-    {Type::Ignored, {"Ignored", "is not installed", Col::yellow}},
+    {Type::Ignored, {"Ignored", "was not installed", Col::yellow}},
+    {Type::Dangling, {"Dangling", "was not removed", Col::yellow}},
     {Type::Failed, {"Failed", "failed to install", Col::red}},
 };
 

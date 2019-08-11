@@ -9,7 +9,8 @@
 
 /*
  * Helper class for setting up the installation environment and
- * providing the helper methods to complete it.
+ * providing methods and order to complete it. Logic to take care of
+ * dependency resolution is here.
  */
 class Installer final
 {
@@ -22,7 +23,6 @@ class Installer final
 
     bool forceInstall;
     bool noDeps;
-    int  failedCount;
 
     Report                report;
     std::set<std::string> pending;
@@ -34,8 +34,9 @@ public:
     /*
      * Install every addon in the `addons` vector.
      */
-    auto installAll() noexcept -> const Report&;
+    auto installAll() noexcept -> Report;
 
+private:
     /*
      * Install a single specific addon that has been precached by the
      * database.
@@ -57,14 +58,14 @@ auto Command::install(const Opts& opts) noexcept -> ExitCode
     if (Common::noSMRoot(opts)) return ExitCode::NoSMRoot;
     if (auto ret = Common::load(); ret) return ret;
 
-    Installer installer(opts.getDbUrl(), addons, opts.force(),
-                        opts.noDeps());
+    auto installer =
+        Installer(opts.getDbUrl(), addons, opts.force(), opts.noDeps());
 
     const auto& report = installer.installAll();
 
     if (!Common::save()) return ExitCode::WriteError;
 
-    out(Ch::Info) << "Installation complete" << cr;
+    out(Ch::Info) << "Installation complete." << cr;
 
     report.print();
 
@@ -77,8 +78,7 @@ Installer::Installer(const std::string&  databaseUrl,
     : database(databaseUrl),
       ids(ids),
       forceInstall(forceInstall),
-      noDeps(noDeps),
-      failedCount(0)
+      noDeps(noDeps)
 {
     Scraper::make(0, std::make_shared<AMScraper>());
     Scraper::make(1, std::make_shared<LTScraper>());
@@ -90,7 +90,7 @@ Installer::Installer(const std::string&  databaseUrl,
     }
 }
 
-auto Installer::installAll() noexcept -> const Report&
+auto Installer::installAll() noexcept -> Report
 {
     for (const auto& id : ids)
     {

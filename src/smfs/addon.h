@@ -15,8 +15,6 @@ class Addon final : public std::enable_shared_from_this<Addon>
     using AddonSet = std::set<Ptr>;
     using AddonOpt = std::optional<Ptr>;
 
-    using FileTuple = std::pair<File::Ptr, std::string>;
-
     using EachAddon = std::function<void(Ptr)>;
     using EachFile  = std::function<bool(const File::Ptr&)>;
     using EachDep   = std::function<bool(const std::string&)>;
@@ -73,6 +71,7 @@ public:
 
     static void forEach(const EachAddon&) noexcept;
     static auto findByFile(const File::Ptr& file) noexcept -> AddonSet;
+    static auto findByDep(const std::string& dep) noexcept -> AddonSet;
 
     static void               clear() noexcept;
     [[nodiscard]] static auto load() noexcept -> LoadResult;

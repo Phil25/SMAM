@@ -18,7 +18,8 @@ public:
         Skipped,    // already installed
         Queued,     // already being installed
         Ignored,    // depenency forcefully not installed
-        Failed      // failed to install/remove
+        Dangling,   // depenency forcefully not removed
+        Failed      // failed to install
     };
 
 private:

@@ -5,7 +5,7 @@ pytest.register_assert_rewrite('common')
 from common import SMAM
 
 @pytest.mark.parametrize('addon', DEPENDENCY_DATA)
-def test_dependency(addon):
+def test_dependency_install(addon):
     with SMAM() as smam:
         smam.exec('install ' + addon)
         smam.check_installed(INSTALL_DATA[addon])
@@ -14,12 +14,12 @@ def test_dependency(addon):
             smam.check_installed(INSTALL_DATA[dep])
 
 @pytest.mark.parametrize('addon', DEPENDENCY_DATA)
-def test_dependency_no_deps(addon):
+def test_dependency_install_no_deps(addon):
     if addon == 'wants_self':
         return
 
     with SMAM() as smam:
-        smam.exec('install ' + addon + ' --no-deps')
+        smam.exec('install --no-deps ' + addon)
         smam.check_installed(INSTALL_DATA[addon])
 
         for dep in DEPENDENCY_DATA[addon]:

@@ -4,7 +4,6 @@ import shutil
 
 BINARY = './bin/smam'
 
-
 class SMAM:
 
     def __init__(self, binary = BINARY, destination = './mod/'):
