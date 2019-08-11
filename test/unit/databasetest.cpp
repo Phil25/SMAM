@@ -7,9 +7,9 @@
 #include "../../src/database.h"
 #include "../../src/download.h"
 
-inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
+inline auto getFiles(const AddonPtr& addon) noexcept
 {
-    auto files = std::vector<File::Ptr>();
+    auto files = std::vector<FilePtr>();
 
     addon->forEachFile([&files](const auto& file) {
         files.push_back(file);

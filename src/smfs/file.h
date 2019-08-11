@@ -7,13 +7,14 @@
 
 #include <nlohmann/json.hpp>
 
+class File;
+using FilePtr = std::shared_ptr<File>;
+
 class File final
 {
     std::string path, name, url;
 
 public:
-    using Ptr = std::shared_ptr<File>;
-
     File(const std::string& data);
 
     auto getPath() const noexcept -> std::string;
@@ -66,8 +67,8 @@ public:
     operator std::filesystem::path() const;
 };
 
-bool operator==(const File::Ptr& f1, const File::Ptr& f2) noexcept;
-bool operator!=(const File::Ptr& f1, const File::Ptr& f2) noexcept;
+bool operator==(const FilePtr& f1, const FilePtr& f2) noexcept;
+bool operator!=(const FilePtr& f1, const FilePtr& f2) noexcept;
 
-void from_json(const nlohmann::json&, File::Ptr&);
-void to_json(nlohmann::json&, const File::Ptr&) noexcept;
+void from_json(const nlohmann::json&, FilePtr&);
+void to_json(nlohmann::json&, const FilePtr&) noexcept;

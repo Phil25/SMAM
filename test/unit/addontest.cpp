@@ -15,12 +15,12 @@ constexpr const char* dataFile = ".smamdata.json";
 
 inline auto get(const std::string& file)
 {
-    return json(file).get<File::Ptr>();
+    return json(file).get<FilePtr>();
 }
 
-inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
+inline auto getFiles(const AddonPtr& addon) noexcept
 {
-    auto files = std::vector<File::Ptr>();
+    auto files = std::vector<FilePtr>();
 
     addon->forEachFile([&files](const auto& file) {
         files.push_back(file);
@@ -30,7 +30,7 @@ inline auto getFiles(const std::shared_ptr<Addon>& addon) noexcept
     return files;
 }
 
-inline auto getDeps(const std::shared_ptr<Addon>& addon) noexcept
+inline auto getDeps(const AddonPtr& addon) noexcept
 {
     auto deps = std::vector<std::string>();
 
@@ -56,7 +56,7 @@ TEST(AddonTest, DeserializeFullLocal)
             {"explicit", true},
             {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     EXPECT_EQ("test", addon->getId());
@@ -77,7 +77,7 @@ TEST(AddonTest, DeserializePartialLocal)
             {"id", "test"},
             {"author", "Somedev"},
             {"description", "Test addon"},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     EXPECT_EQ("test", addon->getId());
@@ -103,7 +103,7 @@ TEST(AddonTest, DeserializeFullRemote)
             {"explicit", true},
             {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     EXPECT_EQ("test", addon->getId());
@@ -124,7 +124,7 @@ TEST(AddonTest, DeserializePartialRemote)
             {"id", "test"},
             {"author", "Somedev"},
             {"description", "Test addon"},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     EXPECT_EQ("test", addon->getId());
@@ -150,7 +150,7 @@ TEST(AddonTest, SerializeFull)
             {"explicit", true},
             {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
             {"deps", {"someplugin", "someextension"}},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     json j = addon;
@@ -160,7 +160,7 @@ TEST(AddonTest, SerializeFull)
     EXPECT_EQ("Test addon", j["description"]);
     EXPECT_TRUE(j["explicit"]);
 
-    std::vector<File::Ptr> files;
+    std::vector<FilePtr> files;
     j["files"].get_to(files);
     EXPECT_THAT(files, ElementsAre(plugin, gamedata, source));
 
@@ -177,7 +177,7 @@ TEST(AddonTest, SerializePartial)
             {"id", "test"},
             {"author", "Somedev"},
             {"description", "Test addon"},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     json j = addon;
@@ -205,7 +205,7 @@ TEST(AddonTest, Detach)
             {"author", "Somedev"},
             {"description", "Test addon"},
             {"files", {plugin->raw(), gamedata->raw(), source->raw()}},
-        }.get<std::shared_ptr<Addon>>();
+        }.get<AddonPtr>();
     // clang-format on
 
     EXPECT_THAT(getFiles(a), ElementsAre(plugin, gamedata, source));
@@ -247,14 +247,14 @@ TEST(AddonTest, FindByFile)
         {"author", "Somedev"},
         {"description", "Test addon"},
         {"files", {plugin->raw(), gamedata->raw()}},
-    }.get<std::shared_ptr<Addon>>();
+    }.get<AddonPtr>();
 
     auto a2 = json{
         {"id", "test2"},
         {"author", "Somedev"},
         {"description", "Test addon2"},
         {"files", {gamedata->raw(), source->raw()}},
-    }.get<std::shared_ptr<Addon>>();
+    }.get<AddonPtr>();
     // clang-format on
 
     a1->addToInstalled();
@@ -311,7 +311,7 @@ TEST(AddonTest, SaveInstalled)
         {"explicit", true},
         {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
         {"deps", {"plugin1", "test2"}},
-    }.get<std::shared_ptr<Addon>>()->addToInstalled();
+    }.get<AddonPtr>()->addToInstalled();
 
     json{
         {"id", "test2"},
@@ -320,7 +320,7 @@ TEST(AddonTest, SaveInstalled)
         {"explicit", false},
         {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
         {"deps", {"plugin2", "plugin3"}},
-    }.get<std::shared_ptr<Addon>>()->addToInstalled();
+    }.get<AddonPtr>()->addToInstalled();
     // clang-format on
 
     ASSERT_TRUE(Addon::save());

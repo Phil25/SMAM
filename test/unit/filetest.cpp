@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 inline auto get(const std::string& file)
 {
-    return json(file).get<File::Ptr>();
+    return json(file).get<FilePtr>();
 }
 
 TEST(FileTest, DeserializeLocal)

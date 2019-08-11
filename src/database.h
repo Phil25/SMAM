@@ -7,7 +7,7 @@
 class Database final
 {
 public:
-    using Plan = std::pair<std::string, std::shared_ptr<Addon>>;
+    using Plan = std::pair<std::string, AddonPtr>;
 
 private:
     using PlanVar = std::variant<Plan, std::string>;  // potential error

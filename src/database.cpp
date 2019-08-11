@@ -56,7 +56,7 @@ bool Database::precache(const std::vector<std::string>& ids) noexcept
 
         try
         {
-            auto addon = j.get<std::shared_ptr<Addon>>();
+            auto addon = j.get<AddonPtr>();
             cached.emplace(id, Plan{j.at("url"), addon});
         }
         catch (const json::exception& e)

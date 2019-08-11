@@ -38,7 +38,7 @@ bool prepare(const fs::path& path, const Addon& addon) noexcept
     return true;
 }
 
-bool fetch(const File::Ptr& file, const Addon& addon) noexcept
+bool fetch(const FilePtr& file, const Addon& addon) noexcept
 {
     auto path = fs::path{*file};
     auto url  = file->getUrl();
@@ -56,7 +56,7 @@ bool fetch(const File::Ptr& file, const Addon& addon) noexcept
 
 bool extractArchives(Addon& addon) noexcept
 {
-    auto extracted = std::vector<File::Ptr>();
+    auto extracted = std::vector<FilePtr>();
 
     bool success = addon.forEachFile([&](const auto& file) {
         auto path = fs::path{*file};
@@ -162,7 +162,7 @@ void Addon::remove(const EachFileRemove& cb) noexcept
     installed.erase(id);
 }
 
-void Addon::detach(const File::Ptr& file) noexcept
+void Addon::detach(const FilePtr& file) noexcept
 {
     for (auto it = files.cbegin(); it != files.cend(); ++it)
     {
@@ -174,7 +174,7 @@ void Addon::detach(const File::Ptr& file) noexcept
     }
 }
 
-void Addon::appendFiles(const std::vector<File::Ptr>& vec) noexcept
+void Addon::appendFiles(const std::vector<FilePtr>& vec) noexcept
 {
     files.insert(files.end(), vec.begin(), vec.end());
 }
@@ -215,7 +215,7 @@ void Addon::forEach(const EachAddon& cb) noexcept
     for (const auto& [_, addon] : installed) cb(addon);
 }
 
-auto Addon::findByFile(const File::Ptr& file) noexcept -> AddonSet
+auto Addon::findByFile(const FilePtr& file) noexcept -> AddonSet
 {
     AddonSet set;
 
@@ -257,7 +257,7 @@ auto Addon::load() noexcept -> LoadResult
     if (!fs::exists(p)) return LoadResult::OK;
 
     auto   ifs    = std::ifstream(p);
-    auto   addons = std::vector<std::shared_ptr<Addon>>();
+    auto   addons = std::vector<AddonPtr>();
     json   in;
     size_t hash;
 
@@ -289,7 +289,7 @@ bool Addon::save() noexcept
     std::ofstream ofs(fs::path{dataFilename}, std::ios::trunc);
     if (!ofs) return false;
 
-    std::vector<std::shared_ptr<Addon>> addons;
+    std::vector<AddonPtr> addons;
 
     for (auto& [_, addon] : installed) addons.push_back(addon);
 
@@ -304,7 +304,7 @@ bool Addon::save() noexcept
     return true;
 }
 
-void from_json(const json& j, Addon::Ptr& addon)
+void from_json(const json& j, AddonPtr& addon)
 {
     addon = std::make_shared<Addon>(j.at("id"));
 
@@ -322,7 +322,7 @@ void from_json(const json& j, Addon::Ptr& addon)
     }
 }
 
-void to_json(json& j, const Addon::Ptr& addon) noexcept
+void to_json(json& j, const AddonPtr& addon) noexcept
 {
     j.emplace("id", addon->id);
     j.emplace("author", addon->author);

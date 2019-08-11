@@ -124,22 +124,19 @@ bool File::evaluate(const Scraper::Data& data) noexcept
 
 File::operator std::filesystem::path() const { return raw(); }
 
-bool operator==(const File::Ptr& f1, const File::Ptr& f2) noexcept
+bool operator==(const FilePtr& f1, const FilePtr& f2) noexcept
 {
     return f1->raw() == f2->raw();
 }
 
-bool operator!=(const File::Ptr& f1, const File::Ptr& f2) noexcept
+bool operator!=(const FilePtr& f1, const FilePtr& f2) noexcept
 {
     return !operator==(f1, f2);
 }
 
-void from_json(const json& j, File::Ptr& file)
+void from_json(const json& j, FilePtr& file)
 {
     file = std::make_shared<File>(j);
 }
 
-void to_json(json& j, const File::Ptr& file) noexcept
-{
-    j = file->raw();
-}
+void to_json(json& j, const FilePtr& file) noexcept { j = file->raw(); }
