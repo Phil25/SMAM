@@ -10,6 +10,7 @@ add_executable(tests
   unit/utilstest.cpp
   unit/downloadtest.cpp
   unit/databasetest.cpp
+  unit/scrapertest.cpp
   unit/amscrapertest.cpp
   unit/ltscrapertest.cpp
   unit/ghscrapertest.cpp

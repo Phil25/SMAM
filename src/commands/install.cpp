@@ -43,11 +43,6 @@ private:
      */
     auto installSingle(const std::string& addon) noexcept
         -> Report::Type;
-
-    /*
-     * Returns the processed data of a specified addon.
-     */
-    auto get(const std::string& url) noexcept -> Scraper::Data;
 };
 
 auto Command::install(const Opts& opts) noexcept -> ExitCode
@@ -80,9 +75,9 @@ Installer::Installer(const std::string&  databaseUrl,
       forceInstall(forceInstall),
       noDeps(noDeps)
 {
-    Scraper::make(0, std::make_shared<AMScraper>());
-    Scraper::make(1, std::make_shared<LTScraper>());
-    Scraper::make(2, std::make_shared<GHScraper>());
+    Scraper::add(std::make_unique<AMScraper>());
+    Scraper::add(std::make_unique<LTScraper>());
+    Scraper::add(std::make_unique<GHScraper>());
 
     if (!database.precache(ids))
     {
@@ -99,6 +94,7 @@ auto Installer::installAll() noexcept -> Report
 
         if (result == Type::Installed)
         {
+            assert(Addon::get(id).has_value());
             Addon::get(id).value()->markExplicit();
         }
 
@@ -138,7 +134,7 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
     pending.insert(id);  // circumvent cyclic deps inf loop
 
     auto plan  = std::get<Database::Plan>(planVar);
-    auto data  = get(plan.first);
+    auto data  = Scraper::getData(plan.first);
     auto addon = plan.second;
 
     bool success = addon->forEachDep([&](const auto& dep) {
@@ -176,21 +172,4 @@ auto Installer::installSingle(const std::string& id) noexcept -> Type
     }
 
     return Type::Installed;
-}
-
-auto Installer::get(const std::string& url) noexcept -> Scraper::Data
-{
-    Scraper::Data data;
-
-    if (!url.empty())
-    {
-        if (auto scraper = Scraper::get(url))
-        {
-            data = scraper->get()->fetch(url);
-        }
-
-        data.url = url;
-    }
-
-    return data;
 }

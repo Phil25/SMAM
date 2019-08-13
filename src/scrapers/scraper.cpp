@@ -2,7 +2,8 @@
 
 #include <cassert>
 
-std::array<std::shared_ptr<Scraper>, Scraper::COUNT> Scraper::scrapers;
+Scraper::Vector Scraper::scrapers;
+constexpr int   COUNT = 3;
 
 Scraper::Scraper(std::string_view url, const std::string& from,
                  const std::string& to) noexcept
@@ -17,21 +18,30 @@ bool Scraper::match(const std::string& url) const noexcept
     return url.compare(0, aptUrl.size(), aptUrl) == 0;
 }
 
-void Scraper::make(int i, std::shared_ptr<Scraper> scraper) noexcept
+void Scraper::add(ScraperPtr scraper) noexcept
 {
-    assert(i <= COUNT && "Invalid position");
-    scrapers[i] = scraper;
+    assert(scrapers.size() <= COUNT);
+    scrapers.emplace_back(std::move(scraper));
 }
 
-auto Scraper::get(const std::string& url) noexcept -> MaybeScraper
+auto Scraper::getData(const std::string& url) noexcept -> Data
 {
-    for (const auto& scraper : scrapers)
+    assert(scrapers.size() > 0 && "Scrapers not initialized");
+
+    auto data = Data{};
+
+    if (!url.empty())
     {
-        if (scraper->match(url))
+        for (const auto& scraper : scrapers)
         {
-            return scraper;
+            if (scraper->match(url))
+            {
+                data = scraper->fetch(url);
+            }
         }
+
+        data.url = url;
     }
 
-    return std::nullopt;
+    return data;
 }

@@ -2,12 +2,16 @@
 
 #include <map>
 #include <memory>
+#include <vector>
 
 class Scraper
 {
-public:
-    using MaybeScraper = std::optional<std::shared_ptr<Scraper>>;
+    using ScraperPtr = std::unique_ptr<Scraper>;
+    using Vector     = std::vector<ScraperPtr>;
 
+    static Vector scrapers;
+
+public:
     struct Data : std::map<std::string, std::string>
     {
         enum class Website
@@ -21,11 +25,6 @@ public:
         std::string url     = {};
         Website     website = Website::Unknown;
     };
-
-private:
-    constexpr static int COUNT = 3;
-
-    static std::array<std::shared_ptr<Scraper>, COUNT> scrapers;
 
 protected:
     const std::string aptUrl, dataFrom, dataTo;
@@ -47,12 +46,12 @@ public:
     bool match(const std::string& url) const noexcept;
 
     /*
-     * Add an instance of a scraper to the global list
+     * Add an instance of a scraper to the static list
      */
-    static void make(int i, std::shared_ptr<Scraper> scraper) noexcept;
+    static void add(ScraperPtr scraper) noexcept;
 
     /*
      * Return appropriate Scraper for given URL or null.
      */
-    static auto get(const std::string& url) noexcept -> MaybeScraper;
+    static auto getData(const std::string& url) noexcept -> Data;
 };

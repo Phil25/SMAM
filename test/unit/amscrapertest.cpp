@@ -1,4 +1,4 @@
-#include "scrapertest.hpp"
+#include "scrapertestcommon.hpp"
 
 #ifdef NDEBUG
 #undef NDEBUG  // make downloader use curlmock
