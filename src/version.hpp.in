@@ -1,0 +1,46 @@
+#pragma once
+
+namespace smam::version
+{
+constexpr const char* Full()
+{
+    return "@VERSION_MAJOR@"
+           ".@VERSION_MINOR@"
+           ".@VERSION_PATCH@"
+           "-@VERSION_REVISION@";
+}
+
+constexpr const char* FullAgent()
+{
+    return "@AGENT@/@VERSION_MAJOR@"
+           ".@VERSION_MINOR@"
+           ".@VERSION_PATCH@"
+           "-@VERSION_REVISION@";
+}
+
+constexpr const char* Agent()
+{
+    return "@AGNENT@";
+}
+
+constexpr const char* Major()
+{
+    return "@VERSION_MAJOR@";
+}
+
+constexpr const char* Minor()
+{
+    return "@VERSION_MINOR@";
+}
+
+constexpr const char* Patch()
+{
+    return "@VERSION_PATCH@";
+}
+
+constexpr const char* Revision()
+{
+    return "@VERSION_REVISION@";
+}
+
+}  // namespace smam::version

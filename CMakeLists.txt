@@ -27,7 +27,7 @@ set(PROJECT_AGENT "SourceMod Addon Manager")
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 0)
-set(VERSION_PATCH 1a)
+set(VERSION_PATCH 2a)
 set(VERSION_REVISION ${GIT_REVISION})
 set(AGENT ${PROJECT_AGENT})
 
@@ -37,7 +37,7 @@ configure_file("${PROJECT_SOURCE_DIR}/src/version.hpp.in" "${PROJECT_SOURCE_DIR}
 
 add_subdirectory(src)
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  enable_testing()
-  add_subdirectory(test)
-endif()
+#if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  #enable_testing()
+  #add_subdirectory(test)
+#endif()
