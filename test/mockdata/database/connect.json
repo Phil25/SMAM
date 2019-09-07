@@ -1,9 +1,0 @@
-{
-	"id": "connect",
-	"author": "asherkin",
-	"description": "A safer OnClientPreConnect forward.",
-	"url": "https://builds.limetech.io/?p=connect",
-	"files": [
-		"../../;.*"
-	]
-}

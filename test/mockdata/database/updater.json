@@ -1,9 +1,0 @@
-{
-	"id": "updater",
-	"author": "GoD-Tony",
-	"description": "Automatically updates SourceMod plugins and files.",
-	"url": "https://bitbucket.org/GoD_Tony/updater/downloads/",
-	"files": [
-		"plugins/;updater.smx"
-	]
-}
