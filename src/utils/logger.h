@@ -19,12 +19,12 @@ class Logger final
 {
     std::ostream* os;
 
-    bool color{true};
-    bool prefix{true};
+    bool color{true}, prefix{true};
 
 public:
     Logger() noexcept;
 
+    auto operator()() noexcept -> Logger&;
     auto Info() noexcept -> Logger&;
     auto Warning() noexcept -> Logger&;
     auto Error() noexcept -> Logger&;

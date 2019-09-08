@@ -8,13 +8,11 @@ namespace smam
 {
 class Options final
 {
-    Logger logger;
-
     boost::program_options::options_description helpDesc;
     boost::program_options::variables_map       vm;
 
 public:
-    Options(int argc, const char* argv[], Logger) noexcept;
+    Options(int argc, const char* argv[], Logger&) noexcept;
 
     auto GenHelp(const char* binary) const noexcept -> std::string;
 

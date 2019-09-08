@@ -4,8 +4,7 @@
 
 namespace smam
 {
-Options::Options(int argc, const char* argv[], Logger logger) noexcept
-    : logger(std::move(logger))
+Options::Options(int argc, const char* argv[], Logger& logger) noexcept
 {
     namespace po = boost::program_options;
 

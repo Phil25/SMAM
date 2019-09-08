@@ -20,32 +20,36 @@ Logger::Logger() noexcept : os(&std::cout)
 {
 }
 
+auto Logger::operator()() noexcept -> Logger&
+{
+    if (prefix) *this << "    ";
+    return *this;
+}
+
 auto Logger::Info() noexcept -> Logger&
 {
     *this << Col::blue;
     if (prefix) *this << "[I] ";
-    *this << Col::reset;
-    return *this;
+    return *this << Col::reset;
 }
 
 auto Logger::Warning() noexcept -> Logger&
 {
     *this << Col::yellow;
     if (prefix) *this << "[W] ";
-    *this << Col::reset;
-    return *this;
+    return *this << Col::reset;
 }
 
 auto Logger::Error() noexcept -> Logger&
 {
     *this << Col::red;
     if (prefix) *this << "[E] ";
-    *this << Col::reset;
-    return *this;
+    return *this << Col::reset;
 }
 
 void Logger::SetPrefix(bool prefix) noexcept
 {
+    this->prefix = prefix;
 }
 
 void Logger::SetColor(bool color) noexcept
