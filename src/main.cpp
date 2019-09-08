@@ -48,5 +48,5 @@ int main(int argc, const char* argv[])
         return ExitCode::UnknownCommand;
     }
 
-    return command::Run(command, options);
+    return command::Run(logger, command, options);
 }
