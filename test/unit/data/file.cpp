@@ -1,4 +1,4 @@
-#include "../../src/data/file.h"
+#include <data/file.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

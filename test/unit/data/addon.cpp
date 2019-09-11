@@ -1,4 +1,4 @@
-#include "../../src/data/addon.h"
+#include <data/addon.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

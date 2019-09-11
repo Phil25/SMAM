@@ -74,7 +74,10 @@ public:
                   std::is_base_of_v<Operation<Context>, OP>>>
     [[nodiscard]] auto Run(Args... args) noexcept -> Executor&
     {
-        if (error) return *this;  // halt while in erroneous state
+        if (!error.message.empty())
+        {
+            return *this;  // halt while in erroneous state
+        }
 
         auto op = OP{logger, context, std::forward<Args>(args)...};
         op.Run();
@@ -86,6 +89,11 @@ public:
     [[nodiscard]] auto GetError() const noexcept
     {
         return error;
+    }
+
+    auto GetContext() const noexcept -> const Context&
+    {
+        return context;
     }
 };
 }  // namespace smam
