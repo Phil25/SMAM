@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <fstream>
 #include <nlohmann/json.hpp>
 
 namespace smam
@@ -162,5 +163,126 @@ TEST(AddonTest, SerializePartial)
     EXPECT_FALSE(json.at("explicit"));
     EXPECT_THAT(json.at("files"), IsEmpty());
     EXPECT_THAT(json.at("deps"), IsEmpty());
+}
+
+TEST(AddonTest, Save)
+{
+    // clang-format off
+    nlohmann::json{
+        {"id", "test"},
+        {"author", "Somedev"},
+        {"description", "Test addon"},
+        {"explicit", true},
+        {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+        {"deps", {"plugin1", "test2"}},
+    }.get<AddonPtr>()->MarkInstalled();
+
+    nlohmann::json{
+        {"id", "test2"},
+        {"author", "Somedev"},
+        {"description", "Test addon2"},
+        {"explicit", false},
+        {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
+        {"deps", {"plugin2", "plugin3"}},
+    }.get<AddonPtr>()->MarkInstalled();
+    // clang-format on
+
+    ASSERT_TRUE(Addon::Save(dataFile));
+
+    auto ifs = std::ifstream(dataFile);
+    ASSERT_TRUE(ifs);
+
+    auto json = nlohmann::json::parse(ifs);
+    ifs.close();
+
+    ASSERT_TRUE(json.count("data"));
+    ASSERT_TRUE(json.count("hash"));
+
+    ASSERT_EQ(3810067853656611362u, json.at("hash").get<size_t>());
+    ASSERT_EQ(2, json.at("data").size());
+
+    const auto& a1 = json["data"][0];
+    const auto& a2 = json["data"][1];
+
+    EXPECT_EQ("test", a1["id"]);
+    EXPECT_EQ("Somedev", a1["author"]);
+    EXPECT_EQ("Test addon", a1["description"]);
+    EXPECT_TRUE(a1["explicit"]);
+
+    EXPECT_THAT(a1["files"].get<std::vector<std::string>>(),
+                ElementsAre("plugins/bin.smx", "gamedata/data.txt"));
+
+    EXPECT_THAT(a1["deps"].get<std::vector<std::string>>(),
+                ElementsAre("plugin1", "test2"));
+
+    EXPECT_EQ("test2", a2["id"]);
+    EXPECT_EQ("Somedev", a2["author"]);
+    EXPECT_EQ("Test addon2", a2["description"]);
+    EXPECT_FALSE(a2["explicit"]);
+
+    EXPECT_THAT(a2["files"].get<std::vector<std::string>>(),
+                ElementsAre("plugins/bin2.smx", "translations/tr.txt"));
+
+    EXPECT_THAT(a2["deps"].get<std::vector<std::string>>(),
+                ElementsAre("plugin2", "plugin3"));
+}
+
+TEST(AddonTest, Load)
+{
+    auto ofs = std::ofstream(dataFile, std::ios::trunc);
+    ASSERT_TRUE(ofs);
+
+    // clang-format off
+    auto json = nlohmann::json{{"data", {
+        {
+            {"id", "test"},
+            {"author", "Somedev"},
+            {"description", "Test addon"},
+            {"explicit", true},
+            {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+            {"deps", {"plugin1", "test2"}},
+        },
+        {
+            {"id", "test2"},
+            {"author", "Somedev"},
+            {"description", "Test addon2"},
+            {"explicit", false},
+            {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
+            {"deps", {"plugin2", "plugin3"}},
+        }
+    }}, {"hash", 3810067853656611362u}};
+    // clang-format on
+
+    ofs << json;
+    ofs.close();
+
+    ASSERT_TRUE(Addon::Load(dataFile));
+
+    try
+    {
+        auto test = Addon::Get("test").value();
+        EXPECT_EQ("test", test->ID());
+        EXPECT_EQ("Somedev", test->Author());
+        EXPECT_EQ("Test addon", test->Description());
+        EXPECT_TRUE(test->IsExplicit());
+        EXPECT_EQ("plugins/bin.smx", test->Files().at(0)->Raw());
+        EXPECT_EQ("gamedata/data.txt", test->Files().at(1)->Raw());
+        EXPECT_THAT(test->Dependencies(),
+                    ElementsAre("plugin1", "test2"));
+
+        auto test2 = Addon::Get("test2").value();
+        EXPECT_EQ("test2", test2->ID());
+        EXPECT_EQ("Somedev", test2->Author());
+        EXPECT_EQ("Test addon2", test2->Description());
+        EXPECT_FALSE(test2->IsExplicit());
+        EXPECT_EQ("plugins/bin2.smx", test2->Files().at(0)->Raw());
+        EXPECT_EQ("translations/tr.txt", test2->Files().at(1)->Raw());
+        EXPECT_THAT(test2->Dependencies(),
+                    ElementsAre("plugin2", "plugin3"));
+    }
+    catch (const std::exception& e)
+    {
+        FAIL() << e.what();
+    }
 }
 }  // namespace smam

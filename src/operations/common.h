@@ -32,4 +32,24 @@ public:
 
     void Run() noexcept;
 };
+
+class LoadAddons final : public Operation<CommonContext>
+{
+    std::filesystem::path path;
+
+public:
+    LoadAddons(Logger&, CommonContext&, std::string filename) noexcept;
+
+    void Run() noexcept;
+};
+
+class SaveAddons final : public Operation<CommonContext>
+{
+    std::filesystem::path path;
+
+public:
+    SaveAddons(Logger&, CommonContext&, std::string filename) noexcept;
+
+    void Run() noexcept;
+};
 }  // namespace smam

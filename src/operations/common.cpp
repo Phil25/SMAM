@@ -1,5 +1,6 @@
 #include "common.h"
 
+#include <data/addon.h>
 #include <utils/path.h>
 
 namespace smam
@@ -36,6 +37,46 @@ void CheckSMRoot::Run() noexcept
     else
     {
         Fail("SourceMod root not found.");
+    }
+}
+
+LoadAddons::LoadAddons(Logger& logger, CommonContext& context,
+                       std::string filename) noexcept
+    : Operation(logger, context),
+      path(GetContext().root / std::move(filename))
+{
+}
+
+void LoadAddons::Run() noexcept
+{
+    if (!path::HasReadAndWritePermissions(path))
+    {
+        Fail("No read or write permissions.");
+    }
+
+    if (!Addon::Load(path))
+    {
+        Fail("Failed to load installed addons.");
+    }
+}
+
+SaveAddons::SaveAddons(Logger& logger, CommonContext& context,
+                       std::string filename) noexcept
+    : Operation(logger, context),
+      path(GetContext().root / std::move(filename))
+{
+}
+
+void SaveAddons::Run() noexcept
+{
+    if (!path::HasReadAndWritePermissions(path))
+    {
+        Fail("No read or write permissions.");
+    }
+
+    if (!Addon::Save(path))
+    {
+        Fail("Failed to save installed addons.");
     }
 }
 }  // namespace smam

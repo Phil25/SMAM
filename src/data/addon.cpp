@@ -1,5 +1,8 @@
 #include "addon.h"
 
+#include <fstream>
+#include <nlohmann/json.hpp>
+
 namespace smam
 {
 Addon::InstalledMap Addon::installed;
@@ -79,6 +82,53 @@ void Addon::MarkInstalled() noexcept
 /*static*/ void Addon::ForEach(const ForEachAddon& f) noexcept
 {
     for (const auto& [_, addon] : installed) f(addon);
+}
+
+/*static*/ bool Addon::Load(const std::string& file) noexcept
+{
+    auto   ifs    = std::ifstream(file);
+    auto   addons = std::vector<AddonPtr>();
+    auto   json   = nlohmann::json();
+    size_t hash;
+
+    try
+    {
+        ifs >> json;
+        json.at("data").get_to(addons);
+        hash = json.at("hash").get<size_t>();
+    }
+    catch (const nlohmann::json::exception&)
+    {
+        return false;
+    }
+
+    if (hash != std::hash<nlohmann::json>{}(json["data"]))
+    {
+        return false;
+    }
+
+    for (auto& addon : addons) addon->MarkInstalled();
+
+    ifs.close();
+    return true;
+}
+
+/*static*/ bool Addon::Save(const std::string& file) noexcept
+{
+    auto ofs = std::ofstream(file, std::ios::trunc);
+    if (!ofs) return false;
+
+    auto addons = std::vector<AddonPtr>();
+    for (const auto& [_, addon] : installed) addons.push_back(addon);
+
+    auto json    = nlohmann::json();
+    json["data"] = std::move(addons);
+    json["hash"] = std::hash<nlohmann::json>{}(json["data"]);
+
+    ofs << json;
+
+    ofs.close();
+    return true;
 }
 
 void from_json(const nlohmann::json& json, AddonPtr& addon)

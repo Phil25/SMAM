@@ -12,12 +12,12 @@ using AddonPtr = std::shared_ptr<Addon>;
 using FileVector    = std::vector<FilePtr>;
 using DependencySet = std::set<std::string>;
 
-class Addon final : std::enable_shared_from_this<Addon>
+class Addon final : public std::enable_shared_from_this<Addon>
 {
     using AddonOpt     = std::optional<AddonPtr>;
-    using InstalledMap = std::map<std::string, AddonPtr>;
     using ForEachAddon = std::function<void(AddonPtr)>;
 
+    using InstalledMap = std::map<std::string, AddonPtr>;
     static InstalledMap installed;
 
     const std::string id, author, description;
@@ -51,6 +51,9 @@ public:
     static auto Get(const std::string& id) noexcept -> AddonOpt;
     static bool IsInstalled(const std::string& id) noexcept;
     static void ForEach(const ForEachAddon&) noexcept;
+
+    [[nodiscard]] static bool Load(const std::string& file) noexcept;
+    [[nodiscard]] static bool Save(const std::string& file) noexcept;
 };
 
 void from_json(const nlohmann::json&, AddonPtr&);
