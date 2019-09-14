@@ -1,155 +1,87 @@
-#include <operations/common.hpp>
+#include <operations/common.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <filesystem>
+
 namespace smam
 {
-struct TestContext final
-{
-    int step{0};
-    int value{0};
-};
-
-class OperationBlank final : public Operation<TestContext>
-{
-public:
-    OperationBlank(Logger& logger, TestContext& context) noexcept
-        : Operation(logger, context)
-    {
-    }
-
-    void Run() noexcept override
-    {
-        ++GetContext().step;
-    }
-};
-
-class OperationStopping final : public Operation<TestContext>
-{
-public:
-    OperationStopping(Logger& logger, TestContext& context) noexcept
-        : Operation(logger, context)
-    {
-    }
-
-    void Run() noexcept override
-    {
-        Stop();
-    }
-};
-
-class OperationFailing final : public Operation<TestContext>
-{
-public:
-    OperationFailing(Logger& logger, TestContext& context) noexcept
-        : Operation(logger, context)
-    {
-    }
-
-    void Run() noexcept override
-    {
-        Fail("failure");
-    }
-};
-
-class OperationAdder final : public Operation<TestContext>
-{
-    int valueToAdd;
-
-public:
-    OperationAdder(Logger& logger, TestContext& context, int v) noexcept
-        : Operation(logger, context), valueToAdd(v)
-    {
-    }
-
-    void Run() noexcept override
-    {
-        ++GetContext().step;
-        GetContext().value += valueToAdd;
-    }
-};
-
 class OperationsCommonTest : public ::testing::Test
 {
 protected:
-    Logger                logger;
-    Executor<TestContext> exec{logger};
+    Logger                  logger;
+    Executor<CommonContext> exec{logger};
+
+    auto MakeOptions(std::string command) noexcept -> Options
+    {
+        std::vector<std::string> args{"smam"};
+        std::string              arg;
+
+        std::istringstream iss(std::move(command));
+        while (iss >> arg) args.push_back(arg);
+
+        int         size = args.size();
+        const char* argv[size];
+
+        for (int i = 0; i < size; ++i)
+        {
+            argv[i] = args[i].c_str();
+        }
+
+        return {size, argv, logger};
+    }
+
+    void SetUp() override
+    {
+        namespace fs = std::filesystem;
+        fs::create_directories("mod/addons/sourcemod/plugins");
+    }
+
+    void TearDown() override
+    {
+        std::filesystem::remove_all("mod");
+    }
 };
 
-TEST_F(OperationsCommonTest, SingleFinish)
+TEST_F(OperationsCommonTest, CheckAddons)
 {
-    auto error = exec.Run<OperationBlank>().GetError();
-    EXPECT_FALSE(error);
-    EXPECT_EQ(1, exec.GetContext().step);
+    auto options1 = MakeOptions("install tf2items rtd");
+    auto error1   = exec.Run<CheckAddons>(options1).GetError();
+
+    ASSERT_FALSE(error1);
+
+    auto options2 = MakeOptions("install -d abc");
+    auto error2   = exec.Run<CheckAddons>(options2).GetError();
+
+    ASSERT_TRUE(error2);
+    EXPECT_EQ("No addons specified.", error2.message);
 }
 
-TEST_F(OperationsCommonTest, ChainFinish)
+TEST_F(OperationsCommonTest, CheckSMRootNoOptions)
 {
-    auto error = exec.Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .GetError();
-
-    EXPECT_FALSE(error);
-    EXPECT_EQ(9, exec.GetContext().step);
-}
-
-TEST_F(OperationsCommonTest, ChainStop)
-{
-    auto error = exec.Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationStopping>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .GetError();
-
-    EXPECT_FALSE(error);
-    EXPECT_EQ(5, exec.GetContext().step);
-}
-
-TEST_F(OperationsCommonTest, ChainFail)
-{
-    auto error = exec.Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationFailing>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .Run<OperationBlank>()
-                     .GetError();
-
+    auto error = exec.Run<CheckSMRoot>(MakeOptions("")).GetError();
     ASSERT_TRUE(error);
-    EXPECT_EQ(3, exec.GetContext().step);
-    EXPECT_EQ("failure", error.message);
+    EXPECT_EQ("SourceMod root not found.", error.message);
 }
 
-TEST_F(OperationsCommonTest, ChainAdder)
+TEST_F(OperationsCommonTest, CheckSMRootNotFound)
 {
-    auto error = exec.Run<OperationBlank>()
-                     .Run<OperationAdder>(1)
-                     .Run<OperationBlank>()
-                     .Run<OperationAdder>(5)
-                     .Run<OperationBlank>()
-                     .Run<OperationAdder>(-2)
-                     .Run<OperationAdder>(1)
-                     .Run<OperationBlank>()
-                     .GetError();
+    auto error = exec.Run<CheckSMRoot>(MakeOptions("-d .")).GetError();
+    ASSERT_TRUE(error);
+    EXPECT_EQ("SourceMod root not found.", error.message);
+}
 
-    EXPECT_FALSE(error);
-    EXPECT_EQ(8, exec.GetContext().step);
-    EXPECT_EQ(5, exec.GetContext().value);
+TEST_F(OperationsCommonTest, CheckSMRootFound)
+{
+    namespace fs               = std::filesystem;
+    static const fs::path root = "mod/addons/sourcemod";
+
+    auto error =
+        exec.Run<CheckSMRoot>(MakeOptions("install tf2items -d ./mod/"))
+            .GetError();
+
+    ASSERT_FALSE(error);
+    EXPECT_TRUE(fs::equivalent(root, exec.GetContext().root));
 }
 }  // namespace smam

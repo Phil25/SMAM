@@ -1,11 +1,11 @@
 #pragma once
 
 #include <data/addon.h>
-#include <operations/common.hpp>
+#include <operations/core.hpp>
 
 namespace smam
 {
-struct AddonContext
+struct AddonContext final
 {
     AddonPtr              addon;
     std::set<std::string> pendingToBeInstalled;
