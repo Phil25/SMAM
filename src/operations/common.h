@@ -38,7 +38,8 @@ class LoadAddons final : public Operation<CommonContext>
     std::filesystem::path path;
 
 public:
-    LoadAddons(Logger&, CommonContext&, std::string filename) noexcept;
+    LoadAddons(Logger&, CommonContext&,
+               std::filesystem::path path) noexcept;
 
     void Run() noexcept;
 };
@@ -48,7 +49,8 @@ class SaveAddons final : public Operation<CommonContext>
     std::filesystem::path path;
 
 public:
-    SaveAddons(Logger&, CommonContext&, std::string filename) noexcept;
+    SaveAddons(Logger&, CommonContext&,
+               std::filesystem::path path) noexcept;
 
     void Run() noexcept;
 };

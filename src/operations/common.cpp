@@ -41,9 +41,8 @@ void CheckSMRoot::Run() noexcept
 }
 
 LoadAddons::LoadAddons(Logger& logger, CommonContext& context,
-                       std::string filename) noexcept
-    : Operation(logger, context),
-      path(GetContext().root / std::move(filename))
+                       std::filesystem::path path) noexcept
+    : Operation(logger, context), path(std::move(path))
 {
 }
 
@@ -61,9 +60,8 @@ void LoadAddons::Run() noexcept
 }
 
 SaveAddons::SaveAddons(Logger& logger, CommonContext& context,
-                       std::string filename) noexcept
-    : Operation(logger, context),
-      path(GetContext().root / std::move(filename))
+                       std::filesystem::path path) noexcept
+    : Operation(logger, context), path(std::move(path))
 {
 }
 

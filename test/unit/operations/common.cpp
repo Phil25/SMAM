@@ -120,8 +120,7 @@ TEST_F(OperationsCommonTest, LoadAddonsFinish)
     ofs.close();
 
     auto error =
-        exec.Run<CheckSMRoot>(MakeOptions("install tf2items -d ./mod/"))
-            .Run<LoadAddons>(".smamdata.json")
+        exec.Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_FALSE(error) << error.message;
@@ -136,8 +135,7 @@ TEST_F(OperationsCommonTest, LoadAddonsFail)
     ofs.close();
 
     auto error =
-        exec.Run<CheckSMRoot>(MakeOptions("install tf2items -d ./mod/"))
-            .Run<LoadAddons>(".smamdata.json")
+        exec.Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_TRUE(error);
@@ -167,8 +165,7 @@ TEST_F(OperationsCommonTest, SaveAddonsFinish)
     // clang-format on
 
     auto error =
-        exec.Run<CheckSMRoot>(MakeOptions("install tf2items -d ./mod/"))
-            .Run<SaveAddons>(".smamdata.json")
+        exec.Run<SaveAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_FALSE(error) << error.message;
