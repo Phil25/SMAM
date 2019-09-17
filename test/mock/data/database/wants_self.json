@@ -1,0 +1,12 @@
+{
+	"id": "wants_self",
+	"author": "SomeDev",
+	"description": "I want myself as dependency.",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1387386",
+	"files": [
+		"plugins/;dynamic_motd.smx"
+	],
+	"deps": [
+		"wants_self"
+	]
+}

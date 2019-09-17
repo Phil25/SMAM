@@ -1,4 +1,8 @@
+add_library(mock_curl mock/curl.cpp)
+target_include_directories(mock_curl PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
+
 add_executable(tests
+  unit/mock/curl.cpp
   unit/data/file.cpp
   unit/data/addon.cpp
   unit/utils/options.cpp
@@ -23,4 +27,7 @@ target_link_libraries(tests
   # Data
   data_file
   data_addon
+
+  # Other
+  mock_curl
 )

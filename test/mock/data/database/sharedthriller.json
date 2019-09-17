@@ -1,0 +1,9 @@
+{
+	"id": "sharedthriller",
+	"author": "Somedev",
+	"description": "I share a file with thriller.",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1590169",
+	"files": [
+		"gamedata/;thriller.plugin.txt"
+	]
+}

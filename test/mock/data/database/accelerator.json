@@ -1,0 +1,9 @@
+{
+	"id": "accelerator",
+	"author": "asherkin",
+	"description": "Crash reporting that doesn't suck.",
+	"url": "https://builds.limetech.io/?p=accelerator",
+	"files": [
+		"../../;.*"
+	]
+}

@@ -1,0 +1,12 @@
+{
+	"id": "rtd",
+	"author": "Phil25",
+	"description": "Lets players roll for temporary benefits.",
+	"url": "https://github.com/Phil25/RTD/",
+	"files": [
+		"./;rtd-.*.zip"
+	],
+	"deps": [
+		"tf2attributes"
+	]
+}

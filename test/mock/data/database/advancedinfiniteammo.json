@@ -1,0 +1,9 @@
+{
+	"id": "advancedinfiniteammo",
+	"author": "Tylerst",
+	"description": "Infinite usage for just about everything.",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1754217",
+	"files": [
+		"plugins/;AdvancedInfiniteAmmo.smx"
+	]
+}

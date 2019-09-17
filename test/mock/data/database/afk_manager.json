@@ -1,0 +1,10 @@
+{
+	"id": "afk_manager",
+	"author": "Rothgar",
+	"description": "AFK manager/kicker.",
+	"url": "https://forums.alliedmods.net/showpost.php?p=708265",
+	"files": [
+		"plugins/;http://afkmanager.dawgclan.net/plugins/afk_manager4.smx",
+		"translations/;http://afkmanager.dawgclan.net/translations/afk_manager.phrases.txt"
+	]
+}

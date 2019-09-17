@@ -1,0 +1,12 @@
+{
+	"id": "wants_rtd",
+	"author": "Somedev",
+	"description": "I want rtd",
+	"url": "https://forums.alliedmods.net/showpost.php?p=1387386",
+	"files": [
+		"plugins/;dynamic_motd.smx"
+	],
+	"deps": [
+		"rtd"
+	]
+}
