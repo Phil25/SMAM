@@ -3,6 +3,7 @@ target_include_directories(mock_curl PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNC
 
 add_executable(tests
   unit/mock/curl.cpp
+  unit/net/download.cpp
   unit/data/file.cpp
   unit/data/addon.cpp
   unit/utils/options.cpp
@@ -18,6 +19,7 @@ target_link_libraries(tests
 
   # Utilities
   utils_logger
+  utils_common
   utils_path
   utils_options
 
@@ -27,6 +29,9 @@ target_link_libraries(tests
   # Data
   data_file
   data_addon
+
+  # Network
+  net_download
 
   # Other
   mock_curl

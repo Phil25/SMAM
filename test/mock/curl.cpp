@@ -16,7 +16,9 @@
 #else
 #define PROJECT_ROOT ".."
 #endif
+
 #define DATABASE_PATH "/test/mock/data/database/"
+#define THRIDPARTY_PATH "/test/mock/data/thirdparty/"
 
 const std::map<std::string, std::string> tpLink = {
 #include "./data/thirdparty_link.json"
@@ -71,7 +73,7 @@ auto mockcurl::QueryDatabase(const std::string& url) noexcept
     }
 
     auto str = res.dump();
-    return std::vector<char>{str.begin(), str.end()};
+    return {str.begin(), str.end()};
 }
 
 auto FetchData(const std::string& url) noexcept -> std::vector<char>
@@ -81,16 +83,18 @@ auto FetchData(const std::string& url) noexcept -> std::vector<char>
         return mockcurl::QueryDatabase(url);
     }  // else call to a thirdparty website
 
-    auto loc = PROJECT_ROOT DATABASE_PATH + tpLink.at(url);
+    auto loc = PROJECT_ROOT THRIDPARTY_PATH + tpLink.at(url);
 
     auto ifs = std::ifstream(loc, std::ios::in | std::ios::ate);
     if (!ifs) return {};
 
-    auto len = ifs.tellg();
-    auto res = std::vector<char>(len);
+    auto length = ifs.tellg();
+    if (!length) return {};
+
+    auto res = std::vector<char>(length);
 
     ifs.seekg(0, std::ios::beg);
-    ifs.read(&res[0], len);
+    ifs.read(&res.front(), length);
     ifs.close();
 
     return res;
