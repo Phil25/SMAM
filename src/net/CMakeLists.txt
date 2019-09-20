@@ -6,3 +6,4 @@ else()
   target_link_libraries(net_download PRIVATE CONAN_PKG::libcurl)
 endif()
 
+add_library(net_database database.cpp)

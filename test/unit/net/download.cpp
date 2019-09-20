@@ -33,7 +33,7 @@ protected:
 TEST_F(DownloadTest, TF2Items)
 {
     auto result =
-        download::Html("https://builds.limetech.io/?p=tf2items");
+        download::Html("https://builds.limetech.io/?p=tf2items").str();
 
     ASSERT_EQ(10716, result.size()) << "Bad size";
 
@@ -46,8 +46,10 @@ TEST_F(DownloadTest, TF2Items)
 
 TEST_F(DownloadTest, Thriller)
 {
-    auto result = download::Html(
-        "https://forums.alliedmods.net/showpost.php?p=1590169");
+    auto result =
+        download::Html(
+            "https://forums.alliedmods.net/showpost.php?p=1590169")
+            .str();
 
     ASSERT_EQ(20009, result.size()) << "Bad size";
 
@@ -59,9 +61,11 @@ TEST_F(DownloadTest, Thriller)
 
 TEST_F(DownloadTest, TF2Attributes)
 {
-    auto result = download::Html(
-        "https://api.github.com/repos/FlaminSarge/tf2attributes/"
-        "releases/latest");
+    auto result =
+        download::Html(
+            "https://api.github.com/repos/FlaminSarge/tf2attributes/"
+            "releases/latest")
+            .str();
 
     ASSERT_EQ(5655, result.size()) << "Bad size";
 

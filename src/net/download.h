@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ostream>
+#include <sstream>
 
 namespace smam::download
 {
@@ -12,6 +12,6 @@ struct Error final
 };
 
 auto Raw(const std::string& url, std::ostream&) noexcept -> Error;
-auto Html(const std::string& url) noexcept -> std::string;
+auto Html(const std::string& url) noexcept -> std::stringstream;
 auto File(const std::string& url, const char* dest) noexcept -> Error;
 }  // namespace smam::download

@@ -61,22 +61,19 @@ auto download::Raw(const std::string& url, std::ostream& os) noexcept
     return {};
 }
 
-auto download::Html(const std::string& url) noexcept -> std::string
+auto download::Html(const std::string& url) noexcept
+    -> std::stringstream
 {
-    auto oss = std::ostringstream();
-    return download::Raw(url, oss) ? "" : oss.str();
+    auto oss = std::stringstream();
+    if (auto error = download::Raw(url, oss)) return {};
+    return oss;
 }
 
 auto download::File(const std::string& url, const char* dest) noexcept
     -> Error
 {
     auto ofs = std::ofstream(dest);
-
-    if (auto error = download::Raw(url, ofs))
-    {
-        return error;
-    }
-
+    if (auto error = download::Raw(url, ofs)) return error;
     return {};
 }
 }  // namespace smam
