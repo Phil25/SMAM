@@ -3,43 +3,8 @@
 #include <cassert>
 #include <sstream>
 
-namespace smam::utils
+namespace
 {
-auto SplitLines(const std::string& data) noexcept
-    -> std::vector<std::string>
-{
-    std::istringstream       dataStream(data);
-    std::string              line;
-    std::vector<std::string> lines;
-
-    while (std::getline(dataStream, line))
-    {
-        lines.push_back(line);
-    }
-
-    return lines;
-}
-
-bool IsLink(const std::string& str) noexcept
-{
-    static constexpr std::string_view https = "https://";
-    static constexpr std::string_view http  = "http://";
-
-    return str.compare(0, https.size(), https) == 0 ||
-           str.compare(0, http.size(), http) == 0;
-}
-
-auto ExtractString(std::string source, const std::string& from,
-                   const std::string& to) noexcept -> std::string
-{
-    if (from.empty() || to.empty()) return source;
-
-    auto start = source.find(from) + from.size();
-    auto end   = source.find(to, start);
-
-    return source.substr(start, end - start);
-}
-
 class Version final
 {
     std::vector<int> nums;
@@ -56,8 +21,8 @@ public:
             }
         }
 
-        std::istringstream iss(std::move(version));
-        std::string        word;
+        auto iss  = std::istringstream(std::move(version));
+        auto word = std::string{};
 
         // parse every word (space separated) into the int vector
         while (iss >> word)
@@ -86,8 +51,48 @@ public:
         return 0;
     }
 };
+}  // namespace
 
-auto BiggestVersion(const std::vector<std::string>& versions) noexcept
+namespace smam
+{
+auto utils::SplitLines(const std::string& data) noexcept
+    -> std::vector<std::string>
+{
+    std::istringstream       dataStream(data);
+    std::string              line;
+    std::vector<std::string> lines;
+
+    while (std::getline(dataStream, line))
+    {
+        lines.push_back(line);
+    }
+
+    return lines;
+}
+
+bool utils::IsLink(const std::string& str) noexcept
+{
+    static constexpr std::string_view https = "https://";
+    static constexpr std::string_view http  = "http://";
+
+    return str.compare(0, https.size(), https) == 0 ||
+           str.compare(0, http.size(), http) == 0;
+}
+
+auto utils::ExtractString(const std::string& source,
+                          const std::string& from,
+                          const std::string& to) noexcept -> std::string
+{
+    if (from.empty() || to.empty()) return source;
+
+    auto start = source.find(from) + from.size();
+    auto end   = source.find(to, start);
+
+    return source.substr(start, end - start);
+}
+
+auto utils::BiggestVersion(
+    const std::vector<std::string>& versions) noexcept
     -> const std::string&
 {
     assert(versions.size());
@@ -108,4 +113,4 @@ auto BiggestVersion(const std::vector<std::string>& versions) noexcept
 
     return versions[biggestIndex];
 }
-}  // namespace smam::utils
+}  // namespace smam
