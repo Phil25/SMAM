@@ -1,8 +1,18 @@
-#include "addon.h"
+#include "installer.h"
 
 namespace smam
 {
-CheckPending::CheckPending(Logger& logger, AddonContext& context,
+InitializeScrapers::InitializeScrapers(
+    Logger& logger, InstallerContext& context) noexcept
+    : Operation(logger, context)
+{
+}
+
+void InitializeScrapers::Run() noexcept
+{
+}
+
+CheckPending::CheckPending(Logger& logger, InstallerContext& context,
                            std::string currentID) noexcept
     : Operation(logger, context), currentID(std::move(currentID))
 {

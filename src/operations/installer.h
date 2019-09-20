@@ -5,18 +5,26 @@
 
 namespace smam
 {
-struct AddonContext final
+struct InstallerContext final
 {
     AddonPtr              addon;
     std::set<std::string> pendingToBeInstalled;
 };
 
-class CheckPending final : public Operation<AddonContext>
+class InitializeScrapers final : public Operation<InstallerContext>
+{
+public:
+    InitializeScrapers(Logger&, InstallerContext&) noexcept;
+
+    void Run() noexcept override;
+};
+
+class CheckPending final : public Operation<InstallerContext>
 {
     std::string currentID;
 
 public:
-    CheckPending(Logger&, AddonContext&,
+    CheckPending(Logger&, InstallerContext&,
                  std::string currentID) noexcept;
 
     void Run() noexcept override;
