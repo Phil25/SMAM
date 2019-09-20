@@ -11,6 +11,9 @@ add_executable(tests
   unit/utils/path.cpp
   unit/operations/core.cpp
   unit/operations/common.cpp
+  unit/scrapers/amscraper.cpp
+  unit/scrapers/ltscraper.cpp
+  unit/scrapers/ghscraper.cpp
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
@@ -34,6 +37,11 @@ target_link_libraries(tests
   # Network
   net_download
   net_database
+
+  # Scrapers
+  scrapper_am
+  scrapper_lt
+  scrapper_gh
 
   # Other
   mock_curl
