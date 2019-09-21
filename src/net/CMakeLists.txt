@@ -7,3 +7,4 @@ else()
 endif()
 
 add_library(net_database database.cpp)
+target_link_libraries(net_database PRIVATE net_download data_addon)

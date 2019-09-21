@@ -1,14 +1,21 @@
 #pragma once
 
 #include <data/addon.h>
+#include <net/database.h>
+#include <scrapers/scraper.h>
 #include <operations/core.hpp>
 
 namespace smam
 {
 struct InstallerContext final
 {
-    AddonPtr              addon;
+    std::array<ScraperPtr, 3> scrapers;
+    Database                  database;
+
     std::set<std::string> pendingToBeInstalled;
+
+    InstallerContext(const std::string&              databaseUrl,
+                     const std::vector<std::string>& ids) noexcept;
 };
 
 class InitializeScrapers final : public Operation<InstallerContext>

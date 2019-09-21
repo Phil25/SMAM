@@ -2,6 +2,13 @@
 
 namespace smam
 {
+InstallerContext::InstallerContext(
+    const std::string&              databaseUrl,
+    const std::vector<std::string>& ids) noexcept
+    : database(databaseUrl, ids)
+{
+}
+
 InitializeScrapers::InitializeScrapers(
     Logger& logger, InstallerContext& context) noexcept
     : Operation(logger, context)

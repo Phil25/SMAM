@@ -20,19 +20,12 @@ constexpr const char* badf = "badfileaddon";
 class DatabaseTest : public ::testing::Test
 {
 protected:
-    Logger      logger;
     const char* url = "localhost:7666";
 
     template <typename... Args>
     inline auto MakeCache(Args... args)
     {
-        return Database(logger, url, {std::forward<Args>(args)...})
-            .Cached();
-    }
-
-    void SetUp() override
-    {
-        logger.SetOutput(false);
+        return Database(url, {std::forward<Args>(args)...}).Cached();
     }
 };
 

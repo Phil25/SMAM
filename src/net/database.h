@@ -1,7 +1,6 @@
 #pragma once
 
 #include <data/addon.h>
-#include <utils/logger.h>
 
 #include <map>
 #include <string>
@@ -24,8 +23,8 @@ class Database final
     CacheMap cached;
 
 public:
-    Database(Logger& logger, std::string url,
-             std::initializer_list<std::string> ids) noexcept;
+    Database(std::string                     url,
+             const std::vector<std::string>& ids) noexcept;
 
     auto Cached() noexcept -> const CacheMap&;
 };
