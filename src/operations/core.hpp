@@ -65,9 +65,7 @@ class Executor final
     Context context;
 
 public:
-    template <typename... Args>
-    Executor(Logger& logger, Args... args) noexcept
-        : logger(logger), context(std::forward<Args>(args)...)
+    Executor(Logger& logger) noexcept : logger(logger)
     {
     }
 

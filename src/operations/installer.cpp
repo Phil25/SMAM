@@ -1,22 +1,36 @@
 #include "installer.h"
 
+#include <net/database.h>
+#include <scrapers/scraper.h>
+
 namespace smam
 {
-InstallerContext::InstallerContext(
-    const std::string&              databaseUrl,
-    const std::vector<std::string>& ids) noexcept
-    : database(databaseUrl, ids)
+FetchData::FetchData(Logger& logger, InstallerContext& context,
+                     const std::string&              databaseUrl,
+                     const std::vector<std::string>& ids) noexcept
+    : Operation(logger, context), databaseUrl(databaseUrl), ids(ids)
 {
 }
 
-InitializeScrapers::InitializeScrapers(
-    Logger& logger, InstallerContext& context) noexcept
-    : Operation(logger, context)
+void FetchData::Run() noexcept
 {
-}
+    auto& data   = GetContext().data;
+    auto& logger = GetLogger();
 
-void InitializeScrapers::Run() noexcept
-{
+    data = Database(logger, databaseUrl, ids).Cached();
+
+    for (const auto& id : ids)
+    {
+        if (auto it = data.find(id); it != data.end())
+        {
+            // Mark every user-specified addon as explicit.
+            it->second.addon->MarkExplicit();
+        }
+        else
+        {
+            logger.Error() << '"' << id << "\" not found." << cr;
+        }
+    }
 }
 
 CheckPending::CheckPending(Logger& logger, InstallerContext& context,

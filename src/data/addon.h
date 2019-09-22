@@ -58,4 +58,10 @@ public:
 
 void from_json(const nlohmann::json&, AddonPtr&);
 void to_json(nlohmann::json&, const AddonPtr&) noexcept;
+
+struct AddonPlan
+{
+    std::string url;
+    AddonPtr    addon;
+};
 }  // namespace smam

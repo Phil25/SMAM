@@ -21,11 +21,17 @@ class DatabaseTest : public ::testing::Test
 {
 protected:
     const char* url = "localhost:7666";
+    Logger      l;
 
     template <typename... Args>
     inline auto MakeCache(Args... args)
     {
-        return Database(url, {std::forward<Args>(args)...}).Cached();
+        return Database(l, url, {std::forward<Args>(args)...}).Cached();
+    }
+
+    void SetUp() override
+    {
+        l.SetOutput(false);
     }
 };
 

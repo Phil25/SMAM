@@ -1,6 +1,7 @@
 #pragma once
 
 #include <data/addon.h>
+#include <utils/logger.h>
 
 #include <map>
 #include <string>
@@ -9,13 +10,7 @@ namespace smam
 {
 class Database final
 {
-    struct Plan
-    {
-        std::string url;
-        AddonPtr    addon;
-    };
-
-    using CacheMap = std::map<std::string, Plan>;
+    using CacheMap = std::map<std::string, AddonPlan>;
 
     /*
      * Maps Addon IDs to {url, addon}
@@ -23,7 +18,7 @@ class Database final
     CacheMap cached;
 
 public:
-    Database(std::string                     url,
+    Database(Logger&, std::string url,
              const std::vector<std::string>& ids) noexcept;
 
     auto Cached() noexcept -> const CacheMap&;

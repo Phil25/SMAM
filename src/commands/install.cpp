@@ -7,8 +7,7 @@ namespace smam
 auto command::Install(Logger& logger, const Options& options) noexcept
     -> ExitCode
 {
-    auto exec = Executor<InstallerContext>(
-        logger, options.DatabaseUrl(), options.Addons());
+    auto exec = Executor<InstallerContext>(logger);
 
     auto error = exec.Run<CheckPending>("id").GetError();
 
