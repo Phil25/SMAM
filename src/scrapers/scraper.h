@@ -37,5 +37,6 @@ public:
     virtual auto Parse(const std::string& url) noexcept -> Data = 0;
 };
 
-using ScraperPtr = std::unique_ptr<Scraper>;
+using ScraperPtr   = std::unique_ptr<Scraper>;
+using ScraperArray = std::array<ScraperPtr, 3>;
 }  // namespace smam

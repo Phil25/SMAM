@@ -39,9 +39,9 @@ target_link_libraries(tests
   net_database
 
   # Scrapers
-  scrapper_am
-  scrapper_lt
-  scrapper_gh
+  scraper_am
+  scraper_lt
+  scraper_gh
 
   # Other
   mock_curl

@@ -34,14 +34,29 @@ auto File::Path() const noexcept -> const std::string&
     return path;
 }
 
+void File::Path(std::string path) noexcept
+{
+    this->path = std::move(path);
+}
+
 auto File::Name() const noexcept -> const std::string&
 {
     return name;
 }
 
+void File::Name(std::string name) noexcept
+{
+    this->name = std::move(name);
+}
+
 auto File::Link() const noexcept -> const std::string&
 {
     return link;
+}
+
+void File::Link(std::string link) noexcept
+{
+    this->link = std::move(link);
 }
 
 auto File::Raw() const noexcept -> std::string

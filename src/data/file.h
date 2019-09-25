@@ -15,8 +15,13 @@ public:
     File(const std::string&);
 
     auto Path() const noexcept -> const std::string&;
+    void Path(std::string) noexcept;
+
     auto Name() const noexcept -> const std::string&;
+    void Name(std::string) noexcept;
+
     auto Link() const noexcept -> const std::string&;
+    void Link(std::string) noexcept;
 
     auto Raw() const noexcept -> std::string;
 };

@@ -8,12 +8,32 @@ auto command::Install(Logger& logger, const Options& options) noexcept
     -> ExitCode
 {
     auto exec = Executor<InstallerContext>(logger);
+    auto db   = options.DatabaseUrl();
+    auto ids  = options.Addons();
 
-    auto error = exec.Run<CheckPending>("id").GetError();
+    auto setupError = exec.Run<PrecacheAddons>(db, ids)
+                          .Run<InitScrapers>()
+                          .GetError();
 
-    if (error)
+    if (setupError)
     {
-        logger << error.message << cr;
+        logger << setupError.message << cr;
+        return ExitCode::Failure;
+    }
+
+    for (const auto& id : ids)
+    {
+        auto error = exec.Run<CheckPending>(id)
+                         .Run<SetAddon>(id)
+                         .Run<CheckInstalled>(options.Force())
+                         .Run<InstallDependencies>()
+                         .Run<InstallAddon>()
+                         .GetError();
+
+        if (error)
+        {
+            logger << error.message << cr;
+        }
     }
 
     return ExitCode::OK;
