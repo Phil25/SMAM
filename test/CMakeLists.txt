@@ -9,11 +9,12 @@ add_executable(tests
   unit/data/addon.cpp
   unit/utils/options.cpp
   unit/utils/path.cpp
-  unit/operations/core.cpp
-  unit/operations/common.cpp
   unit/scrapers/amscraper.cpp
   unit/scrapers/ltscraper.cpp
   unit/scrapers/ghscraper.cpp
+  unit/operations/core.cpp
+  unit/operations/common.cpp
+  unit/operations/installer.cpp
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
@@ -29,6 +30,7 @@ target_link_libraries(tests
 
   # Operations
   op_common
+  op_installer
 
   # Data
   data_file

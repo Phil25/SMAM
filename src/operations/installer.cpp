@@ -72,14 +72,14 @@ void SetAddon::Run() noexcept
 {
     const auto& data = GetContext().data;
 
-    if (auto it = data.find(currentID); it == data.end())
-    {
-        Fail("Not found: \"" + currentID + '"');
-    }
-    else
+    if (auto it = data.find(currentID); it != data.end())
     {
         GetContext().addon = it->second.addon;
         GetContext().url   = std::move(it->second.url);
+    }
+    else
+    {
+        Fail("Not found: \"" + currentID + '"');
     }
 }
 
