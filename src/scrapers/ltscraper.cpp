@@ -35,7 +35,7 @@ auto ParseData(const std::string& doc) noexcept
         name = url.substr(++pos);
     }
 
-    data.emplace(name, url);
+    data.nameToLink.emplace(name, url);
     return data;
 }
 }  // namespace

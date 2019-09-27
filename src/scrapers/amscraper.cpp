@@ -119,11 +119,11 @@ auto AMNode::ParseData(const std::string& doc) noexcept
         auto node  = AMNode(anchor.node());
         auto name  = node.Name();
         auto url   = node.Url();
-        auto entry = data.find(name);
+        auto entry = data.nameToLink.find(name);
 
-        if (entry == data.end())
+        if (entry == data.nameToLink.end())
         {
-            data.emplace(name, url);
+            data.nameToLink.emplace(name, url);
         }
         else if (IsUrlReplaceable(entry->second))
         {

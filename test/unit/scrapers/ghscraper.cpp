@@ -13,11 +13,11 @@ protected:
 
 TEST_F(GHScraperTest, TF2Attributes)
 {
-    expected["tf2attributes.smx"] =
+    expected.nameToLink["tf2attributes.smx"] =
         "https://github.com/FlaminSarge/tf2attributes/releases/"
         "download/v1.2.1/tf2attributes.smx";
 
-    expected["tf2attributes_example.smx"] =
+    expected.nameToLink["tf2attributes_example.smx"] =
         "https://github.com/FlaminSarge/tf2attributes/releases/"
         "download/v1.2.1/tf2attributes_example.smx";
 

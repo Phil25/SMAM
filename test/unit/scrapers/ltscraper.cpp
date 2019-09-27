@@ -13,7 +13,7 @@ protected:
 
 TEST_F(LTScraperTest, Accelerator)
 {
-    expected["accelerator-2.4.3-git127-b302f00-linux.zip"] =
+    expected.nameToLink["accelerator-2.4.3-git127-b302f00-linux.zip"] =
         "https://builds.limetech.io/files/"
         "accelerator-2.4.3-git127-b302f00-linux.zip";
 
@@ -27,7 +27,7 @@ TEST_F(LTScraperTest, Accelerator)
 
 TEST_F(LTScraperTest, Connect)
 {
-    expected["connect-1.2.0-hg38-linux.zip"] =
+    expected.nameToLink["connect-1.2.0-hg38-linux.zip"] =
         "https://builds.limetech.io/files/"
         "connect-1.2.0-hg38-linux.zip";
 
@@ -41,7 +41,7 @@ TEST_F(LTScraperTest, Connect)
 
 TEST_F(LTScraperTest, SteamTools)
 {
-    expected["steamtools-0.10.0-git179-54fdc51-linux.zip"] =
+    expected.nameToLink["steamtools-0.10.0-git179-54fdc51-linux.zip"] =
         "https://builds.limetech.io/files/"
         "steamtools-0.10.0-git179-54fdc51-linux.zip";
 
@@ -55,7 +55,7 @@ TEST_F(LTScraperTest, SteamTools)
 
 TEST_F(LTScraperTest, TF2Items)
 {
-    expected["tf2items-1.6.4-hg279-linux.zip"] =
+    expected.nameToLink["tf2items-1.6.4-hg279-linux.zip"] =
         "https://builds.limetech.io/files/"
         "tf2items-1.6.4-hg279-linux.zip";
 

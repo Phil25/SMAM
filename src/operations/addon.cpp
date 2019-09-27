@@ -27,7 +27,7 @@ auto FindMatches(const std::string&   base,
     {
         const std::regex re(base);
 
-        for (const auto& [name, _] : data)
+        for (const auto& [name, _] : data.nameToLink)
         {
             if (std::regex_match(name, re))
             {
@@ -85,9 +85,9 @@ void EvaluateFiles::Run() noexcept
 
     for (auto& file : GetContext().addon->Files())
     {
-        auto attachment = data.find(file->Name());
+        auto attachment = data.nameToLink.find(file->Name());
 
-        if (attachment != data.end())  // found
+        if (attachment != data.nameToLink.end())  // found
         {
             file->Link(attachment->second);
             continue;
@@ -110,9 +110,9 @@ void EvaluateFiles::Run() noexcept
         if (!names.empty())
         {
             std::string best = utils::BiggestVersion(names);
-            attachment       = data.find(best);
+            attachment       = data.nameToLink.find(best);
 
-            if (attachment != data.end())
+            if (attachment != data.nameToLink.end())
             {
                 file->Name(best);
                 file->Link(attachment->second);

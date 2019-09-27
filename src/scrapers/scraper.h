@@ -9,7 +9,7 @@ namespace smam
 class Scraper
 {
 public:
-    struct Data : std::map<std::string, std::string>
+    struct Data final
     {
         enum class Website
         {
@@ -19,8 +19,9 @@ public:
             Unknown
         };
 
-        std::string url{};
-        Website     website{Website::Unknown};
+        std::map<std::string, std::string> nameToLink;
+        std::string                        url{};
+        Website                            website{Website::Unknown};
     };
 
 protected:

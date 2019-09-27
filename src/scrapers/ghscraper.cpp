@@ -63,7 +63,9 @@ auto GHScraper::Parse(const std::string& url) noexcept -> Data
 
         for (const auto& asset : root.at("assets"))
         {
-            data[asset.at("name")] = asset.at("browser_download_url");
+            data.nameToLink.emplace(
+                std::move(asset.at("name")),
+                std::move(asset.at("browser_download_url")));
         }
     }
     catch (const json::exception&)
