@@ -14,6 +14,7 @@ add_executable(tests
   unit/scrapers/ghscraper.cpp
   unit/operations/core.cpp
   unit/operations/common.cpp
+  unit/operations/addon.cpp
   unit/operations/installer.cpp
 )
 
@@ -30,6 +31,7 @@ target_link_libraries(tests
 
   # Operations
   op_common
+  op_addon
   op_installer
 
   # Data

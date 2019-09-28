@@ -54,6 +54,7 @@ auto LTScraper::Parse(const std::string& url) noexcept -> Data
     auto data = ParseData(utils::ExtractString(doc, from, to));
 
     data.website = Data::Website::Limetech;
+    data.url     = url;
 
     return data;
 }

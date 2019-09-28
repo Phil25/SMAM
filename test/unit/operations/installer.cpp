@@ -7,14 +7,14 @@ namespace smam
 {
 constexpr const char* url = "localhost:7666";
 
-class InstallerTest : public ::testing::Test
+class OperarationInstallerTest : public ::testing::Test
 {
 protected:
     Logger                     logger;
     Executor<InstallerContext> exec{logger};
 };
 
-TEST_F(InstallerTest, PrecacheAddonsSinglePositive)
+TEST_F(OperarationInstallerTest, PrecacheAddonsSinglePositive)
 {
     const auto addons = std::vector<std::string>{"accelerator"};
     const auto error = exec.Run<PrecacheAddons>(url, addons).GetError();
@@ -35,7 +35,7 @@ TEST_F(InstallerTest, PrecacheAddonsSinglePositive)
     EXPECT_TRUE(plan.addon->IsExplicit());
 }
 
-TEST_F(InstallerTest, PrecacheAddonsSingleNegative)
+TEST_F(OperarationInstallerTest, PrecacheAddonsSingleNegative)
 {
     const auto addons = std::vector<std::string>{"invalid"};
     const auto error = exec.Run<PrecacheAddons>(url, addons).GetError();
@@ -47,7 +47,7 @@ TEST_F(InstallerTest, PrecacheAddonsSingleNegative)
     ASSERT_EQ(0, data.size());
 }
 
-TEST_F(InstallerTest, PrecacheAddonsMultiple)
+TEST_F(OperarationInstallerTest, PrecacheAddonsMultiple)
 {
     const auto addons =
         std::vector<std::string>{"accelerator", "invalid", "thriller"};
@@ -78,7 +78,7 @@ TEST_F(InstallerTest, PrecacheAddonsMultiple)
     EXPECT_TRUE(thr.addon->IsExplicit());
 }
 
-TEST_F(InstallerTest, PrecacheAddonsDependencies)
+TEST_F(OperarationInstallerTest, PrecacheAddonsDependencies)
 {
     const auto addons = std::vector<std::string>{"rtd", "a_wants_b"};
     const auto error = exec.Run<PrecacheAddons>(url, addons).GetError();
@@ -122,7 +122,7 @@ TEST_F(InstallerTest, PrecacheAddonsDependencies)
     EXPECT_FALSE(bwa.addon->IsExplicit());
 }
 
-TEST_F(InstallerTest, InitScrapers)
+TEST_F(OperarationInstallerTest, InitScrapers)
 {
     const auto error = exec.Run<InitScrapers>().GetError();
 
@@ -142,7 +142,7 @@ TEST_F(InstallerTest, InitScrapers)
               exec.GetContext().scrapers[2]->Url());
 }
 
-TEST_F(InstallerTest, CheckPending)
+TEST_F(OperarationInstallerTest, CheckPending)
 {
     auto error = exec.Run<CheckPending>("id").GetError();
 
@@ -154,7 +154,7 @@ TEST_F(InstallerTest, CheckPending)
     EXPECT_EQ("_", error.message);
 }
 
-TEST_F(InstallerTest, SetAddonSuccess)
+TEST_F(OperarationInstallerTest, SetAddonSuccess)
 {
     auto addons = std::vector<std::string>{"rtd"};
 
@@ -173,7 +173,7 @@ TEST_F(InstallerTest, SetAddonSuccess)
     EXPECT_TRUE(addon->IsExplicit());
 }
 
-TEST_F(InstallerTest, SetAddonFail)
+TEST_F(OperarationInstallerTest, SetAddonFail)
 {
     auto error = exec.Run<SetAddon>("rtd").GetError();
 
@@ -181,7 +181,7 @@ TEST_F(InstallerTest, SetAddonFail)
     EXPECT_EQ("Not found: \"rtd\"", error.message);
 }
 
-TEST_F(InstallerTest, CheckInstalled)
+TEST_F(OperarationInstallerTest, CheckInstalled)
 {
     auto addons = std::vector<std::string>{"rtd"};
 
@@ -201,7 +201,7 @@ TEST_F(InstallerTest, CheckInstalled)
     EXPECT_EQ("Already installed: \"rtd\"", error.message);
 }
 
-TEST_F(InstallerTest, CheckInstalledForce)
+TEST_F(OperarationInstallerTest, CheckInstalledForce)
 {
     auto addons = std::vector<std::string>{"rtd"};
 

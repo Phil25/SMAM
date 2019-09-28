@@ -69,6 +69,7 @@ void FindData::Run() noexcept
         if (Match(url, scraper->Url()))
         {
             GetContext().data = scraper->Parse(url);
+            return;
         }
     }
 }

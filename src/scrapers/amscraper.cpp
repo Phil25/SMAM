@@ -150,6 +150,7 @@ auto AMScraper::Parse(const std::string& url) noexcept -> Data
     auto data = AMNode::ParseData(utils::ExtractString(doc, from, to));
 
     data.website = Data::Website::AlliedModders;
+    data.url     = url;
 
     return data;
 }

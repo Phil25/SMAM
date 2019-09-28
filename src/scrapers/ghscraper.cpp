@@ -54,6 +54,7 @@ auto GHScraper::Parse(const std::string& url) noexcept -> Data
 
     Data data;
     data.website = Data::Website::GitHub;
+    data.url     = url;
 
     try
     {
