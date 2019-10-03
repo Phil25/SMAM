@@ -17,15 +17,14 @@ using namespace testing;
 class OperationsCommonTest : public ::testing::Test
 {
 protected:
-    Logger                  logger;
-    Executor<CommonContext> exec{logger};
+    Logger logger;
 
-    auto MakeOptions(std::string command) noexcept -> Options
+    auto Exec(const char* cmd) noexcept -> Executor<CommonContext>
     {
         std::vector<std::string> args{"smam"};
         std::string              arg;
 
-        std::istringstream iss(std::move(command));
+        std::istringstream iss(cmd);
         while (iss >> arg) args.push_back(arg);
 
         int         size = args.size();
@@ -36,7 +35,13 @@ protected:
             argv[i] = args[i].c_str();
         }
 
-        return {size, argv, logger};
+        return {logger,
+                std::make_shared<Options>(Options{size, argv, logger})};
+    }
+
+    auto Exec() noexcept -> Executor<CommonContext>
+    {
+        return Exec("");
     }
 
     void SetUp() override
@@ -53,13 +58,12 @@ protected:
 
 TEST_F(OperationsCommonTest, CheckAddons)
 {
-    auto options1 = MakeOptions("install tf2items rtd");
-    auto error1   = exec.Run<CheckAddons>(options1).GetError();
+    auto error1 =
+        Exec("install tf2items rtd").Run<CheckAddons>().GetError();
 
     ASSERT_FALSE(error1) << error1.message;
 
-    auto options2 = MakeOptions("install -d abc");
-    auto error2   = exec.Run<CheckAddons>(options2).GetError();
+    auto error2 = Exec("install -d abc").Run<CheckAddons>().GetError();
 
     ASSERT_TRUE(error2);
     EXPECT_EQ("No addons specified.", error2.message);
@@ -67,14 +71,14 @@ TEST_F(OperationsCommonTest, CheckAddons)
 
 TEST_F(OperationsCommonTest, CheckSMRootNoOptions)
 {
-    auto error = exec.Run<CheckSMRoot>(MakeOptions("")).GetError();
+    auto error = Exec().Run<CheckSMRoot>().GetError();
     ASSERT_TRUE(error);
     EXPECT_EQ("SourceMod root not found.", error.message);
 }
 
 TEST_F(OperationsCommonTest, CheckSMRootNotFound)
 {
-    auto error = exec.Run<CheckSMRoot>(MakeOptions("-d .")).GetError();
+    auto error = Exec("-d .").Run<CheckSMRoot>().GetError();
     ASSERT_TRUE(error);
     EXPECT_EQ("SourceMod root not found.", error.message);
 }
@@ -84,9 +88,8 @@ TEST_F(OperationsCommonTest, CheckSMRootFound)
     namespace fs               = std::filesystem;
     static const fs::path root = "mod/addons/sourcemod";
 
-    auto error =
-        exec.Run<CheckSMRoot>(MakeOptions("install tf2items -d ./mod/"))
-            .GetError();
+    auto exec  = Exec("install tf2items -d ./mod/");
+    auto error = exec.Run<CheckSMRoot>().GetError();
 
     ASSERT_FALSE(error) << error.message;
     EXPECT_TRUE(fs::equivalent(root, exec.GetContext().root));
@@ -120,7 +123,8 @@ TEST_F(OperationsCommonTest, LoadAddonsFinish)
     ofs.close();
 
     auto error =
-        exec.Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
+        Exec()
+            .Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_FALSE(error) << error.message;
@@ -135,7 +139,8 @@ TEST_F(OperationsCommonTest, LoadAddonsFail)
     ofs.close();
 
     auto error =
-        exec.Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
+        Exec()
+            .Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_TRUE(error);
@@ -165,7 +170,8 @@ TEST_F(OperationsCommonTest, SaveAddonsFinish)
     // clang-format on
 
     auto error =
-        exec.Run<SaveAddons>("mod/addons/sourcemod/.smamdata.json")
+        Exec()
+            .Run<SaveAddons>("mod/addons/sourcemod/.smamdata.json")
             .GetError();
 
     ASSERT_FALSE(error) << error.message;

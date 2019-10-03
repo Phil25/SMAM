@@ -38,6 +38,16 @@ void Addon::MarkExplicit() noexcept
     installedExplicitly = true;
 }
 
+auto Addon::BaseURL() const noexcept -> const std::string&
+{
+    return baseUrl;
+}
+
+void Addon::BaseURL(std::string baseUrl) noexcept
+{
+    this->baseUrl = std::move(baseUrl);
+}
+
 auto Addon::Files() const noexcept -> const FileVector&
 {
     return files;

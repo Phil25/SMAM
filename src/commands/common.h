@@ -15,7 +15,6 @@ enum ExitCode
     NoAddons,
     NoSMRoot,
     CorruptedCache,
-    Failure,
 };
 
 namespace command

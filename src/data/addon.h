@@ -22,6 +22,7 @@ class Addon final : public std::enable_shared_from_this<Addon>
 
     const std::string id, author, description;
 
+    std::string   baseUrl;
     bool          installedExplicitly{false};
     FileVector    files;
     DependencySet dependencies;
@@ -38,6 +39,9 @@ public:
 
     bool IsExplicit() const noexcept;
     void MarkExplicit() noexcept;
+
+    auto BaseURL() const noexcept -> const std::string&;
+    void BaseURL(std::string) noexcept;
 
     auto Files() const noexcept -> const FileVector&;
     void Files(FileVector) noexcept;
@@ -59,9 +63,5 @@ public:
 void from_json(const nlohmann::json&, AddonPtr&);
 void to_json(nlohmann::json&, const AddonPtr&) noexcept;
 
-struct AddonPlan
-{
-    std::string url;
-    AddonPtr    addon;
-};
+using AddonMap = std::map<std::string, AddonPtr>;
 }  // namespace smam

@@ -1,34 +1,36 @@
 #include "common.h"
 
+#include <net/database.h>
 #include <operations/installer.h>
+#include <scrapers/amscraper.h>
+#include <scrapers/ghscraper.h>
+#include <scrapers/ltscraper.h>
 
 namespace smam
 {
 auto command::Install(Logger& logger, const Options& options) noexcept
     -> ExitCode
 {
-    auto exec = Executor<InstallerContext>(logger);
-    auto db   = options.DatabaseUrl();
-    auto ids  = options.Addons();
+    const auto& ids   = options.Addons();
+    const auto& url   = options.DatabaseUrl();
+    const auto  cache = Database(logger, url, ids).Cached();
 
-    auto setupError = exec.Run<PrecacheAddons>(db, ids)
-                          .Run<InitScrapers>()
-                          .GetError();
-
-    if (setupError)
-    {
-        logger << setupError.message << cr;
-        return ExitCode::Failure;
-    }
+    static_assert(std::tuple_size<ScraperArray>::value == 3);
+    auto scrapers   = std::make_shared<ScraperArray>();
+    scrapers->at(0) = std::make_unique<AMScraper>();
+    scrapers->at(1) = std::make_unique<LTScraper>();
+    scrapers->at(2) = std::make_unique<GHScraper>();
 
     for (const auto& id : ids)
     {
-        auto error = exec.Run<CheckPending>(id)
-                         .Run<SetAddon>(id)
-                         .Run<CheckInstalled>(options.Force())
-                         .Run<InstallDependencies>()
-                         .Run<InstallAddon>()
-                         .GetError();
+        const auto error = Executor<InstallerContext>(logger, id, cache)
+                               .Run<CheckPending>()
+                               .Run<ParseCache>()
+                               .Run<MarkExplicit>()
+                               .Run<CheckInstalled>(options.Force())
+                               .Run<InstallDependencies>(scrapers)
+                               .Run<InstallAddon>(scrapers)
+                               .GetError();
 
         if (error)
         {

@@ -10,6 +10,8 @@ namespace smam
 {
 namespace addon
 {
+constexpr const char* rtd  = "rtd";
+constexpr const char* tf2a = "tf2attributes";
 constexpr const char* acce = "accelerator";
 constexpr const char* thri = "thriller";
 constexpr const char* bad1 = "bad1";
@@ -42,10 +44,11 @@ TEST_F(DatabaseTest, PositiveSingle)
     ASSERT_EQ(1, cache.size());
     ASSERT_TRUE(cache.count(addon::acce));
 
-    const auto& [url, addon] = cache[addon::acce];
+    const auto& addon = cache[addon::acce];
 
-    ASSERT_FALSE(url.empty());
-    EXPECT_EQ("https://builds.limetech.io/?p=accelerator", url);
+    ASSERT_FALSE(addon->BaseURL().empty());
+    EXPECT_EQ("https://builds.limetech.io/?p=accelerator",
+              addon->BaseURL());
 
     auto files = addon->Files();
     ASSERT_EQ(1, files.size());
@@ -61,11 +64,11 @@ TEST_F(DatabaseTest, PositiveMultiple)
     ASSERT_TRUE(cache.count(addon::acce));
     ASSERT_TRUE(cache.count(addon::thri));
 
-    EXPECT_FALSE(cache[addon::acce].url.empty());
-    EXPECT_FALSE(cache[addon::acce].addon->Files().empty());
+    EXPECT_FALSE(cache[addon::acce]->BaseURL().empty());
+    EXPECT_FALSE(cache[addon::acce]->Files().empty());
 
-    EXPECT_FALSE(cache[addon::thri].url.empty());
-    EXPECT_FALSE(cache[addon::thri].addon->Files().empty());
+    EXPECT_FALSE(cache[addon::thri]->BaseURL().empty());
+    EXPECT_FALSE(cache[addon::thri]->Files().empty());
 }
 
 TEST_F(DatabaseTest, NegativeSingle)
@@ -87,8 +90,20 @@ TEST_F(DatabaseTest, PositiveNegativeMix)
     ASSERT_TRUE(cache.count(addon::acce));
     ASSERT_FALSE(cache.count(addon::bad2));
 
-    EXPECT_FALSE(cache[addon::acce].url.empty());
-    EXPECT_FALSE(cache[addon::acce].addon->Files().empty());
+    EXPECT_FALSE(cache[addon::acce]->BaseURL().empty());
+    EXPECT_FALSE(cache[addon::acce]->Files().empty());
+}
+
+TEST_F(DatabaseTest, Dependencies)
+{
+    auto cache = MakeCache(addon::rtd);
+
+    ASSERT_EQ(2, cache.size());
+    ASSERT_TRUE(cache.count(addon::rtd));
+    ASSERT_TRUE(cache.count(addon::tf2a));
+
+    EXPECT_FALSE(cache[addon::rtd]->BaseURL().empty());
+    EXPECT_FALSE(cache[addon::tf2a]->Files().empty());
 }
 
 TEST_F(DatabaseTest, NotPrecached)

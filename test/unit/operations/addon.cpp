@@ -5,6 +5,8 @@
 
 #include <operations/installer.h>
 
+#include <net/database.h>
+
 #include <scrapers/amscraper.h>
 #include <scrapers/ghscraper.h>
 #include <scrapers/ltscraper.h>
@@ -16,56 +18,41 @@ using namespace testing;
 class OperationAddonTest : public ::testing::Test
 {
 protected:
-    Logger                     logger;
-    Executor<AddonContext>     exec{logger};
-    Executor<InstallerContext> installer{logger};
+    Logger      logger;
+    const char* url = "localhost:7666";
 
-    auto GetPlans() noexcept
+    auto GetAddon(const std::string& id) noexcept -> AddonPtr
     {
-        const auto& data  = installer.GetContext().data;
-        auto        plans = std::vector<AddonPlan>{};
+        const auto cache = Database(logger, url, {id}).Cached();
 
-        std::transform(data.cbegin(), data.cend(),
-                       std::back_inserter(plans),
-                       [](const auto& entry) { return entry.second; });
+        if (auto it = cache.find(id); it != cache.end())
+        {
+            return it->second;
+        }
 
-        return plans;
-    }
-
-    void SetUp() override
-    {
-        const char* url = "localhost:7666";
-        const auto  addons =
-            std::vector<std::string>{"accelerator", "rtd", "thriller"};
-
-        const auto error =
-            installer.Run<PrecacheAddons>(url, addons).GetError();
-
-        ASSERT_FALSE(error) << "SetUp failed: " << error.message;
-        ASSERT_EQ(4, GetPlans().size());
+        return {};
     }
 };
 
-TEST_F(OperationAddonTest, InitAddonContext)
+TEST_F(OperationAddonTest, ContextConstructor)
 {
-    auto error =
-        exec.Run<InitAddonContext>(GetPlans()[1].addon).GetError();
-
-    ASSERT_FALSE(error) << error.message;
+    auto exec = Executor<AddonContext>(logger, GetAddon("rtd"));
     EXPECT_EQ("rtd", exec.GetContext().addon->ID());
 }
 
 TEST_F(OperationAddonTest, FindData)
 {
-    const auto scrapers = ScraperArray{std::make_unique<AMScraper>(),
-                                       std::make_unique<LTScraper>(),
-                                       std::make_unique<GHScraper>()};
+    auto addon = GetAddon("rtd");
+    auto exec  = Executor<AddonContext>(logger, addon);
 
-    const auto url = GetPlans()[1].url;
-    ASSERT_EQ("https://github.com/Phil25/RTD/", url);
+    auto scrapers   = std::make_shared<ScraperArray>();
+    scrapers->at(0) = std::make_unique<AMScraper>();
+    scrapers->at(1) = std::make_unique<LTScraper>();
+    scrapers->at(2) = std::make_unique<GHScraper>();
 
-    auto error =
-        exec.Run<FindData>(std::cref(scrapers), url).GetError();
+    ASSERT_EQ("https://github.com/Phil25/RTD/", addon->BaseURL());
+
+    auto error = exec.Run<FindData>(scrapers).GetError();
 
     ASSERT_FALSE(error) << error.message;
 

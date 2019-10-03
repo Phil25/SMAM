@@ -10,17 +10,15 @@ namespace smam
 {
 class Database final
 {
-    using CacheMap = std::map<std::string, AddonPlan>;
-
     /*
-     * Maps Addon IDs to {url, addon}
+     * Maps Addon IDs to AddonPtr
      */
-    CacheMap cached;
+    AddonMap cached;
 
 public:
     Database(Logger&, std::string url,
              const std::vector<std::string>& ids) noexcept;
 
-    auto Cached() noexcept -> const CacheMap&;
+    auto Cached() noexcept -> const AddonMap&;
 };
 }  // namespace smam

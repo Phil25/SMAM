@@ -5,29 +5,34 @@
 
 namespace smam
 {
-CheckAddons::CheckAddons(Logger& logger, CommonContext& context,
-                         const Options& options) noexcept
-    : Operation(logger, context), options(options)
+CommonContext::CommonContext(const OptionsPtr& options) noexcept
+    : options(options)
+{
+}
+
+CheckAddons::CheckAddons(Logger&        logger,
+                         CommonContext& context) noexcept
+    : Operation(logger, context)
 {
 }
 
 void CheckAddons::Run() noexcept
 {
-    if (options.Addons().empty())
+    if (GetContext().options->Addons().empty())
     {
         Fail("No addons specified.");
     }
 }
 
-CheckSMRoot::CheckSMRoot(Logger& logger, CommonContext& context,
-                         const Options& options) noexcept
-    : Operation(logger, context), options(options)
+CheckSMRoot::CheckSMRoot(Logger&        logger,
+                         CommonContext& context) noexcept
+    : Operation(logger, context)
 {
 }
 
 void CheckSMRoot::Run() noexcept
 {
-    auto dest = options.Destination().value_or("");
+    auto dest = GetContext().options->Destination().value_or("");
     auto root = path::FindSMRoot(dest);
 
     if (root)

@@ -44,8 +44,10 @@ Database::Database(Logger& logger, std::string url,
 
         try
         {
-            auto p = AddonPlan{entry.at("url"), entry.get<AddonPtr>()};
-            cached.emplace(std::move(id), std::move(p));
+            auto addon = entry.get<AddonPtr>();
+            addon->BaseURL(entry.at("url"));
+
+            cached.emplace(std::move(id), addon);
         }
         catch (const json::exception& e)
         {
@@ -58,7 +60,7 @@ Database::Database(Logger& logger, std::string url,
     }
 }
 
-auto Database::Cached() noexcept -> const CacheMap&
+auto Database::Cached() noexcept -> const AddonMap&
 {
     return cached;
 }

@@ -11,24 +11,23 @@ namespace smam
 struct CommonContext final
 {
     std::filesystem::path root;
+    OptionsPtr            options;
+
+    explicit CommonContext(const OptionsPtr&) noexcept;
 };
 
 class CheckAddons final : public Operation<CommonContext>
 {
-    const Options& options;
-
 public:
-    CheckAddons(Logger&, CommonContext&, const Options&) noexcept;
+    CheckAddons(Logger&, CommonContext&) noexcept;
 
     void Run() noexcept;
 };
 
 class CheckSMRoot final : public Operation<CommonContext>
 {
-    const Options& options;
-
 public:
-    CheckSMRoot(Logger&, CommonContext&, const Options&) noexcept;
+    CheckSMRoot(Logger&, CommonContext&) noexcept;
 
     void Run() noexcept;
 };

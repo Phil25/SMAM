@@ -3,90 +3,70 @@
 #include <net/database.h>
 #include <operations/addon.h>
 
-#include <scrapers/amscraper.h>
-#include <scrapers/ghscraper.h>
-#include <scrapers/ltscraper.h>
-
 namespace smam
 {
-PrecacheAddons::PrecacheAddons(
-    Logger& logger, InstallerContext& context,
-    const std::string&              databaseUrl,
-    const std::vector<std::string>& ids) noexcept
-    : Operation(logger, context), databaseUrl(databaseUrl), ids(ids)
+InstallerContext::InstallerContext(std::string id,
+                                   AddonMap    cache) noexcept
+    : id(std::move(id)), cache(std::move(cache))
 {
 }
 
-void PrecacheAddons::Run() noexcept
-{
-    auto& data = GetContext().data;
-
-    data = Database(GetLogger(), databaseUrl, ids).Cached();
-
-    for (const auto& id : ids)
-    {
-        if (auto it = data.find(id); it != data.end())
-        {
-            // Mark every user-specified addon as explicit.
-            it->second.addon->MarkExplicit();
-        }
-    }
-}
-
-InitScrapers::InitScrapers(Logger&           logger,
-                           InstallerContext& context) noexcept
-    : Operation(logger, context)
-{
-}
-
-void InitScrapers::Run() noexcept
-{
-    GetContext().scrapers[0] = std::make_unique<AMScraper>();
-    GetContext().scrapers[1] = std::make_unique<LTScraper>();
-    GetContext().scrapers[2] = std::make_unique<GHScraper>();
-}
-
-CheckPending::CheckPending(Logger& logger, InstallerContext& context,
-                           std::string currentID) noexcept
-    : Operation(logger, context), currentID(std::move(currentID))
+CheckPending::CheckPending(Logger& l, InstallerContext& c) noexcept
+    : Operation(l, c)
 {
 }
 
 void CheckPending::Run() noexcept
 {
-    if (GetContext().pendingToBeInstalled.count(currentID))
+    if (GetContext().pendingToBeInstalled.count(GetContext().id))
     {
         Stop();
     }
 
-    GetContext().pendingToBeInstalled.emplace(std::move(currentID));
+    GetContext().pendingToBeInstalled.insert(GetContext().id);
 }
 
-SetAddon::SetAddon(Logger& logger, InstallerContext& context,
-                   std::string currentID) noexcept
-    : Operation(logger, context), currentID(std::move(currentID))
+ParseCache::ParseCache(Logger& l, InstallerContext& c) noexcept
+    : Operation(l, c)
 {
 }
 
-void SetAddon::Run() noexcept
+void ParseCache::Run() noexcept
 {
-    const auto& data = GetContext().data;
+    const auto& cache = GetContext().cache;
 
-    if (auto it = data.find(currentID); it != data.end())
+    if (auto it = cache.find(GetContext().id); it != cache.end())
     {
-        GetContext().addon = it->second.addon;
-        GetContext().url   = std::move(it->second.url);
+        GetContext().addon = it->second;
     }
     else
     {
-        Fail("Not found: \"" + currentID + '"');
+        Fail("Not found: \"" + GetContext().id + '"');
     }
 }
 
-CheckInstalled::CheckInstalled(Logger&           logger,
-                               InstallerContext& context,
-                               bool              force) noexcept
-    : Operation(logger, context), force(force)
+MarkExplicit::MarkExplicit(Logger& l, InstallerContext& c) noexcept
+    : Operation(l, c)
+{
+}
+
+void MarkExplicit::Run() noexcept
+{
+    assert(GetContext().addon);
+
+    /*
+     * Every user-specified addon should be marked as explicit.
+     * Needs to be marked before CheckInstalled in case the user wants
+     * to specify explicitness, after the addon has potentially
+     * been installed as a dependnecy initially.
+     * TODO: Notify the user about marking an addon as explicit.
+     */
+    GetContext().addon->MarkExplicit();
+}
+
+CheckInstalled::CheckInstalled(Logger& l, InstallerContext& c,
+                               bool force) noexcept
+    : Operation(l, c), force(force)
 {
 }
 
@@ -104,40 +84,40 @@ void CheckInstalled::Run() noexcept
 }
 
 InstallDependencies::InstallDependencies(
-    Logger& logger, InstallerContext& context) noexcept
-    : Operation(logger, context)
+    Logger& logger, InstallerContext& context,
+    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+    : Operation(logger, context), scrapers(scrapers)
 {
 }
 
 void InstallDependencies::Run() noexcept
 {
+    assert(GetContext().addon);
+
     for (const auto& dep : GetContext().addon->Dependencies())
     {
         // TODO: finish me after figuring out installation
     }
 }
 
-InstallAddon::InstallAddon(Logger&           logger,
-                           InstallerContext& context) noexcept
-    : Operation(logger, context)
+InstallAddon::InstallAddon(
+    Logger& logger, InstallerContext& context,
+    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+    : Operation(logger, context), scrapers(scrapers)
 {
 }
 
 void InstallAddon::Run() noexcept
 {
-    const auto& con = GetContext();
+    assert(GetContext().addon);
 
-    auto exec  = Executor<AddonContext>(GetLogger());
-    auto error = exec.Run<InitAddonContext>(con.addon)
-                     .Run<FindData>(std::cref(con.scrapers), con.url)
+    auto error = Executor<AddonContext>(GetLogger(), GetContext().addon)
+                     .Run<FindData>(scrapers)
                      .Run<EvaluateFiles>()
                      .Run<DownloadFiles>()
                      .Run<MarkInstalled>()
                      .GetError();
 
-    if (error)
-    {
-        Fail(error.message);
-    }
+    if (error) Fail(error.message);
 }
 }  // namespace smam

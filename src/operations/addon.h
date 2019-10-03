@@ -7,29 +7,21 @@
 
 namespace smam
 {
-struct AddonContext
+struct AddonContext final
 {
     AddonPtr      addon;
     Scraper::Data data;
-};
 
-class InitAddonContext final : public Operation<AddonContext>
-{
-public:
-    InitAddonContext(Logger&, AddonContext&, const AddonPtr&) noexcept;
-
-    void Run() noexcept override;
+    explicit AddonContext(const AddonPtr&) noexcept;
 };
 
 class FindData final : public Operation<AddonContext>
 {
-    const ScraperArray& scrapers;
-    const std::string&  url;
+    std::shared_ptr<ScraperArray> scrapers;
 
 public:
     FindData(Logger&, AddonContext&,
-             std::reference_wrapper<const ScraperArray>,
-             const std::string& url) noexcept;
+             const std::shared_ptr<ScraperArray>&) noexcept;
 
     void Run() noexcept override;
 };

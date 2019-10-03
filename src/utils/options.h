@@ -31,4 +31,6 @@ public:
     auto LogFile() const noexcept -> std::optional<std::string>;
     auto Destination() const noexcept -> std::optional<std::string>;
 };
+
+using OptionsPtr = std::shared_ptr<Options>;
 }  // namespace smam

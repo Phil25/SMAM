@@ -43,32 +43,27 @@ auto FindMatches(const std::string&   base,
 }
 }  // namespace
 
-InitAddonContext::InitAddonContext(Logger&         logger,
-                                   AddonContext&   context,
-                                   const AddonPtr& addon) noexcept
-    : Operation(logger, context)
-{
-    GetContext().addon = addon;
-}
-
-void InitAddonContext::Run() noexcept
+AddonContext::AddonContext(const AddonPtr& addon) noexcept
+    : addon(addon)
 {
 }
 
-FindData::FindData(Logger& logger, AddonContext& context,
-                   std::reference_wrapper<const ScraperArray> scrapers,
-                   const std::string& url) noexcept
-    : Operation(logger, context), scrapers(scrapers), url(url)
+FindData::FindData(
+    Logger& logger, AddonContext& context,
+    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+    : Operation(logger, context), scrapers(scrapers)
 {
 }
 
 void FindData::Run() noexcept
 {
-    for (const auto& scraper : scrapers)
+    const auto& baseUrl = GetContext().addon->BaseURL();
+
+    for (const auto& scraper : *scrapers)
     {
-        if (Match(url, scraper->Url()))
+        if (Match(baseUrl, scraper->Url()))
         {
-            GetContext().data = scraper->Parse(url);
+            GetContext().data = scraper->Parse(baseUrl);
             return;
         }
     }
