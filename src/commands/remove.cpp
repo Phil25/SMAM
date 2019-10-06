@@ -2,8 +2,8 @@
 
 namespace smam
 {
-auto command::Remove(Logger& logger, const Options& options) noexcept
-    -> ExitCode
+auto command::Remove(const LoggerPtr&  logger,
+                     const OptionsPtr& options) noexcept -> ExitCode
 {
     return ExitCode::OK;
 }

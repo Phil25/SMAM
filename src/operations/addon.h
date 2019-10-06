@@ -20,7 +20,7 @@ class FindData final : public Operation<AddonContext>
     std::shared_ptr<ScraperArray> scrapers;
 
 public:
-    FindData(Logger&, AddonContext&,
+    FindData(const LoggerPtr&, AddonContext&,
              const std::shared_ptr<ScraperArray>&) noexcept;
 
     void Run() noexcept override;
@@ -29,7 +29,7 @@ public:
 class EvaluateFiles final : public Operation<AddonContext>
 {
 public:
-    EvaluateFiles(Logger&, AddonContext&) noexcept;
+    EvaluateFiles(const LoggerPtr&, AddonContext&) noexcept;
 
     void Run() noexcept override;
 };
@@ -37,7 +37,7 @@ public:
 class DownloadFiles final : public Operation<AddonContext>
 {
 public:
-    DownloadFiles(Logger&, AddonContext&) noexcept;
+    DownloadFiles(const LoggerPtr&, AddonContext&) noexcept;
 
     void Run() noexcept override;
 };
@@ -45,7 +45,7 @@ public:
 class MarkInstalled final : public Operation<AddonContext>
 {
 public:
-    MarkInstalled(Logger&, AddonContext&) noexcept;
+    MarkInstalled(const LoggerPtr&, AddonContext&) noexcept;
 
     void Run() noexcept override;
 };

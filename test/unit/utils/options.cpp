@@ -6,7 +6,7 @@ namespace smam
 {
 class OperationsOptionsTest : public ::testing::Test
 {
-    Logger logger;
+    LoggerPtr logger = std::make_shared<Logger>();
 
 protected:
     auto MakeOptions(std::string command) noexcept -> Options

@@ -23,7 +23,7 @@ auto BuildQueryURL(std::string                     url,
 
 namespace smam
 {
-Database::Database(Logger& logger, std::string url,
+Database::Database(const LoggerPtr& logger, std::string url,
                    const std::vector<std::string>& ids) noexcept
 {
     using json = nlohmann::json;
@@ -33,7 +33,7 @@ Database::Database(Logger& logger, std::string url,
     auto root = json::parse(download::Html(url), nullptr, false);
     if (root.is_discarded())
     {
-        logger.Error() << "Query result parsing failed.";
+        logger->Error() << "Query result parsing failed.";
         return;
     }
 
@@ -51,11 +51,11 @@ Database::Database(Logger& logger, std::string url,
         }
         catch (const json::exception& e)
         {
-            logger.Error() << e.what() << cr;
+            logger->Error() << e.what() << cr;
         }
         catch (const std::invalid_argument& e)
         {
-            logger.Error() << e.what() << cr;
+            logger->Error() << e.what() << cr;
         }
     }
 }

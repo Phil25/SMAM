@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <ostream>
 
 namespace smam
@@ -30,6 +31,7 @@ public:
     auto Info() noexcept -> Logger&;
     auto Warning() noexcept -> Logger&;
     auto Error() noexcept -> Logger&;
+    auto Out() noexcept -> Logger&;
 
     void SetPrefix(bool) noexcept;
     void SetColor(bool) noexcept;
@@ -46,4 +48,6 @@ public:
         return *this;
     }
 };
+
+using LoggerPtr = std::shared_ptr<Logger>;
 }  // namespace smam

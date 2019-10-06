@@ -23,7 +23,7 @@ class DatabaseTest : public ::testing::Test
 {
 protected:
     const char* url = "localhost:7666";
-    Logger      l;
+    LoggerPtr   l   = std::make_shared<Logger>();
 
     template <typename... Args>
     inline auto MakeCache(Args... args)
@@ -33,7 +33,7 @@ protected:
 
     void SetUp() override
     {
-        l.SetOutput(false);
+        l->SetOutput(false);
     }
 };
 

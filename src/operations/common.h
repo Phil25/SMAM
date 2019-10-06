@@ -19,7 +19,7 @@ struct CommonContext final
 class CheckAddons final : public Operation<CommonContext>
 {
 public:
-    CheckAddons(Logger&, CommonContext&) noexcept;
+    CheckAddons(const LoggerPtr&, CommonContext&) noexcept;
 
     void Run() noexcept;
 };
@@ -27,7 +27,7 @@ public:
 class CheckSMRoot final : public Operation<CommonContext>
 {
 public:
-    CheckSMRoot(Logger&, CommonContext&) noexcept;
+    CheckSMRoot(const LoggerPtr&, CommonContext&) noexcept;
 
     void Run() noexcept;
 };
@@ -37,7 +37,7 @@ class LoadAddons final : public Operation<CommonContext>
     std::filesystem::path path;
 
 public:
-    LoadAddons(Logger&, CommonContext&,
+    LoadAddons(const LoggerPtr&, CommonContext&,
                std::filesystem::path path) noexcept;
 
     void Run() noexcept;
@@ -48,7 +48,7 @@ class SaveAddons final : public Operation<CommonContext>
     std::filesystem::path path;
 
 public:
-    SaveAddons(Logger&, CommonContext&,
+    SaveAddons(const LoggerPtr&, CommonContext&,
                std::filesystem::path path) noexcept;
 
     void Run() noexcept;

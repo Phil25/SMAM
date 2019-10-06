@@ -2,8 +2,8 @@
 
 namespace smam
 {
-auto command::Info(Logger& logger, const Options& options) noexcept
-    -> ExitCode
+auto command::Info(const LoggerPtr&  logger,
+                   const OptionsPtr& options) noexcept -> ExitCode
 {
     return ExitCode::OK;
 }

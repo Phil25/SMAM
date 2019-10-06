@@ -17,7 +17,7 @@ using namespace testing;
 class OperationsCommonTest : public ::testing::Test
 {
 protected:
-    Logger logger;
+    LoggerPtr logger = std::make_shared<Logger>();
 
     auto Exec(const char* cmd) noexcept -> Executor<CommonContext>
     {

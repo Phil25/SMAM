@@ -18,17 +18,17 @@ struct Error final
 template <class Context>
 class Operation
 {
-    Logger&  logger;
-    Context& context;
-    Error    error;
+    LoggerPtr logger;
+    Context&  context;
+    Error     error;
 
 protected:
-    Operation(Logger& logger, Context& context) noexcept
+    Operation(const LoggerPtr& logger, Context& context) noexcept
         : logger(logger), context(context)
     {
     }
 
-    auto GetLogger() noexcept -> Logger&
+    auto GetLogger() noexcept -> LoggerPtr&
     {
         return logger;
     }
@@ -60,13 +60,13 @@ public:
 template <class Context>
 class Executor final
 {
-    Error   error;
-    Logger& logger;
-    Context context;
+    Error     error;
+    LoggerPtr logger;
+    Context   context;
 
 public:
     template <typename... Args>
-    Executor(Logger& logger, Args... args) noexcept
+    Executor(const LoggerPtr& logger, Args... args) noexcept
         : logger(logger), context(std::forward<Args>(args)...)
     {
     }

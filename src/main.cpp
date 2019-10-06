@@ -8,43 +8,43 @@ int main(int argc, const char* argv[])
 {
     using namespace smam;
 
-    auto       logger  = Logger();
-    const auto options = Options(argc, argv, logger);
+    const auto logger  = std::make_shared<Logger>();
+    const auto options = std::make_shared<Options>(argc, argv, logger);
 
-    if (options.Help())
+    if (options->Help())
     {
-        logger << options.GenHelp(argv[0]);
+        logger->Out() << options->GenHelp(argv[0]);
         return ExitCode::OK;
     }
 
-    if (options.Version())
+    if (options->Version())
     {
-        logger << version::Full() << cr;
+        logger->Out() << version::Full() << cr;
         return ExitCode::OK;
     }
 
-    if (!getuid() && !options.AllowRoot())
+    if (!getuid() && !options->AllowRoot())
     {
-        logger.Error() << "SMAM should not be run as root." << cr;
+        logger->Error() << "SMAM should not be run as root." << cr;
         return ExitCode::RunAsRoot;
     }
 
-    logger.SetPrefix(!options.NoPrefix());
-    logger.SetColor(!options.NoColor());
-    logger.SetOutput(!options.Quiet());
+    logger->SetPrefix(!options->NoPrefix());
+    logger->SetColor(!options->NoColor());
+    logger->SetOutput(!options->Quiet());
 
-    const auto& command = options.Command();
+    const auto& command = options->Command();
 
     if (command.empty())
     {
-        logger.Error() << "No command provided." << cr;
+        logger->Error() << "No command provided." << cr;
         return ExitCode::NoCommand;
     }
 
     if (!command::Exists(command))
     {
-        logger.Error() << "Unknown command: \"" << command << "\""
-                       << cr;
+        logger->Error() << "Unknown command: \"" << command << "\""
+                        << cr;
         return ExitCode::UnknownCommand;
     }
 

@@ -16,7 +16,7 @@ class Database final
     AddonMap cached;
 
 public:
-    Database(Logger&, std::string url,
+    Database(const LoggerPtr&, std::string url,
              const std::vector<std::string>& ids) noexcept;
 
     auto Cached() noexcept -> const AddonMap&;

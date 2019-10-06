@@ -12,7 +12,7 @@ class Options final
     boost::program_options::variables_map       vm;
 
 public:
-    Options(int argc, const char* argv[], Logger&) noexcept;
+    Options(int argc, const char* argv[], const LoggerPtr&) noexcept;
 
     auto GenHelp(const char* binary) const noexcept -> std::string;
 

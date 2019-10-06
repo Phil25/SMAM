@@ -47,6 +47,11 @@ auto Logger::Error() noexcept -> Logger&
     return *this << Col::reset;
 }
 
+auto Logger::Out() noexcept -> Logger&
+{
+    return *this;
+}
+
 void Logger::SetPrefix(bool prefix) noexcept
 {
     this->prefix = prefix;

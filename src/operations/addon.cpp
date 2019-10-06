@@ -49,7 +49,7 @@ AddonContext::AddonContext(const AddonPtr& addon) noexcept
 }
 
 FindData::FindData(
-    Logger& logger, AddonContext& context,
+    const LoggerPtr& logger, AddonContext& context,
     const std::shared_ptr<ScraperArray>& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {
@@ -69,8 +69,8 @@ void FindData::Run() noexcept
     }
 }
 
-EvaluateFiles::EvaluateFiles(Logger&       logger,
-                             AddonContext& context) noexcept
+EvaluateFiles::EvaluateFiles(const LoggerPtr& logger,
+                             AddonContext&    context) noexcept
     : Operation(logger, context)
 {
 }
@@ -135,8 +135,8 @@ void EvaluateFiles::Run() noexcept
     }
 }
 
-DownloadFiles::DownloadFiles(Logger&       logger,
-                             AddonContext& context) noexcept
+DownloadFiles::DownloadFiles(const LoggerPtr& logger,
+                             AddonContext&    context) noexcept
     : Operation(logger, context)
 {
 }
@@ -156,11 +156,11 @@ void DownloadFiles::Run() noexcept
 
         if (fs::exists(path))
         {
-            GetLogger().Warning() << "Overwriting " << path << cr;
+            GetLogger()->Warning() << "Overwriting " << path << cr;
         }
         else
         {
-            GetLogger().Info() << path << cr;
+            GetLogger()->Info() << path << cr;
         }
 
         if (auto error = download::File(file->Link(), path.c_str()))
@@ -171,8 +171,8 @@ void DownloadFiles::Run() noexcept
     }
 }
 
-MarkInstalled::MarkInstalled(Logger&       logger,
-                             AddonContext& context) noexcept
+MarkInstalled::MarkInstalled(const LoggerPtr& logger,
+                             AddonContext&    context) noexcept
     : Operation(logger, context)
 {
 }

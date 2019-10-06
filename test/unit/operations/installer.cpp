@@ -12,8 +12,8 @@ constexpr const char* url = "localhost:7666";
 class OperarationInstallerTest : public ::testing::Test
 {
 protected:
-    Logger   logger;
-    AddonMap cache;
+    LoggerPtr logger = std::make_shared<Logger>();
+    AddonMap  cache;
 
     void SetUp() override
     {

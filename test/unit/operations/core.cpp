@@ -14,7 +14,8 @@ struct TestContext final
 class OperationBlank final : public Operation<TestContext>
 {
 public:
-    OperationBlank(Logger& logger, TestContext& context) noexcept
+    OperationBlank(const LoggerPtr& logger,
+                   TestContext&     context) noexcept
         : Operation(logger, context)
     {
     }
@@ -28,7 +29,8 @@ public:
 class OperationStopping final : public Operation<TestContext>
 {
 public:
-    OperationStopping(Logger& logger, TestContext& context) noexcept
+    OperationStopping(const LoggerPtr& logger,
+                      TestContext&     context) noexcept
         : Operation(logger, context)
     {
     }
@@ -42,7 +44,8 @@ public:
 class OperationFailing final : public Operation<TestContext>
 {
 public:
-    OperationFailing(Logger& logger, TestContext& context) noexcept
+    OperationFailing(const LoggerPtr& logger,
+                     TestContext&     context) noexcept
         : Operation(logger, context)
     {
     }
@@ -58,7 +61,8 @@ class OperationAdder final : public Operation<TestContext>
     int valueToAdd;
 
 public:
-    OperationAdder(Logger& logger, TestContext& context, int v) noexcept
+    OperationAdder(const LoggerPtr& logger, TestContext& context,
+                   int v) noexcept
         : Operation(logger, context), valueToAdd(v)
     {
     }
@@ -73,7 +77,7 @@ public:
 class OperationsCoreTest : public ::testing::Test
 {
 protected:
-    Logger                logger;
+    LoggerPtr             logger = std::make_shared<Logger>();
     Executor<TestContext> exec{logger};
 };
 

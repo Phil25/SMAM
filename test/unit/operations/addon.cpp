@@ -18,8 +18,8 @@ using namespace testing;
 class OperationAddonTest : public ::testing::Test
 {
 protected:
-    Logger      logger;
-    const char* url = "localhost:7666";
+    LoggerPtr   logger = std::make_shared<Logger>();
+    const char* url    = "localhost:7666";
 
     auto GetAddon(const std::string& id) noexcept -> AddonPtr
     {

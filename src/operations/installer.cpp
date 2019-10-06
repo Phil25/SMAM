@@ -11,7 +11,8 @@ InstallerContext::InstallerContext(std::string id,
 {
 }
 
-CheckPending::CheckPending(Logger& l, InstallerContext& c) noexcept
+CheckPending::CheckPending(const LoggerPtr&  l,
+                           InstallerContext& c) noexcept
     : Operation(l, c)
 {
 }
@@ -26,7 +27,7 @@ void CheckPending::Run() noexcept
     GetContext().pendingToBeInstalled.insert(GetContext().id);
 }
 
-ParseCache::ParseCache(Logger& l, InstallerContext& c) noexcept
+ParseCache::ParseCache(const LoggerPtr& l, InstallerContext& c) noexcept
     : Operation(l, c)
 {
 }
@@ -45,7 +46,8 @@ void ParseCache::Run() noexcept
     }
 }
 
-MarkExplicit::MarkExplicit(Logger& l, InstallerContext& c) noexcept
+MarkExplicit::MarkExplicit(const LoggerPtr&  l,
+                           InstallerContext& c) noexcept
     : Operation(l, c)
 {
 }
@@ -64,7 +66,7 @@ void MarkExplicit::Run() noexcept
     GetContext().addon->MarkExplicit();
 }
 
-CheckInstalled::CheckInstalled(Logger& l, InstallerContext& c,
+CheckInstalled::CheckInstalled(const LoggerPtr& l, InstallerContext& c,
                                bool force) noexcept
     : Operation(l, c), force(force)
 {
@@ -84,7 +86,7 @@ void CheckInstalled::Run() noexcept
 }
 
 InstallDependencies::InstallDependencies(
-    Logger& logger, InstallerContext& context,
+    const LoggerPtr& logger, InstallerContext& context,
     const std::shared_ptr<ScraperArray>& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {
@@ -101,7 +103,7 @@ void InstallDependencies::Run() noexcept
 }
 
 InstallAddon::InstallAddon(
-    Logger& logger, InstallerContext& context,
+    const LoggerPtr& logger, InstallerContext& context,
     const std::shared_ptr<ScraperArray>& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {

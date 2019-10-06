@@ -1,6 +1,7 @@
 #include "common.h"
 
 #include <net/database.h>
+#include <operations/common.h>
 #include <operations/installer.h>
 #include <scrapers/amscraper.h>
 #include <scrapers/ghscraper.h>
@@ -8,11 +9,17 @@
 
 namespace smam
 {
-auto command::Install(Logger& logger, const Options& options) noexcept
-    -> ExitCode
+auto command::Install(const LoggerPtr&  logger,
+                      const OptionsPtr& options) noexcept -> ExitCode
 {
-    const auto& ids   = options.Addons();
-    const auto& url   = options.DatabaseUrl();
+    auto error = Executor<CommonContext>(logger, options)
+                     .Run<CheckAddons>()
+                     .Run<CheckSMRoot>()
+                     .Run<LoadAddons>("correct me")
+                     .GetError();
+
+    const auto& ids   = options->Addons();
+    const auto& url   = options->DatabaseUrl();
     const auto  cache = Database(logger, url, ids).Cached();
 
     static_assert(std::tuple_size<ScraperArray>::value == 3);
@@ -27,14 +34,14 @@ auto command::Install(Logger& logger, const Options& options) noexcept
                                .Run<CheckPending>()
                                .Run<ParseCache>()
                                .Run<MarkExplicit>()
-                               .Run<CheckInstalled>(options.Force())
+                               .Run<CheckInstalled>(options->Force())
                                .Run<InstallDependencies>(scrapers)
                                .Run<InstallAddon>(scrapers)
                                .GetError();
 
         if (error)
         {
-            logger << error.message << cr;
+            logger->Error() << error.message << cr;
         }
     }
 

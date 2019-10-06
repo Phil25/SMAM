@@ -21,7 +21,7 @@ struct InstallerContext final
 class CheckPending final : public Operation<InstallerContext>
 {
 public:
-    CheckPending(Logger&, InstallerContext&) noexcept;
+    CheckPending(const LoggerPtr&, InstallerContext&) noexcept;
 
     void Run() noexcept override;
 };
@@ -29,7 +29,7 @@ public:
 class ParseCache final : public Operation<InstallerContext>
 {
 public:
-    ParseCache(Logger&, InstallerContext&) noexcept;
+    ParseCache(const LoggerPtr&, InstallerContext&) noexcept;
 
     void Run() noexcept override;
 };
@@ -37,7 +37,7 @@ public:
 class MarkExplicit final : public Operation<InstallerContext>
 {
 public:
-    MarkExplicit(Logger&, InstallerContext&) noexcept;
+    MarkExplicit(const LoggerPtr&, InstallerContext&) noexcept;
 
     void Run() noexcept override;
 };
@@ -47,7 +47,8 @@ class CheckInstalled final : public Operation<InstallerContext>
     bool force;
 
 public:
-    CheckInstalled(Logger&, InstallerContext&, bool force) noexcept;
+    CheckInstalled(const LoggerPtr&, InstallerContext&,
+                   bool force) noexcept;
 
     void Run() noexcept override;
 };
@@ -57,7 +58,7 @@ class InstallDependencies final : public Operation<InstallerContext>
     std::shared_ptr<ScraperArray> scrapers;
 
 public:
-    InstallDependencies(Logger&, InstallerContext&,
+    InstallDependencies(const LoggerPtr&, InstallerContext&,
                         const std::shared_ptr<ScraperArray>&) noexcept;
 
     void Run() noexcept override;
@@ -68,7 +69,7 @@ class InstallAddon final : public Operation<InstallerContext>
     std::shared_ptr<ScraperArray> scrapers;
 
 public:
-    InstallAddon(Logger&, InstallerContext&,
+    InstallAddon(const LoggerPtr&, InstallerContext&,
                  const std::shared_ptr<ScraperArray>&) noexcept;
 
     void Run() noexcept override;

@@ -10,8 +10,8 @@ CommonContext::CommonContext(const OptionsPtr& options) noexcept
 {
 }
 
-CheckAddons::CheckAddons(Logger&        logger,
-                         CommonContext& context) noexcept
+CheckAddons::CheckAddons(const LoggerPtr& logger,
+                         CommonContext&   context) noexcept
     : Operation(logger, context)
 {
 }
@@ -24,8 +24,8 @@ void CheckAddons::Run() noexcept
     }
 }
 
-CheckSMRoot::CheckSMRoot(Logger&        logger,
-                         CommonContext& context) noexcept
+CheckSMRoot::CheckSMRoot(const LoggerPtr& logger,
+                         CommonContext&   context) noexcept
     : Operation(logger, context)
 {
 }
@@ -45,7 +45,7 @@ void CheckSMRoot::Run() noexcept
     }
 }
 
-LoadAddons::LoadAddons(Logger& logger, CommonContext& context,
+LoadAddons::LoadAddons(const LoggerPtr& logger, CommonContext& context,
                        std::filesystem::path path) noexcept
     : Operation(logger, context), path(std::move(path))
 {
@@ -64,7 +64,7 @@ void LoadAddons::Run() noexcept
     }
 }
 
-SaveAddons::SaveAddons(Logger& logger, CommonContext& context,
+SaveAddons::SaveAddons(const LoggerPtr& logger, CommonContext& context,
                        std::filesystem::path path) noexcept
     : Operation(logger, context), path(std::move(path))
 {
