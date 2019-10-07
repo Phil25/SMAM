@@ -15,8 +15,14 @@ auto command::Install(const LoggerPtr&  logger,
     auto error = Executor<CommonContext>(logger, options)
                      .Run<CheckAddons>()
                      .Run<CheckSMRoot>()
-                     .Run<LoadAddons>("correct me")
+                     .Run<LoadAddons>()
                      .GetError();
+
+    if (error)
+    {
+        logger->Error() << error.message << cr;
+        return error.code;
+    }
 
     const auto& ids   = options->Addons();
     const auto& url   = options->DatabaseUrl();

@@ -1,20 +1,10 @@
 #pragma once
 
 #include <utils/logger.h>
+#include <utils/error.hpp>
 
 namespace smam
 {
-struct Error final
-{
-    std::string message;
-    bool        silent{false};
-
-    operator bool() const noexcept
-    {
-        return !message.empty() && !silent;
-    }
-};
-
 template <class Context>
 class Operation
 {
@@ -38,14 +28,15 @@ protected:
         return context;
     }
 
-    void Fail(std::string message) noexcept
+    void Fail(std::string msg, ExitCode code = ExitCode::OK) noexcept
     {
-        error = {std::move(message), false};
+        error = {std::move(msg), code, false};
     }
 
     void Stop() noexcept
     {
-        error = {"_", true};  // error message not empty -> error exists
+        // error message not empty -> error exists
+        error = {"_", ExitCode::OK, true};
     }
 
 public:

@@ -1,23 +1,9 @@
 #pragma once
 
 #include <utils/options.h>
+#include <utils/codes.hpp>
 
-namespace smam
-{
-enum ExitCode
-{
-    OK        = 0,
-    RunAsRoot = 1,
-    NoPermissions,
-    WriteError,
-    NoCommand,
-    UnknownCommand,
-    NoAddons,
-    NoSMRoot,
-    CorruptedCache,
-};
-
-namespace command
+namespace smam::command
 {
 using CommandPtr = ExitCode (*)(const LoggerPtr&,
                                 const OptionsPtr&) noexcept;
@@ -33,5 +19,4 @@ auto Search(const LoggerPtr&, const OptionsPtr&) noexcept -> ExitCode;
 bool Exists(const std::string& command) noexcept;
 auto Run(const LoggerPtr&, const std::string& command,
          const OptionsPtr&) noexcept -> ExitCode;
-}  // namespace command
-}  // namespace smam
+}  // namespace smam::command

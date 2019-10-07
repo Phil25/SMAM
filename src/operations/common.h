@@ -38,7 +38,7 @@ class LoadAddons final : public Operation<CommonContext>
 
 public:
     LoadAddons(const LoggerPtr&, CommonContext&,
-               std::filesystem::path path) noexcept;
+               std::filesystem::path path = {}) noexcept;
 
     void Run() noexcept;
 };

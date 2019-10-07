@@ -5,6 +5,8 @@
 
 namespace smam
 {
+constexpr std::string_view cache = ".smamdata.json";
+
 CommonContext::CommonContext(const OptionsPtr& options) noexcept
     : options(options)
 {
@@ -20,7 +22,7 @@ void CheckAddons::Run() noexcept
 {
     if (GetContext().options->Addons().empty())
     {
-        Fail("No addons specified.");
+        Fail("No addons specified.", ExitCode::NoAddons);
     }
 }
 
@@ -41,7 +43,7 @@ void CheckSMRoot::Run() noexcept
     }
     else
     {
-        Fail("SourceMod root not found.");
+        Fail("SourceMod root not found.", ExitCode::NoSMRoot);
     }
 }
 
@@ -53,14 +55,16 @@ LoadAddons::LoadAddons(const LoggerPtr& logger, CommonContext& context,
 
 void LoadAddons::Run() noexcept
 {
+    if (path.empty()) path = GetContext().root / cache;
+
     if (!path::HasReadAndWritePermissions(path))
     {
-        Fail("No read or write permissions.");
+        Fail("No read or write permissions.", ExitCode::NoPermissions);
     }
 
     if (!Addon::Load(path))
     {
-        Fail("Failed to load installed addons.");
+        Fail("Failed to load installed addons.", ExitCode::BadCache);
     }
 }
 
@@ -74,12 +78,12 @@ void SaveAddons::Run() noexcept
 {
     if (!path::HasReadAndWritePermissions(path))
     {
-        Fail("No read or write permissions.");
+        Fail("No read or write permissions.", ExitCode::NoPermissions);
     }
 
     if (!Addon::Save(path))
     {
-        Fail("Failed to save installed addons.");
+        Fail("Failed to save installed addons.", ExitCode::WriteError);
     }
 }
 }  // namespace smam
