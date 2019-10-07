@@ -69,30 +69,33 @@ TEST_F(OperationsCommonTest, CheckAddons)
     EXPECT_EQ("No addons specified.", error2.message);
 }
 
-TEST_F(OperationsCommonTest, CheckSMRootNoOptions)
+TEST_F(OperationsCommonTest, GoToSMRootNoOptions)
 {
-    auto error = Exec().Run<CheckSMRoot>().GetError();
+    auto error = Exec().Run<GoToSMRoot>().GetError();
     ASSERT_TRUE(error);
     EXPECT_EQ("SourceMod root not found.", error.message);
 }
 
-TEST_F(OperationsCommonTest, CheckSMRootNotFound)
+TEST_F(OperationsCommonTest, GoToSMRootNotFound)
 {
-    auto error = Exec("-d .").Run<CheckSMRoot>().GetError();
+    auto error = Exec("-d .").Run<GoToSMRoot>().GetError();
     ASSERT_TRUE(error);
     EXPECT_EQ("SourceMod root not found.", error.message);
 }
 
-TEST_F(OperationsCommonTest, CheckSMRootFound)
+TEST_F(OperationsCommonTest, GoToSMRootFound)
 {
-    namespace fs               = std::filesystem;
-    static const fs::path root = "mod/addons/sourcemod";
+    namespace fs = std::filesystem;
+    static const fs::path root =
+        fs::current_path() / "mod/addons/sourcemod";
 
     auto exec  = Exec("install tf2items -d ./mod/");
-    auto error = exec.Run<CheckSMRoot>().GetError();
+    auto error = exec.Run<GoToSMRoot>().GetError();
 
     ASSERT_FALSE(error) << error.message;
     EXPECT_TRUE(fs::equivalent(root, exec.GetContext().root));
+    EXPECT_TRUE(
+        fs::equivalent(fs::current_path(), exec.GetContext().root));
 }
 
 TEST_F(OperationsCommonTest, LoadAddonsFinish)

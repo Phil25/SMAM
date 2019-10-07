@@ -26,13 +26,13 @@ void CheckAddons::Run() noexcept
     }
 }
 
-CheckSMRoot::CheckSMRoot(const LoggerPtr& logger,
-                         CommonContext&   context) noexcept
+GoToSMRoot::GoToSMRoot(const LoggerPtr& logger,
+                       CommonContext&   context) noexcept
     : Operation(logger, context)
 {
 }
 
-void CheckSMRoot::Run() noexcept
+void GoToSMRoot::Run() noexcept
 {
     auto dest = GetContext().options->Destination().value_or("");
     auto root = path::FindSMRoot(dest);
@@ -40,6 +40,7 @@ void CheckSMRoot::Run() noexcept
     if (root)
     {
         GetContext().root = root.value();
+        std::filesystem::current_path(GetContext().root);
     }
     else
     {

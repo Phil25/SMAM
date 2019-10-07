@@ -14,7 +14,7 @@ auto command::Install(const LoggerPtr&  logger,
 {
     auto error = Executor<CommonContext>(logger, options)
                      .Run<CheckAddons>()
-                     .Run<CheckSMRoot>()
+                     .Run<GoToSMRoot>()
                      .Run<LoadAddons>()
                      .GetError();
 

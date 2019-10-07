@@ -24,10 +24,10 @@ public:
     void Run() noexcept;
 };
 
-class CheckSMRoot final : public Operation<CommonContext>
+class GoToSMRoot final : public Operation<CommonContext>
 {
 public:
-    CheckSMRoot(const LoggerPtr&, CommonContext&) noexcept;
+    GoToSMRoot(const LoggerPtr&, CommonContext&) noexcept;
 
     void Run() noexcept;
 };
