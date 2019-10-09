@@ -1,8 +1,8 @@
 #include "path.h"
 
-namespace smam::path
+namespace smam
 {
-bool IsSafe(const std::filesystem::path& path) noexcept
+bool path::IsSafe(const std::filesystem::path& path) noexcept
 {
     static const fs::path back = "..";
     constexpr int maxDepth     = 2;  // how far back the path is safe
@@ -16,7 +16,7 @@ bool IsSafe(const std::filesystem::path& path) noexcept
     return true;
 }
 
-auto FindSMRoot(const std::filesystem::path& startAt) noexcept
+auto path::FindSMRoot(const std::filesystem::path& startAt) noexcept
     -> std::optional<std::filesystem::path>
 {
     bool exists  = fs::exists(startAt);
@@ -35,7 +35,7 @@ auto FindSMRoot(const std::filesystem::path& startAt) noexcept
     return std::nullopt;
 }
 
-bool CreateIfSafe(const fs::path& path) noexcept
+bool path::CreateIfSafe(const fs::path& path) noexcept
 {
     if (!IsSafe(path)) return false;
 
@@ -43,14 +43,14 @@ bool CreateIfSafe(const fs::path& path) noexcept
     return true;
 }
 
-bool HasReadAndWritePermissions(const fs::path& path) noexcept
+bool path::HasReadAndWritePermissions(const fs::path& path) noexcept
 {
     auto perms = fs::status(path).permissions();
     return (perms & fs::perms::owner_read) != fs::perms::none &&
            (perms & fs::perms::owner_write) != fs::perms::none;
 }
 
-void RemoveEmptyDirectories(fs::path path) noexcept
+void path::RemoveEmptyDirectories(fs::path path) noexcept
 {
     while (!path.empty())
     {
@@ -62,4 +62,4 @@ void RemoveEmptyDirectories(fs::path path) noexcept
         path = path.parent_path();
     }
 }
-}  // namespace smam::path
+}  // namespace smam

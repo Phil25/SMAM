@@ -125,10 +125,8 @@ TEST_F(OperationsCommonTest, LoadAddonsFinish)
     // clang-format on
     ofs.close();
 
-    auto error =
-        Exec()
-            .Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
-            .GetError();
+    std::filesystem::current_path("./mod/addons/sourcemod/");
+    auto error = Exec().Run<LoadAddons>(".smamdata.json").GetError();
 
     ASSERT_FALSE(error) << error.message;
 }
@@ -141,10 +139,8 @@ TEST_F(OperationsCommonTest, LoadAddonsFail)
     ofs << "Wait, this isn't JSON...\n";
     ofs.close();
 
-    auto error =
-        Exec()
-            .Run<LoadAddons>("mod/addons/sourcemod/.smamdata.json")
-            .GetError();
+    std::filesystem::current_path("./mod/addons/sourcemod/");
+    auto error = Exec().Run<LoadAddons>(".smamdata.json").GetError();
 
     ASSERT_TRUE(error);
     EXPECT_EQ("Failed to load installed addons.", error.message);

@@ -56,7 +56,8 @@ LoadAddons::LoadAddons(const LoggerPtr& logger, CommonContext& context,
 
 void LoadAddons::Run() noexcept
 {
-    if (path.empty()) path = GetContext().root / cache;
+    assert(path.parent_path().empty() &&
+           "LoadAddons path parameter must be in current directory");
 
     if (!path::HasReadAndWritePermissions(path))
     {

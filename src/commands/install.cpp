@@ -15,7 +15,7 @@ auto command::Install(const LoggerPtr&  logger,
     auto error = Executor<CommonContext>(logger, options)
                      .Run<CheckAddons>()
                      .Run<GoToSMRoot>()
-                     .Run<LoadAddons>()
+                     .Run<LoadAddons>(".smamdata.json")
                      .GetError();
 
     if (error)
