@@ -232,11 +232,6 @@ TEST(AddonTest, LoadCreate)
     EXPECT_TRUE(Addon::Load(".smamdata.json"));
 }
 
-TEST(AddonTest, LoadBadDir)
-{
-    EXPECT_FALSE(Addon::Load("this/dir/does/not/exit/.smamdata.json"));
-}
-
 TEST(AddonTest, Load)
 {
     auto ofs = std::ofstream(dataFile, std::ios::trunc);

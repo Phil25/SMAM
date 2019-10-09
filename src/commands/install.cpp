@@ -12,8 +12,8 @@ namespace smam
 auto command::Install(const LoggerPtr&  logger,
                       const OptionsPtr& options) noexcept -> ExitCode
 {
-    auto error = Executor<CommonContext>(logger, options)
-                     .Run<CheckAddons>()
+    auto exec  = Executor<CommonContext>(logger, options);
+    auto error = exec.Run<CheckAddons>()
                      .Run<GoToSMRoot>()
                      .Run<LoadAddons>(".smamdata.json")
                      .GetError();
@@ -49,6 +49,14 @@ auto command::Install(const LoggerPtr&  logger,
         {
             logger->Error() << error.message << cr;
         }
+    }
+
+    error = exec.Run<SaveAddons>(".smamdata.json").GetError();
+
+    if (error)
+    {
+        logger->Error() << error.message << cr;
+        return error.code;
     }
 
     return ExitCode::OK;

@@ -96,7 +96,9 @@ void Addon::MarkInstalled() noexcept
 
 /*static*/ bool Addon::Load(const std::string& file) noexcept
 {
-    auto   ifs    = std::ifstream(file);
+    auto ifs = std::ifstream(file);
+    if (!ifs) return true;  // not exists, nothing to load
+
     auto   addons = std::vector<AddonPtr>();
     auto   json   = nlohmann::json();
     size_t hash;
