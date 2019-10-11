@@ -18,6 +18,7 @@ protected:
 
     void SetUp() override
     {
+        logger->SetOutput(false);
         cache = Database(logger, url, {"rtd", "tf2items"}).Cached();
     }
 };
