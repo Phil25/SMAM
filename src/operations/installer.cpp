@@ -5,6 +5,8 @@
 
 namespace smam
 {
+constexpr std::string_view tempdir = "/tmp/smam/";
+
 InstallerContext::InstallerContext(std::string id,
                                    AddonMap    cache) noexcept
     : id(std::move(id)), cache(std::move(cache))
@@ -122,5 +124,45 @@ void InstallAddon::Run() noexcept
                      .GetError();
 
     if (error) Fail(error.message);
+}
+
+BeginTransaction::BeginTransaction(const LoggerPtr&  logger,
+                                   InstallerContext& context) noexcept
+    : Operation(logger, context)
+{
+}
+
+void BeginTransaction::Run() noexcept
+{
+    namespace fs = std::filesystem;
+
+    GetContext().root = fs::current_path();
+
+    fs::remove_all(tempdir);
+
+    if (!fs::create_directories(tempdir))
+    {
+        Fail("Could not initialize temporary directories.");
+    }
+
+    fs::current_path(tempdir);
+}
+
+CommitTransaction::CommitTransaction(const LoggerPtr&  logger,
+                                     InstallerContext& context) noexcept
+    : Operation(logger, context)
+{
+}
+
+void CommitTransaction::Run() noexcept
+{
+    namespace fs = std::filesystem;
+    using co     = fs::copy_options;
+
+    fs::copy(tempdir, GetContext().root,
+             co::recursive | co::overwrite_existing);
+
+    fs::current_path(GetContext().root);
+    fs::remove_all(tempdir);
 }
 }  // namespace smam

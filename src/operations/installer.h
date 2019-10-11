@@ -14,6 +14,7 @@ struct InstallerContext final
     AddonPtr addon;
 
     std::set<std::string> pendingToBeInstalled;
+    std::filesystem::path root;
 
     explicit InstallerContext(std::string id, AddonMap cache) noexcept;
 };
@@ -71,6 +72,22 @@ class InstallAddon final : public Operation<InstallerContext>
 public:
     InstallAddon(const LoggerPtr&, InstallerContext&,
                  const std::shared_ptr<ScraperArray>&) noexcept;
+
+    void Run() noexcept override;
+};
+
+class BeginTransaction final : public Operation<InstallerContext>
+{
+public:
+    BeginTransaction(const LoggerPtr&, InstallerContext&) noexcept;
+
+    void Run() noexcept override;
+};
+
+class CommitTransaction final : public Operation<InstallerContext>
+{
+public:
+    CommitTransaction(const LoggerPtr&, InstallerContext&) noexcept;
 
     void Run() noexcept override;
 };
