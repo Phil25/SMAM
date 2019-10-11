@@ -23,9 +23,9 @@ protected:
 
     auto GetAddon(const std::string& id) noexcept -> AddonPtr
     {
-        const auto cache = Database(logger, url, {id}).Cached();
+        const auto cache = db::Fetch(logger, url, {id});
 
-        if (auto it = cache.find(id); it != cache.end())
+        if (auto it = cache->find(id); it != cache->end())
         {
             return it->second;
         }

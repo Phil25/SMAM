@@ -13,13 +13,13 @@ constexpr const char* url = "localhost:7666";
 class OperarationInstallerTest : public ::testing::Test
 {
 protected:
-    LoggerPtr logger = std::make_shared<Logger>();
-    AddonMap  cache;
+    LoggerPtr   logger = std::make_shared<Logger>();
+    AddonMapPtr cache;
 
     void SetUp() override
     {
         logger->SetOutput(false);
-        cache = Database(logger, url, {"rtd", "tf2items"}).Cached();
+        cache = db::Fetch(logger, url, {"rtd", "tf2items"});
     }
 };
 

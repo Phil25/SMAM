@@ -26,7 +26,7 @@ auto command::Install(const LoggerPtr&  logger,
 
     const auto& ids   = options->Addons();
     const auto& url   = options->DatabaseUrl();
-    const auto  cache = Database(logger, url, ids).Cached();
+    const auto  cache = db::Fetch(logger, url, ids);
 
     static_assert(std::tuple_size<ScraperArray>::value == 3);
     auto scrapers   = std::make_shared<ScraperArray>();

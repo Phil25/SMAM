@@ -7,9 +7,9 @@ namespace smam
 {
 constexpr std::string_view tempdir = "/tmp/smam/";
 
-InstallerContext::InstallerContext(std::string id,
-                                   AddonMap    cache) noexcept
-    : id(std::move(id)), cache(std::move(cache))
+InstallerContext::InstallerContext(std::string        id,
+                                   const AddonMapPtr& cache) noexcept
+    : id(std::move(id)), cache(cache)
 {
 }
 
@@ -38,7 +38,7 @@ void ParseCache::Run() noexcept
 {
     const auto& cache = GetContext().cache;
 
-    if (auto it = cache.find(GetContext().id); it != cache.end())
+    if (auto it = cache->find(GetContext().id); it != cache->end())
     {
         GetContext().addon = it->second;
     }

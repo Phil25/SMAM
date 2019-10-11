@@ -9,14 +9,15 @@ namespace smam
 struct InstallerContext final
 {
     std::string id;
-    AddonMap    cache;
+    AddonMapPtr cache;
 
     AddonPtr addon;
 
     std::set<std::string> pendingToBeInstalled;
     std::filesystem::path root;
 
-    explicit InstallerContext(std::string id, AddonMap cache) noexcept;
+    explicit InstallerContext(std::string        id,
+                              const AddonMapPtr& cache) noexcept;
 };
 
 class CheckPending final : public Operation<InstallerContext>

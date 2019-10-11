@@ -23,8 +23,9 @@ auto BuildQueryURL(std::string                     url,
 
 namespace smam
 {
-Database::Database(const LoggerPtr& logger, std::string url,
-                   const std::vector<std::string>& ids) noexcept
+auto db::Fetch(const LoggerPtr& logger, std::string url,
+               const std::vector<std::string>& ids) noexcept
+    -> AddonMapPtr
 {
     using json = nlohmann::json;
 
@@ -34,8 +35,10 @@ Database::Database(const LoggerPtr& logger, std::string url,
     if (root.is_discarded())
     {
         logger->Error() << "Query result parsing failed.";
-        return;
+        return {};
     }
+
+    auto cache = std::make_shared<AddonMap>();
 
     for (const auto& entry : root)
     {
@@ -47,7 +50,7 @@ Database::Database(const LoggerPtr& logger, std::string url,
             auto addon = entry.get<AddonPtr>();
             addon->BaseURL(entry.at("url"));
 
-            cached.emplace(std::move(id), addon);
+            cache->emplace(std::move(id), addon);
         }
         catch (const json::exception& e)
         {
@@ -58,10 +61,7 @@ Database::Database(const LoggerPtr& logger, std::string url,
             logger->Error() << e.what() << cr;
         }
     }
-}
 
-auto Database::Cached() noexcept -> const AddonMap&
-{
-    return cached;
+    return cache;
 }
 }  // namespace smam

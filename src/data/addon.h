@@ -65,5 +65,6 @@ public:
 void from_json(const nlohmann::json&, AddonPtr&);
 void to_json(nlohmann::json&, const AddonPtr&) noexcept;
 
-using AddonMap = std::map<std::string, AddonPtr>;
+using AddonMap    = std::map<std::string, AddonPtr>;
+using AddonMapPtr = std::shared_ptr<AddonMap>;
 }  // namespace smam

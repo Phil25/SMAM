@@ -3,22 +3,8 @@
 #include <data/addon.h>
 #include <utils/logger.h>
 
-#include <map>
-#include <string>
-
-namespace smam
+namespace smam::db
 {
-class Database final
-{
-    /*
-     * Maps Addon IDs to AddonPtr
-     */
-    AddonMap cached;
-
-public:
-    Database(const LoggerPtr&, std::string url,
-             const std::vector<std::string>& ids) noexcept;
-
-    auto Cached() noexcept -> const AddonMap&;
-};
-}  // namespace smam
+auto Fetch(const LoggerPtr&, std::string url,
+           const std::vector<std::string>& ids) noexcept -> AddonMapPtr;
+}  // namespace smam::db

@@ -26,9 +26,9 @@ protected:
     LoggerPtr   l   = std::make_shared<Logger>();
 
     template <typename... Args>
-    inline auto MakeCache(Args... args)
+    inline auto Fetch(Args... args)
     {
-        return Database(l, url, {std::forward<Args>(args)...}).Cached();
+        return db::Fetch(l, url, {std::forward<Args>(args)...});
     }
 
     void SetUp() override
@@ -39,12 +39,12 @@ protected:
 
 TEST_F(DatabaseTest, PositiveSingle)
 {
-    auto cache = MakeCache(addon::acce);
+    auto cache = Fetch(addon::acce);
 
-    ASSERT_EQ(1, cache.size());
-    ASSERT_TRUE(cache.count(addon::acce));
+    ASSERT_EQ(1, cache->size());
+    ASSERT_TRUE(cache->count(addon::acce));
 
-    const auto& addon = cache[addon::acce];
+    const auto& addon = cache->at(addon::acce);
 
     ASSERT_FALSE(addon->BaseURL().empty());
     EXPECT_EQ("https://builds.limetech.io/?p=accelerator",
@@ -58,65 +58,65 @@ TEST_F(DatabaseTest, PositiveSingle)
 
 TEST_F(DatabaseTest, PositiveMultiple)
 {
-    auto cache = MakeCache(addon::acce, addon::thri);
+    auto cache = Fetch(addon::acce, addon::thri);
 
-    ASSERT_EQ(2, cache.size());
-    ASSERT_TRUE(cache.count(addon::acce));
-    ASSERT_TRUE(cache.count(addon::thri));
+    ASSERT_EQ(2, cache->size());
+    ASSERT_TRUE(cache->count(addon::acce));
+    ASSERT_TRUE(cache->count(addon::thri));
 
-    EXPECT_FALSE(cache[addon::acce]->BaseURL().empty());
-    EXPECT_FALSE(cache[addon::acce]->Files().empty());
+    EXPECT_FALSE(cache->at(addon::acce)->BaseURL().empty());
+    EXPECT_FALSE(cache->at(addon::acce)->Files().empty());
 
-    EXPECT_FALSE(cache[addon::thri]->BaseURL().empty());
-    EXPECT_FALSE(cache[addon::thri]->Files().empty());
+    EXPECT_FALSE(cache->at(addon::thri)->BaseURL().empty());
+    EXPECT_FALSE(cache->at(addon::thri)->Files().empty());
 }
 
 TEST_F(DatabaseTest, NegativeSingle)
 {
-    EXPECT_TRUE(MakeCache(addon::bad1).empty());
+    EXPECT_TRUE(Fetch(addon::bad1)->empty());
 }
 
 TEST_F(DatabaseTest, NegativeMultiple)
 {
-    EXPECT_TRUE(MakeCache(addon::bad1, addon::bad2).empty());
+    EXPECT_TRUE(Fetch(addon::bad1, addon::bad2)->empty());
 }
 
 TEST_F(DatabaseTest, PositiveNegativeMix)
 {
-    auto cache = MakeCache(addon::bad1, addon::acce, addon::bad2);
+    auto cache = Fetch(addon::bad1, addon::acce, addon::bad2);
 
-    ASSERT_EQ(1, cache.size());
-    ASSERT_FALSE(cache.count(addon::bad1));
-    ASSERT_TRUE(cache.count(addon::acce));
-    ASSERT_FALSE(cache.count(addon::bad2));
+    ASSERT_EQ(1, cache->size());
+    ASSERT_FALSE(cache->count(addon::bad1));
+    ASSERT_TRUE(cache->count(addon::acce));
+    ASSERT_FALSE(cache->count(addon::bad2));
 
-    EXPECT_FALSE(cache[addon::acce]->BaseURL().empty());
-    EXPECT_FALSE(cache[addon::acce]->Files().empty());
+    EXPECT_FALSE(cache->at(addon::acce)->BaseURL().empty());
+    EXPECT_FALSE(cache->at(addon::acce)->Files().empty());
 }
 
 TEST_F(DatabaseTest, Dependencies)
 {
-    auto cache = MakeCache(addon::rtd);
+    auto cache = Fetch(addon::rtd);
 
-    ASSERT_EQ(2, cache.size());
-    ASSERT_TRUE(cache.count(addon::rtd));
-    ASSERT_TRUE(cache.count(addon::tf2a));
+    ASSERT_EQ(2, cache->size());
+    ASSERT_TRUE(cache->count(addon::rtd));
+    ASSERT_TRUE(cache->count(addon::tf2a));
 
-    EXPECT_FALSE(cache[addon::rtd]->BaseURL().empty());
-    EXPECT_FALSE(cache[addon::tf2a]->Files().empty());
+    EXPECT_FALSE(cache->at(addon::rtd)->BaseURL().empty());
+    EXPECT_FALSE(cache->at(addon::tf2a)->Files().empty());
 }
 
 TEST_F(DatabaseTest, NotPrecached)
 {
-    auto cache = MakeCache(addon::acce);
+    auto cache = Fetch(addon::acce);
 
-    ASSERT_EQ(1, cache.size());
-    ASSERT_TRUE(cache.count(addon::acce));
-    ASSERT_FALSE(cache.count(addon::thri));
+    ASSERT_EQ(1, cache->size());
+    ASSERT_TRUE(cache->count(addon::acce));
+    ASSERT_FALSE(cache->count(addon::thri));
 }
 
 TEST_F(DatabaseTest, BadFileAddon)
 {
-    ASSERT_TRUE(MakeCache(addon::badf).empty());
+    ASSERT_TRUE(Fetch(addon::badf)->empty());
 }
 }  // namespace smam
