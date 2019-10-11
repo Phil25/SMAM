@@ -78,6 +78,12 @@ void Addon::MarkInstalled() noexcept
     installed.emplace(id, shared_from_this());
 }
 
+void Addon::AddFiles(FileVector toAdd) noexcept
+{
+    files.insert(files.end(), std::make_move_iterator(toAdd.begin()),
+                 std::make_move_iterator(toAdd.end()));
+}
+
 /*static*/ auto Addon::Get(const std::string& id) noexcept -> AddonOpt
 {
     if (Addon::IsInstalled(id)) return installed.at(id);

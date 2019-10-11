@@ -165,6 +165,24 @@ TEST(AddonTest, SerializePartial)
     EXPECT_THAT(json.at("deps"), IsEmpty());
 }
 
+TEST(AddonTest, AddFiles)
+{
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
+
+    auto addon = Addon("test", {}, {});
+    ASSERT_TRUE(addon.Files().empty());
+
+    addon.AddFiles({plugin});
+    ASSERT_EQ(1, addon.Files().size());
+    EXPECT_THAT(addon.Files(), ElementsAre(plugin));
+
+    addon.AddFiles({gamedata, source});
+    ASSERT_EQ(3, addon.Files().size());
+    EXPECT_THAT(addon.Files(), ElementsAre(plugin, gamedata, source));
+}
+
 TEST(AddonTest, Save)
 {
     // clang-format off

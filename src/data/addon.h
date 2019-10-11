@@ -52,6 +52,8 @@ public:
     bool IsInstalled() const noexcept;
     void MarkInstalled() noexcept;
 
+    void AddFiles(FileVector) noexcept;
+
     static auto Get(const std::string& id) noexcept -> AddonOpt;
     static bool IsInstalled(const std::string& id) noexcept;
     static void ForEach(const ForEachAddon&) noexcept;
