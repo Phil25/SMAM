@@ -117,6 +117,7 @@ void InstallAddon::Run() noexcept
                      .Run<FindData>(scrapers)
                      .Run<EvaluateFiles>()
                      .Run<DownloadFiles>()
+                     .Run<ExtractArchives>()
                      .Run<MarkInstalled>()
                      .GetError();
 

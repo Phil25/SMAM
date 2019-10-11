@@ -49,4 +49,12 @@ public:
 
     void Run() noexcept override;
 };
+
+class ExtractArchives final : public Operation<AddonContext>
+{
+public:
+    ExtractArchives(const LoggerPtr&, AddonContext&) noexcept;
+
+    void Run() noexcept override;
+};
 }  // namespace smam

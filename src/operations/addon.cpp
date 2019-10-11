@@ -1,6 +1,7 @@
 #include "addon.h"
 
 #include <net/download.h>
+#include <utils/archive.h>
 #include <utils/common.h>
 #include <utils/path.h>
 
@@ -40,6 +41,23 @@ auto FindMatches(const std::string&   base,
     }
 
     return filtered;
+}
+
+bool ExamineFilePath(const LoggerPtr&             logger,
+                     const std::filesystem::path& path) noexcept
+{
+    if (!path::CreateIfSafe(path.parent_path())) return false;
+
+    if (std::filesystem::exists(path))
+    {
+        logger->Warning() << "Overwriting " << path << cr;
+    }
+    else
+    {
+        logger->Info() << path << cr;
+    }
+
+    return true;
 }
 }  // namespace
 
@@ -143,24 +161,15 @@ DownloadFiles::DownloadFiles(const LoggerPtr& logger,
 
 void DownloadFiles::Run() noexcept
 {
-    namespace fs = std::filesystem;
+    using namespace std::string_literals;
 
     for (const auto& file : GetContext().addon->Files())
     {
-        auto path = fs::path{file->Raw()};
-        if (!path::CreateIfSafe(path.parent_path()))
+        auto path = std::filesystem::path{file->Raw()};
+        if (!ExamineFilePath(GetLogger(), path))
         {
-            Fail(std::string{"Suspicous file: "} + path.c_str());
+            Fail("Suspicous file: "s + path.c_str());
             return;
-        }
-
-        if (fs::exists(path))
-        {
-            GetLogger()->Warning() << "Overwriting " << path << cr;
-        }
-        else
-        {
-            GetLogger()->Info() << path << cr;
         }
 
         if (auto error = download::File(file->Link(), path.c_str()))
@@ -180,5 +189,38 @@ MarkInstalled::MarkInstalled(const LoggerPtr& logger,
 void MarkInstalled::Run() noexcept
 {
     GetContext().addon->MarkInstalled();
+}
+
+ExtractArchives::ExtractArchives(const LoggerPtr& logger,
+                                 AddonContext&    context) noexcept
+    : Operation(logger, context)
+{
+}
+
+void ExtractArchives::Run() noexcept
+{
+    using namespace std::string_literals;
+
+    auto newFiles = FileVector{};
+
+    for (const auto& file : GetContext().addon->Files())
+    {
+        if (!archive::IsValidArchive(file->Raw())) continue;
+
+        auto path = std::filesystem::path{file->Raw()};
+        GetLogger()->Info() << "Extracting " << path.filename() << cr;
+
+        archive::Extract(path, [&](const auto& extracted) {
+            if (!ExamineFilePath(GetLogger(), extracted))
+            {
+                Fail("Suspicous file: "s + path.c_str());
+                return;
+            }
+
+            newFiles.emplace_back(std::make_shared<File>(extracted));
+        });
+    }
+
+    GetContext().addon->AddFiles(std::move(newFiles));
 }
 }  // namespace smam

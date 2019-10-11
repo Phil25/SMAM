@@ -6,3 +6,6 @@ target_link_libraries(utils_options PRIVATE CONAN_PKG::boost)
 add_library(utils_logger logger.cpp)
 
 add_library(utils_path path.cpp)
+
+add_library(utils_archive archive.cpp)
+target_link_libraries(utils_archive PRIVATE CONAN_PKG::libzip)
