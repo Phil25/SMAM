@@ -43,7 +43,6 @@ protected:
             {"files", {"plugins/bin.smx", "translations/tr.txt"}},
             {"deps", {"plugin2", "plugin3"}},
         }.get<AddonPtr>()->MarkInstalled();
-        Addon::ForEach([](const auto& addon){std::cout << addon->ID() << std::endl;});
         // clang-format on
     }
 

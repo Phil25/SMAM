@@ -16,6 +16,7 @@ add_executable(tests
   unit/operations/common.cpp
   unit/operations/addon.cpp
   unit/operations/installer.cpp
+  # unit/operations/remover.cpp (fully integration tested)
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
@@ -33,6 +34,7 @@ target_link_libraries(tests
   op_common
   op_addon
   op_installer
+  op_remover
 
   # Data
   data_file

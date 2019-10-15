@@ -4,6 +4,8 @@
 #include <scrapers/scraper.h>
 #include <operations/core.hpp>
 
+#include <filesystem>
+
 namespace smam
 {
 struct InstallerContext final

@@ -5,6 +5,7 @@ add_library(cmd_install install.cpp)
 target_link_libraries(cmd_install op_installer)
 
 add_library(cmd_remove remove.cpp)
+target_link_libraries(cmd_remove op_remover)
 
 add_library(cmd_info info.cpp)
 

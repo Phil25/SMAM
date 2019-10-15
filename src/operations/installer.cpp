@@ -84,6 +84,7 @@ void CheckInstalled::Run() noexcept
     if (addon->IsInstalled())
     {
         Fail("Already installed: \"" + addon->ID() + '"');
+        return;
     }
 
     GetLogger()->Info() << "Installing " << Col::green << addon->ID()
