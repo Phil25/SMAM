@@ -78,6 +78,11 @@ void Addon::MarkInstalled() noexcept
     installed.emplace(id, shared_from_this());
 }
 
+void Addon::Erase() const noexcept
+{
+    installed.erase(id);
+}
+
 void Addon::AddFiles(FileVector toAdd) noexcept
 {
     files.insert(files.end(), std::make_move_iterator(toAdd.begin()),
@@ -98,6 +103,15 @@ void Addon::AddFiles(FileVector toAdd) noexcept
 /*static*/ void Addon::ForEach(const ForEachAddon& f) noexcept
 {
     for (const auto& [_, addon] : installed) f(addon);
+}
+
+/*static*/ int Addon::CountByOwnedFile(const FilePtr& file) noexcept
+{
+    return std::count_if(
+        installed.begin(), installed.end(), [&file](const auto& entry) {
+            const auto& f = entry.second->Files();
+            return std::find(f.begin(), f.end(), file) != f.end();
+        });
 }
 
 /*static*/ bool Addon::Load(const std::string& file) noexcept

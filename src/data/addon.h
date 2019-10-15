@@ -51,12 +51,15 @@ public:
 
     bool IsInstalled() const noexcept;
     void MarkInstalled() noexcept;
+    void Erase() const noexcept;
 
     void AddFiles(FileVector) noexcept;
 
     static auto Get(const std::string& id) noexcept -> AddonOpt;
     static bool IsInstalled(const std::string& id) noexcept;
     static void ForEach(const ForEachAddon&) noexcept;
+
+    static int CountByOwnedFile(const FilePtr&) noexcept;
 
     [[nodiscard]] static bool Load(const std::string& file) noexcept;
     [[nodiscard]] static bool Save(const std::string& file) noexcept;

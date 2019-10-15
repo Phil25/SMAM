@@ -11,12 +11,54 @@ namespace smam
 using namespace testing;
 constexpr const char* dataFile = ".smamdata.json";
 
+class AddonTest : public ::testing::Test
+{
+protected:
+    void TearDown() override
+    {
+        Addon::ForEach([](const auto& addon) { addon->Erase(); });
+    }
+};
+
+class AddonTestPreinstalled : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // clang-format off
+        nlohmann::json{
+            {"id", "test"},
+            {"author", "Somedev"},
+            {"description", "Test addon"},
+            {"explicit", true},
+            {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+            {"deps", {"plugin1", "test2"}},
+        }.get<AddonPtr>()->MarkInstalled();
+
+        nlohmann::json{
+            {"id", "test2"},
+            {"author", "Somedev"},
+            {"description", "Test addon2"},
+            {"explicit", false},
+            {"files", {"plugins/bin.smx", "translations/tr.txt"}},
+            {"deps", {"plugin2", "plugin3"}},
+        }.get<AddonPtr>()->MarkInstalled();
+        Addon::ForEach([](const auto& addon){std::cout << addon->ID() << std::endl;});
+        // clang-format on
+    }
+
+    void TearDown() override
+    {
+        Addon::ForEach([](const auto& addon) { addon->Erase(); });
+    }
+};
+
 inline auto get(std::string file)
 {
     return nlohmann::json(std::move(file)).get<FilePtr>();
 }
 
-TEST(AddonTest, DeserializeFullLocal)
+TEST_F(AddonTest, DeserializeFullLocal)
 {
     auto plugin   = get("plugins/bin.smx");
     auto gamedata = get("gamedata/data.txt");
@@ -44,7 +86,7 @@ TEST(AddonTest, DeserializeFullLocal)
                 UnorderedElementsAre("someplugin", "someextension"));
 }
 
-TEST(AddonTest, DeserializePartialLocal)
+TEST_F(AddonTest, DeserializePartialLocal)
 {
     // clang-format off
     auto addon = nlohmann::json{
@@ -63,7 +105,7 @@ TEST(AddonTest, DeserializePartialLocal)
     EXPECT_TRUE(addon->Dependencies().empty());
 }
 
-TEST(AddonTest, DeserializeFullRemote)
+TEST_F(AddonTest, DeserializeFullRemote)
 {
     auto plugin   = get("plugins/;bin.smx");
     auto gamedata = get("gamedata/;data.txt");
@@ -91,7 +133,7 @@ TEST(AddonTest, DeserializeFullRemote)
                 UnorderedElementsAre("someplugin", "someextension"));
 }
 
-TEST(AddonTest, DeserializePartialRemote)
+TEST_F(AddonTest, DeserializePartialRemote)
 {
     // clang-format off
     auto addon = nlohmann::json{
@@ -110,7 +152,7 @@ TEST(AddonTest, DeserializePartialRemote)
     EXPECT_TRUE(addon->Dependencies().empty());
 }
 
-TEST(AddonTest, SerializeFull)
+TEST_F(AddonTest, SerializeFull)
 {
     auto plugin   = get("plugins/bin.smx");
     auto gamedata = get("gamedata/data.txt");
@@ -144,7 +186,7 @@ TEST(AddonTest, SerializeFull)
                 UnorderedElementsAre("someplugin", "someextension"));
 }
 
-TEST(AddonTest, SerializePartial)
+TEST_F(AddonTest, SerializePartial)
 {
     // clang-format off
     auto addon = nlohmann::json{
@@ -165,7 +207,7 @@ TEST(AddonTest, SerializePartial)
     EXPECT_THAT(json.at("deps"), IsEmpty());
 }
 
-TEST(AddonTest, AddFiles)
+TEST_F(AddonTest, AddFiles)
 {
     auto plugin   = get("plugins/bin.smx");
     auto gamedata = get("gamedata/data.txt");
@@ -183,28 +225,15 @@ TEST(AddonTest, AddFiles)
     EXPECT_THAT(addon.Files(), ElementsAre(plugin, gamedata, source));
 }
 
-TEST(AddonTest, Save)
+TEST_F(AddonTestPreinstalled, CountByOwnedFile)
 {
-    // clang-format off
-    nlohmann::json{
-        {"id", "test"},
-        {"author", "Somedev"},
-        {"description", "Test addon"},
-        {"explicit", true},
-        {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
-        {"deps", {"plugin1", "test2"}},
-    }.get<AddonPtr>()->MarkInstalled();
+    EXPECT_EQ(2, Addon::CountByOwnedFile(get("plugins/bin.smx")));
+    EXPECT_EQ(1, Addon::CountByOwnedFile(get("gamedata/data.txt")));
+    EXPECT_EQ(1, Addon::CountByOwnedFile(get("translations/tr.txt")));
+}
 
-    nlohmann::json{
-        {"id", "test2"},
-        {"author", "Somedev"},
-        {"description", "Test addon2"},
-        {"explicit", false},
-        {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
-        {"deps", {"plugin2", "plugin3"}},
-    }.get<AddonPtr>()->MarkInstalled();
-    // clang-format on
-
+TEST_F(AddonTestPreinstalled, Save)
+{
     ASSERT_TRUE(Addon::Save(dataFile));
 
     auto ifs = std::ifstream(dataFile);
@@ -216,7 +245,7 @@ TEST(AddonTest, Save)
     ASSERT_TRUE(json.count("data"));
     ASSERT_TRUE(json.count("hash"));
 
-    ASSERT_EQ(3810067853656611362u, json.at("hash").get<size_t>());
+    ASSERT_EQ(7755100675613232546u, json.at("hash").get<size_t>());
     ASSERT_EQ(2, json.at("data").size());
 
     const auto& a1 = json["data"][0];
@@ -239,18 +268,18 @@ TEST(AddonTest, Save)
     EXPECT_FALSE(a2["explicit"]);
 
     EXPECT_THAT(a2["files"].get<std::vector<std::string>>(),
-                ElementsAre("plugins/bin2.smx", "translations/tr.txt"));
+                ElementsAre("plugins/bin.smx", "translations/tr.txt"));
 
     EXPECT_THAT(a2["deps"].get<std::vector<std::string>>(),
                 ElementsAre("plugin2", "plugin3"));
 }
 
-TEST(AddonTest, LoadCreate)
+TEST_F(AddonTest, LoadCreate)
 {
     EXPECT_TRUE(Addon::Load(".smamdata.json"));
 }
 
-TEST(AddonTest, Load)
+TEST_F(AddonTest, Load)
 {
     auto ofs = std::ofstream(dataFile, std::ios::trunc);
     ASSERT_TRUE(ofs);
