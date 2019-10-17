@@ -96,6 +96,7 @@ EvaluateFiles::EvaluateFiles(const LoggerPtr& logger,
 void EvaluateFiles::Run() noexcept
 {
     const auto& data = GetContext().data;
+    assert(GetContext().addon);
 
     for (auto& file : GetContext().addon->Files())
     {
@@ -163,6 +164,8 @@ void DownloadFiles::Run() noexcept
 {
     using namespace std::string_literals;
 
+    assert(GetContext().addon);
+
     for (const auto& file : GetContext().addon->Files())
     {
         auto path = std::filesystem::path{file->Raw()};
@@ -200,14 +203,20 @@ ExtractArchives::ExtractArchives(const LoggerPtr& logger,
 void ExtractArchives::Run() noexcept
 {
     using namespace std::string_literals;
+    namespace fs = std::filesystem;
+
+    const auto& addon = GetContext().addon;
+    assert(addon);
 
     auto newFiles = FileVector{};
 
-    for (const auto& file : GetContext().addon->Files())
+    for (const auto& file : addon->Files())
     {
-        if (!archive::IsValidArchive(file->Raw())) continue;
+        auto path = fs::path{file->Raw()};
+        assert(fs::exists(path));
 
-        auto path = std::filesystem::path{file->Raw()};
+        if (!archive::IsValidArchive(path)) continue;
+
         GetLogger()->Info() << "Extracting " << path.filename() << cr;
 
         archive::Extract(path, [&](const auto& extracted) {
@@ -219,8 +228,12 @@ void ExtractArchives::Run() noexcept
 
             newFiles.emplace_back(std::make_shared<File>(extracted));
         });
+
+        fs::remove(path);
+        path::RemoveEmptyDirectories(path);
     }
 
-    GetContext().addon->AddFiles(std::move(newFiles));
+    addon->EraseNonExitentFiles();
+    addon->AddFiles(std::move(newFiles));
 }
 }  // namespace smam

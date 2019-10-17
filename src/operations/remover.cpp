@@ -62,7 +62,7 @@ void RemoveAddon::Run() noexcept
         path::RemoveEmptyDirectories(path);
     }
 
-    addon->Erase();
+    addon->MarkUninstalled();
 }
 
 RemoveDependencies::RemoveDependencies(const LoggerPtr& logger,

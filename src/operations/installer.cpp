@@ -5,7 +5,8 @@
 
 namespace smam
 {
-constexpr std::string_view tempdir = "/tmp/smam/";
+constexpr std::string_view tempdir  = "/tmp/smam/addons/sourcemod/";
+constexpr std::string_view tempcore = "/tmp/smam/";
 
 InstallerContext::InstallerContext(std::string        id,
                                    const AddonMapPtr& cache) noexcept
@@ -142,7 +143,7 @@ void BeginTransaction::Run() noexcept
 
     GetContext().root = fs::current_path();
 
-    fs::remove_all(tempdir);
+    if (fs::exists(tempcore)) fs::remove_all(tempcore);
 
     if (!fs::create_directories(tempdir))
     {
@@ -167,6 +168,6 @@ void CommitTransaction::Run() noexcept
              co::recursive | co::overwrite_existing);
 
     fs::current_path(GetContext().root);
-    fs::remove_all(tempdir);
+    fs::remove_all(tempcore);
 }
 }  // namespace smam

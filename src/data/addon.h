@@ -51,13 +51,15 @@ public:
 
     bool IsInstalled() const noexcept;
     void MarkInstalled() noexcept;
-    void Erase() const noexcept;
+    void MarkUninstalled() noexcept;
 
     void AddFiles(FileVector) noexcept;
+    void EraseNonExitentFiles() noexcept;
 
     static auto Get(const std::string& id) noexcept -> AddonOpt;
     static bool IsInstalled(const std::string& id) noexcept;
     static void ForEach(const ForEachAddon&) noexcept;
+    static void EraseAll() noexcept;
 
     static int CountByOwnedFile(const FilePtr&) noexcept;
 

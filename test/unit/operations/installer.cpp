@@ -100,8 +100,9 @@ TEST_F(OperarationInstallerTest, Transaction)
 
     ASSERT_FALSE(error) << error.message;
 
-    ASSERT_EQ("/tmp/smam", fs::current_path());
-    ASSERT_EQ(root, exec.GetContext().root);
+    ASSERT_TRUE(fs::equivalent("/tmp/smam/addons/sourcemod",
+                               fs::current_path()));
+    ASSERT_TRUE(fs::equivalent(root, exec.GetContext().root));
 
     ASSERT_TRUE(fs::create_directory("plugins"));
     ASSERT_TRUE(fs::create_directory("gamedata"));

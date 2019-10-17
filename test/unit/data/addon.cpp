@@ -16,7 +16,7 @@ class AddonTest : public ::testing::Test
 protected:
     void TearDown() override
     {
-        Addon::ForEach([](const auto& addon) { addon->Erase(); });
+        Addon::EraseAll();
     }
 };
 
@@ -48,7 +48,7 @@ protected:
 
     void TearDown() override
     {
-        Addon::ForEach([](const auto& addon) { addon->Erase(); });
+        Addon::EraseAll();
     }
 };
 
@@ -222,6 +222,32 @@ TEST_F(AddonTest, AddFiles)
     addon.AddFiles({gamedata, source});
     ASSERT_EQ(3, addon.Files().size());
     EXPECT_THAT(addon.Files(), ElementsAre(plugin, gamedata, source));
+}
+
+TEST_F(AddonTest, EraseNonExitentFiles)
+{
+    auto plugin   = get("plugins/bin.smx");
+    auto gamedata = get("gamedata/data.txt");
+    auto source   = get("scripting/bin.sp");
+
+    auto addon = Addon("test", {}, {});
+    ASSERT_TRUE(addon.Files().empty());
+
+    addon.AddFiles({plugin});
+    ASSERT_EQ(1, addon.Files().size());
+    EXPECT_THAT(addon.Files(), ElementsAre(plugin));
+
+    addon.AddFiles({gamedata, source});
+    ASSERT_EQ(3, addon.Files().size());
+    EXPECT_THAT(addon.Files(), ElementsAre(plugin, gamedata, source));
+
+    addon.EraseNonExitentFiles();
+    ASSERT_TRUE(addon.Files().empty());
+
+    /*
+     * No files were created -> All should be removed. Erasing specific
+     * files is tested through integration
+     */
 }
 
 TEST_F(AddonTestPreinstalled, CountByOwnedFile)

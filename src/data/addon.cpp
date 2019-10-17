@@ -1,7 +1,9 @@
 #include "addon.h"
 
-#include <fstream>
 #include <nlohmann/json.hpp>
+
+#include <filesystem>
+#include <fstream>
 
 namespace smam
 {
@@ -78,7 +80,7 @@ void Addon::MarkInstalled() noexcept
     installed.emplace(id, shared_from_this());
 }
 
-void Addon::Erase() const noexcept
+void Addon::MarkUninstalled() noexcept
 {
     installed.erase(id);
 }
@@ -87,6 +89,25 @@ void Addon::AddFiles(FileVector toAdd) noexcept
 {
     files.insert(files.end(), std::make_move_iterator(toAdd.begin()),
                  std::make_move_iterator(toAdd.end()));
+}
+
+void Addon::EraseNonExitentFiles() noexcept
+{
+    namespace fs = std::filesystem;
+
+    auto it = files.begin();
+    while (it != files.end())
+    {
+        if (auto path = fs::path{(*it)->Raw()}; fs::exists(path))
+        {
+            ++it;
+        }
+        else
+        {
+            assert(!fs::is_directory(path));
+            it = files.erase(it);
+        }
+    }
 }
 
 /*static*/ auto Addon::Get(const std::string& id) noexcept -> AddonOpt
@@ -103,6 +124,11 @@ void Addon::AddFiles(FileVector toAdd) noexcept
 /*static*/ void Addon::ForEach(const ForEachAddon& f) noexcept
 {
     for (const auto& [_, addon] : installed) f(addon);
+}
+
+/*static*/ void Addon::EraseAll() noexcept
+{
+    installed.clear();
 }
 
 /*static*/ int Addon::CountByOwnedFile(const FilePtr& file) noexcept
