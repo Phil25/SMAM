@@ -85,6 +85,8 @@ void FindData::Run() noexcept
             return;
         }
     }
+
+    GetContext().data.url = baseUrl;
 }
 
 EvaluateFiles::EvaluateFiles(const LoggerPtr& logger,
