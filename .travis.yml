@@ -25,4 +25,4 @@ script:
     - sudo ln -s /usr/bin/g++-9 /usr/local/bin/g++
     - gcc -v && g++ -v
     - mkdir build && cd build && conan install .. --build missing -s build_type=Debug && conan build ..
-    - ./bin/tests
+    - ./bin/tests && python -m pytest ..
