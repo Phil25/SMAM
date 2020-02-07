@@ -16,6 +16,8 @@ using namespace testing;
 
 class OperationsCommonTest : public ::testing::Test
 {
+    std::filesystem::path current;
+
 protected:
     LoggerPtr logger = std::make_shared<Logger>();
 
@@ -47,12 +49,15 @@ protected:
     void SetUp() override
     {
         namespace fs = std::filesystem;
-        fs::create_directories("mod/addons/sourcemod/plugins");
+        fs::create_directories("./mod/addons/sourcemod/plugins");
+        this->current = fs::current_path();
     }
 
     void TearDown() override
     {
-        std::filesystem::remove_all("mod");
+        namespace fs = std::filesystem;
+        fs::current_path(this->current);
+        fs::remove_all("./mod/");
     }
 };
 
