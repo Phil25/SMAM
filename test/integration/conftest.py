@@ -1,6 +1,7 @@
-from subprocess import Popen, PIPE
 import os
+import pytest
 import shutil
+from subprocess import Popen, PIPE
 
 BINARY = './bin/smam'
 
@@ -10,22 +11,6 @@ class SMAM:
         self.binary = binary
         self.destination = destination
         self.smroot = destination + 'addons/sourcemod/'
-
-    def __enter__(self):
-        os.makedirs(self.smroot + 'configs/')
-        os.makedirs(self.smroot + 'data/')
-        os.makedirs(self.smroot + 'gamedata/')
-        os.makedirs(self.smroot + 'plugins/')
-        os.makedirs(self.smroot + 'scripting/')
-        os.makedirs(self.smroot + 'translations/')
-
-        columns = shutil.get_terminal_size().columns
-        print('\n\033[95m\033[1m' + ''.center(columns, '=') + '\033[0m')
-
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        shutil.rmtree(self.destination)
 
     def exec(self, cmd):
         cmds = [self.binary] + cmd.split() + ['-d', self.destination]
@@ -63,3 +48,21 @@ class SMAM:
         else:
             for filename in files:
                 assert not self.exists(filename)
+
+@pytest.fixture(scope="function")
+def smam():
+    smam = SMAM()
+
+    os.makedirs(smam.smroot + 'configs/')
+    os.makedirs(smam.smroot + 'data/')
+    os.makedirs(smam.smroot + 'gamedata/')
+    os.makedirs(smam.smroot + 'plugins/')
+    os.makedirs(smam.smroot + 'scripting/')
+    os.makedirs(smam.smroot + 'translations/')
+
+    columns = shutil.get_terminal_size().columns
+    print('\n\033[95m\033[1m' + ''.center(columns, '=') + '\033[0m')
+
+    yield smam
+
+    shutil.rmtree(smam.destination)
