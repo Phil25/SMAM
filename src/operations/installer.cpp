@@ -102,10 +102,49 @@ InstallDependencies::InstallDependencies(
 void InstallDependencies::Run() noexcept
 {
     assert(GetContext().addon);
+    assert(GetContext().cache);
 
-    for (const auto& dep : GetContext().addon->Dependencies())
+    // waiting until Y combinators are added to the standard in 10 years
+    const auto install = [&](const auto install, const auto addon) {
+        for (const auto& dep : addon->Dependencies())
+        {
+            if (GetContext().pendingToBeInstalled.count(dep))
+            {
+                continue;  // circular dependency prevention
+            }
+
+            GetContext().pendingToBeInstalled.insert(dep);
+
+            if (!GetContext().cache->count(dep))
+            {
+                return Error{"Dependency " + dep + " not found."};
+            }
+
+            const auto dependency = GetContext().cache->at(dep);
+
+            //  recursively install its own dependencies
+            auto error = install(install, dependency);
+
+            if (error) return error;
+
+            error = Executor<AddonContext>(GetLogger(), dependency)
+                        .Run<CheckSatisfied>()
+                        .Run<FindData>(scrapers)
+                        .Run<EvaluateFiles>()
+                        .Run<DownloadFiles>()
+                        .Run<ExtractArchives>()
+                        .Run<MarkInstalled>()
+                        .GetError();
+
+            if (error) return error;
+        };
+
+        return Error{};
+    };
+
+    if (auto error = install(install, GetContext().addon); error)
     {
-        // TODO: finish me after figuring out installation
+        Fail(error.message);
     }
 }
 

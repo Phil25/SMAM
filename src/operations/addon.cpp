@@ -193,6 +193,9 @@ MarkInstalled::MarkInstalled(const LoggerPtr& logger,
 void MarkInstalled::Run() noexcept
 {
     GetContext().addon->MarkInstalled();
+
+    GetLogger()->Info() << "Installed " << Col::green
+                        << GetContext().addon->ID() << Col::reset << cr;
 }
 
 ExtractArchives::ExtractArchives(const LoggerPtr& logger,
@@ -236,5 +239,28 @@ void ExtractArchives::Run() noexcept
 
     addon->EraseNonExitentFiles();
     addon->AddFiles(std::move(newFiles));
+}
+
+CheckSatisfied::CheckSatisfied(const LoggerPtr& logger,
+                               AddonContext&    context) noexcept
+    : Operation(logger, context)
+{
+}
+
+void CheckSatisfied::Run() noexcept
+{
+    const auto& addon = GetContext().addon;
+    assert(addon);
+
+    if (addon->IsInstalled())
+    {
+        GetLogger()->Info() << "Dependency satisfied: " << Col::green
+                            << addon->ID() << Col::reset << cr;
+        Stop();
+        return;
+    }
+
+    GetLogger()->Info() << "Installing dependency: " << Col::green
+                        << addon->ID() << Col::reset << "..." << cr;
 }
 }  // namespace smam

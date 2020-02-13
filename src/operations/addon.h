@@ -57,4 +57,12 @@ public:
 
     void Run() noexcept override;
 };
+
+class CheckSatisfied final : public Operation<AddonContext>
+{
+public:
+    CheckSatisfied(const LoggerPtr&, AddonContext&) noexcept;
+
+    void Run() noexcept override;
+};
 }  // namespace smam
