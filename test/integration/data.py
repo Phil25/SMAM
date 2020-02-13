@@ -94,3 +94,7 @@ DEPENDENCY_DATA = {
     'a_wants_b': ['b_wants_a'],
     'b_wants_a': ['a_wants_b']
 }
+
+BAD_DEPENDENCY_DATA = {
+    'wants_badaddon': ['badaddon'],
+}
