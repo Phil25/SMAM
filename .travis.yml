@@ -15,6 +15,10 @@ addons:
             - g++-9
         update: true
 
+cache:
+    directories:
+     - /home/travis/.conan/
+
 install:
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
     - pip install conan pytest
