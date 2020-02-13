@@ -23,15 +23,15 @@ int main(int argc, const char* argv[])
         return ExitCode::OK;
     }
 
+    logger->SetPrefix(!options->NoPrefix());
+    logger->SetColor(!options->NoColor());
+    logger->SetOutput(!options->Quiet());
+
     if (!getuid() && !options->AllowRoot())
     {
         logger->Error() << "SMAM should not be run as root." << cr;
         return ExitCode::RunAsRoot;
     }
-
-    logger->SetPrefix(!options->NoPrefix());
-    logger->SetColor(!options->NoColor());
-    logger->SetOutput(!options->Quiet());
 
     const auto& command = options->Command();
 
