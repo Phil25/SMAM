@@ -94,7 +94,7 @@ void CheckInstalled::Run() noexcept
 
 InstallDependencies::InstallDependencies(
     const LoggerPtr& logger, InstallerContext& context,
-    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+    const ScraperArrayPtr& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {
 }
@@ -109,9 +109,9 @@ void InstallDependencies::Run() noexcept
     }
 }
 
-InstallAddon::InstallAddon(
-    const LoggerPtr& logger, InstallerContext& context,
-    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+InstallAddon::InstallAddon(const LoggerPtr&       logger,
+                           InstallerContext&      context,
+                           const ScraperArrayPtr& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {
 }

@@ -59,22 +59,22 @@ public:
 
 class InstallDependencies final : public Operation<InstallerContext>
 {
-    std::shared_ptr<ScraperArray> scrapers;
+    ScraperArrayPtr scrapers;
 
 public:
     InstallDependencies(const LoggerPtr&, InstallerContext&,
-                        const std::shared_ptr<ScraperArray>&) noexcept;
+                        const ScraperArrayPtr&) noexcept;
 
     void Run() noexcept override;
 };
 
 class InstallAddon final : public Operation<InstallerContext>
 {
-    std::shared_ptr<ScraperArray> scrapers;
+    ScraperArrayPtr scrapers;
 
 public:
     InstallAddon(const LoggerPtr&, InstallerContext&,
-                 const std::shared_ptr<ScraperArray>&) noexcept;
+                 const ScraperArrayPtr&) noexcept;
 
     void Run() noexcept override;
 };

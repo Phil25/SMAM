@@ -17,11 +17,11 @@ struct AddonContext final
 
 class FindData final : public Operation<AddonContext>
 {
-    std::shared_ptr<ScraperArray> scrapers;
+    ScraperArrayPtr scrapers;
 
 public:
     FindData(const LoggerPtr&, AddonContext&,
-             const std::shared_ptr<ScraperArray>&) noexcept;
+             const ScraperArrayPtr&) noexcept;
 
     void Run() noexcept override;
 };

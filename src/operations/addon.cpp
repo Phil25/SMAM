@@ -66,9 +66,8 @@ AddonContext::AddonContext(const AddonPtr& addon) noexcept
 {
 }
 
-FindData::FindData(
-    const LoggerPtr& logger, AddonContext& context,
-    const std::shared_ptr<ScraperArray>& scrapers) noexcept
+FindData::FindData(const LoggerPtr& logger, AddonContext& context,
+                   const ScraperArrayPtr& scrapers) noexcept
     : Operation(logger, context), scrapers(scrapers)
 {
 }
