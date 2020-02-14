@@ -2,6 +2,34 @@
 
 #include <utils/path.h>
 
+namespace
+{
+void RemoveAddon(smam::AddonPtr addon, smam::LoggerPtr logger) noexcept
+{
+    using namespace smam;
+    namespace fs = std::filesystem;
+
+    for (const auto& file : addon->Files())
+    {
+        auto count = Addon::CountByOwnedFile(file);
+        assert(count && "File owned but not found");
+        auto path = fs::path{file->Raw()};
+
+        if (count > 1)
+        {
+            logger->Warning() << "Skipping shared file: " << path << cr;
+            continue;
+        }
+
+        logger->Info() << path << cr;
+        fs::remove(path);
+        path::RemoveEmptyDirectories(path);
+    }
+
+    addon->MarkUninstalled();
+}
+}  // namespace
+
 namespace smam
 {
 RemoverContext::RemoverContext(std::string id) noexcept
@@ -39,30 +67,8 @@ RemoveAddon::RemoveAddon(const LoggerPtr& logger,
 
 void RemoveAddon::Run() noexcept
 {
-    namespace fs = std::filesystem;
-
-    const auto& addon = GetContext().addon;
-    assert(addon);
-
-    for (const auto& file : addon->Files())
-    {
-        auto count = Addon::CountByOwnedFile(file);
-        assert(count && "File owned but not found");
-        auto path = fs::path{file->Raw()};
-
-        if (count > 1)
-        {
-            GetLogger()->Warning()
-                << "Skipping shared file: " << path << cr;
-            continue;
-        }
-
-        GetLogger()->Info() << path << cr;
-        fs::remove(path);
-        path::RemoveEmptyDirectories(path);
-    }
-
-    addon->MarkUninstalled();
+    assert(GetContext().addon);
+    ::RemoveAddon(GetContext().addon, GetLogger());
 }
 
 RemoveDependencies::RemoveDependencies(const LoggerPtr& logger,
@@ -73,7 +79,23 @@ RemoveDependencies::RemoveDependencies(const LoggerPtr& logger,
 
 void RemoveDependencies::Run() noexcept
 {
-    const auto& addon = GetContext().addon;
-    assert(addon);
+    assert(GetContext().addon);
+
+    const auto remove = [&](const auto remove,
+                            const auto addon) -> void {
+        for (const auto& dep : addon->Dependencies())
+        {
+            if (const auto depOpt = Addon::Get(dep))
+            {
+                const auto dependency = depOpt.value();
+                if (dependency->IsExplicit()) continue;
+
+                ::RemoveAddon(dependency, GetLogger());
+                remove(remove, dependency);
+            }
+        }
+    };
+
+    remove(remove, GetContext().addon);
 }
 }  // namespace smam
