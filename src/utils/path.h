@@ -17,4 +17,6 @@ bool CreateIfSafe(const fs::path&) noexcept;
 bool HasReadAndWritePermissions(const fs::path&) noexcept;
 
 void RemoveEmptyDirectories(fs::path) noexcept;
+
+auto MD5(const fs::path&) noexcept -> std::string;
 }  // namespace smam::path

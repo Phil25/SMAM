@@ -1,5 +1,8 @@
 #include "path.h"
 
+#include <fstream>
+#include <openssl/md5.h>
+
 namespace smam
 {
 bool path::IsSafe(const std::filesystem::path& path) noexcept
@@ -61,5 +64,30 @@ void path::RemoveEmptyDirectories(fs::path path) noexcept
 
         path = path.parent_path();
     }
+}
+
+auto path::MD5(const fs::path& path) noexcept -> std::string
+{
+    auto ifs = std::ifstream(path, std::ifstream::binary);
+    if (!ifs) return {};
+
+    MD5_CTX       context;
+    char          buffer[1024 * 4];
+    unsigned char result[MD5_DIGEST_LENGTH];
+
+    MD5_Init(&context);
+    while (ifs.good())
+    {
+        ifs.read(buffer, sizeof(buffer));
+        MD5_Update(&context, buffer, ifs.gcount());
+    }
+    MD5_Final(result, &context);
+
+    auto oss = std::ostringstream();
+    oss << std::hex << std::setfill('0');
+
+    for (const auto& i : result) oss << static_cast<int>(i);
+
+    return oss.str();
 }
 }  // namespace smam

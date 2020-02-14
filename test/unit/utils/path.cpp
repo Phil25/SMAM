@@ -3,6 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 namespace smam
 {
 TEST(PathTest, PathIsSafe)
@@ -77,5 +79,23 @@ TEST(PathTest, PathRemoveEmptyDirectories)
     EXPECT_TRUE(fs::exists("something/this/somedir"));
 
     fs::remove_all("something");
+}
+
+TEST(PathTest, MD5FileExists)
+{
+    auto ofs = std::ofstream("md5.txt");
+    ASSERT_TRUE(ofs);
+
+    ofs << "This is a test.";
+    ofs.close();
+
+    EXPECT_EQ("12ea8a25e5d487bf68b5f709644019", path::MD5("md5.txt"));
+
+    std::filesystem::remove("md5.txt");
+}
+
+TEST(PathTest, MD5FileNotExists)
+{
+    EXPECT_TRUE(path::MD5("idontexist.txt").empty());
 }
 }  // namespace smam
