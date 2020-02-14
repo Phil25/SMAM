@@ -66,7 +66,15 @@ void MarkExplicit::Run() noexcept
      * been installed as a dependency initially.
      * TODO: Notify the user about marking an addon as explicit.
      */
-    GetContext().addon->MarkExplicit();
+
+    if (const auto addonOpt = Addon::Get(GetContext().addon->ID()))
+    {
+        addonOpt.value()->MarkExplicit();  // mark installed addon
+    }
+    else
+    {
+        GetContext().addon->MarkExplicit();  // mark new addon
+    }
 }
 
 CheckInstalled::CheckInstalled(const LoggerPtr& l, InstallerContext& c,

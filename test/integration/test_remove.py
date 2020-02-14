@@ -41,3 +41,13 @@ def test_not_remove_explicit_dependency_during_install(smam):
     smam.exec('remove rtd')
     smam.check_not_installed(INSTALL_DATA['rtd'])
     smam.check_installed(INSTALL_DATA['tf2attributes'])
+
+def test_not_remove_explicit_dependency_after_install(smam):
+    smam.exec('install rtd')
+    smam.check_installed(INSTALL_DATA['rtd'])
+    smam.check_installed(INSTALL_DATA['tf2attributes'])
+
+    smam.exec('install tf2attributes')
+    smam.exec('remove rtd')
+    smam.check_not_installed(INSTALL_DATA['rtd'])
+    smam.check_installed(INSTALL_DATA['tf2attributes'])
