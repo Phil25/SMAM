@@ -27,6 +27,8 @@ void RemoveAddon(smam::AddonPtr addon, smam::LoggerPtr logger) noexcept
     }
 
     addon->MarkUninstalled();
+    logger->Info() << "Removed " << Col::green << addon->ID()
+                   << Col::reset << cr;
 }
 }  // namespace
 
@@ -89,6 +91,10 @@ void RemoveDependencies::Run() noexcept
             {
                 const auto dependency = depOpt.value();
                 if (dependency->IsExplicit()) continue;
+
+                GetLogger()->Info()
+                    << "Removing loose dependency: " << Col::green
+                    << dependency->ID() << Col::reset << "..." << cr;
 
                 ::RemoveAddon(dependency, GetLogger());
                 remove(remove, dependency);
