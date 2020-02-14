@@ -58,6 +58,7 @@ protected:
         namespace fs = std::filesystem;
         fs::current_path(this->current);
         fs::remove_all("./mod/");
+        logger->SetOutput(true);
     }
 };
 
@@ -136,10 +137,18 @@ TEST_F(OperationsCommonTest, LoadAddonsFinish)
     ASSERT_FALSE(error) << error.message;
 }
 
-TEST_F(OperationsCommonTest, LoadAddonsFail)
+TEST_F(OperationsCommonTest, LoadAddonsFailGeneric)
 {
+    logger->SetOutput(false);
+
     auto ofs = std::ofstream("mod/addons/sourcemod/.smamdata.json",
                              std::ios::trunc);
+    ASSERT_TRUE(ofs);
+    ofs << "Wait, this isn't JSON...\n";
+    ofs.close();
+
+    ofs = std::ofstream("mod/addons/sourcemod/.smamdata.json.bak",
+                        std::ios::trunc);
     ASSERT_TRUE(ofs);
     ofs << "Wait, this isn't JSON...\n";
     ofs.close();
@@ -151,7 +160,24 @@ TEST_F(OperationsCommonTest, LoadAddonsFail)
     EXPECT_EQ("Failed to load installed addons.", error.message);
 }
 
-TEST_F(OperationsCommonTest, SaveAddonsFinish)
+TEST_F(OperationsCommonTest, LoadAddonsFailBackupNotExists)
+{
+    logger->SetOutput(false);
+
+    auto ofs = std::ofstream("mod/addons/sourcemod/.smamdata.json",
+                             std::ios::trunc);
+    ASSERT_TRUE(ofs);
+    ofs << "Wait, this isn't JSON...\n";
+    ofs.close();
+
+    std::filesystem::current_path("./mod/addons/sourcemod/");
+    auto error = Exec().Run<LoadAddons>(".smamdata.json").GetError();
+
+    ASSERT_TRUE(error);
+    EXPECT_EQ("Backup does not exist.", error.message);
+}
+
+TEST_F(OperationsCommonTest, SaveAddons)
 {
     // clang-format off
     nlohmann::json{
@@ -216,5 +242,99 @@ TEST_F(OperationsCommonTest, SaveAddonsFinish)
 
     EXPECT_THAT(a2["deps"].get<std::vector<std::string>>(),
                 ElementsAre("plugin2", "plugin3"));
+}
+
+TEST_F(OperationsCommonTest, SaveAddonsBackup)
+{
+    // clang-format off
+    nlohmann::json{
+        {"id", "test"},
+        {"author", "Somedev"},
+        {"description", "Test addon"},
+        {"explicit", true},
+        {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+        {"deps", {"plugin1", "test2"}},
+    }.get<AddonPtr>()->MarkInstalled();
+
+    nlohmann::json{
+        {"id", "test2"},
+        {"author", "Somedev"},
+        {"description", "Test addon2"},
+        {"explicit", false},
+        {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
+        {"deps", {"plugin2", "plugin3"}},
+    }.get<AddonPtr>()->MarkInstalled();
+    // clang-format on
+
+    auto error =
+        Exec()
+            .Run<SaveAddons>("mod/addons/sourcemod/.smamdata.json")
+            .GetError();
+
+    ASSERT_FALSE(error) << error.message;
+
+    namespace fs = std::filesystem;
+    EXPECT_TRUE(fs::exists("mod/addons/sourcemod/.smamdata.json"));
+    EXPECT_TRUE(fs::exists("mod/addons/sourcemod/.smamdata.json.bak"));
+}
+
+TEST_F(OperationsCommonTest, LoadAddonsBackup)
+{
+    logger->SetOutput(false);
+
+    auto ofs = std::ofstream("mod/addons/sourcemod/.smamdata.json",
+                             std::ios::trunc);
+    ASSERT_TRUE(ofs);
+    // clang-format off
+    ofs << nlohmann::json{{"data", {
+        {
+            {"id", "test"},
+            {"author", "Somedev"},
+            {"description", "Test addon"},
+            {"explicit", true},
+            {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+            {"deps", {"plugin1", "test2"}},
+        },
+        {
+            {"id", "test2"},
+            {"author", "Somedev"},
+            {"description", "Test addon2"},
+            {"explicit", false},
+            {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
+            {"deps", {"plugin2", "plugin3"}},
+        }
+    }}, {"hash", 3810067853656611361u}};  // NOTE: invalid hash
+    // clang-format on
+    ofs.close();
+
+    ofs = std::ofstream("mod/addons/sourcemod/.smamdata.json.bak",
+                        std::ios::trunc);
+    ASSERT_TRUE(ofs);
+    // clang-format off
+    ofs << nlohmann::json{{"data", {
+        {
+            {"id", "test"},
+            {"author", "Somedev"},
+            {"description", "Test addon"},
+            {"explicit", true},
+            {"files", {"plugins/bin.smx", "gamedata/data.txt"}},
+            {"deps", {"plugin1", "test2"}},
+        },
+        {
+            {"id", "test2"},
+            {"author", "Somedev"},
+            {"description", "Test addon2"},
+            {"explicit", false},
+            {"files", {"plugins/bin2.smx", "translations/tr.txt"}},
+            {"deps", {"plugin2", "plugin3"}},
+        }
+    }}, {"hash", 3810067853656611362u}};  // NOTE: correct hash
+    // clang-format on
+    ofs.close();
+
+    std::filesystem::current_path("./mod/addons/sourcemod/");
+    auto error = Exec().Run<LoadAddons>(".smamdata.json").GetError();
+
+    ASSERT_FALSE(error) << error.message;
 }
 }  // namespace smam

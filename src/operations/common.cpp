@@ -62,12 +62,32 @@ void LoadAddons::Run() noexcept
     if (!path::HasReadAndWritePermissions(path))
     {
         Fail("No read or write permissions.", ExitCode::NoPermissions);
+        return;
     }
 
-    if (!Addon::Load(path))
+    if (Addon::Load(path)) return;
+
+    GetLogger()->Warning()
+        << "Loading addons failed! Attempting to load backup." << cr;
+
+    auto backup = path;
+    backup.replace_extension("json.bak");
+
+    if (!path::fs::exists(backup))
     {
-        Fail("Failed to load installed addons.", ExitCode::BadCache);
+        Fail("Backup does not exist.", ExitCode::BadCache);
+        return;
     }
+
+    if (!path::HasReadAndWritePermissions(backup))
+    {
+        Fail("No read or write permissions.", ExitCode::NoPermissions);
+        return;
+    }
+
+    if (Addon::Load(backup)) return;
+
+    Fail("Failed to load installed addons.", ExitCode::BadCache);
 }
 
 SaveAddons::SaveAddons(const LoggerPtr& logger, CommonContext& context,
@@ -81,11 +101,30 @@ void SaveAddons::Run() noexcept
     if (!path::HasReadAndWritePermissions(path))
     {
         Fail("No read or write permissions.", ExitCode::NoPermissions);
+        return;
     }
 
     if (!Addon::Save(path))
     {
         Fail("Failed to save installed addons.", ExitCode::WriteError);
+        return;
     }
+
+    auto backup = path;
+    backup.replace_extension("json.bak");
+
+    if (!path::HasReadAndWritePermissions(backup))
+    {
+        Fail("No read or write permissions.", ExitCode::NoPermissions);
+        return;
+    }
+
+    if (Addon::Save(backup) && path::MD5(path) == path::MD5(backup))
+    {
+        return;
+    }
+
+    Fail("Failed to backup installed addons.", ExitCode::WriteError);
+    path::fs::remove(backup);
 }
 }  // namespace smam

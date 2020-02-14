@@ -63,7 +63,7 @@ void MarkExplicit::Run() noexcept
      * Every user-specified addon should be marked as explicit.
      * Needs to be marked before CheckInstalled in case the user wants
      * to specify explicitness, after the addon has potentially
-     * been installed as a dependnecy initially.
+     * been installed as a dependency initially.
      * TODO: Notify the user about marking an addon as explicit.
      */
     GetContext().addon->MarkExplicit();
