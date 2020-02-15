@@ -26,3 +26,14 @@ def test_install_dependencies_fail(smam, addon):
 
     for dep in BAD_DEPENDENCY_DATA[addon]:
         smam.check_not_installed(BAD_INSTALL_DATA[dep])
+
+@pytest.mark.parametrize('addon', DEPENDENCY_DATA)
+def test_install_no_depencencies(smam, addon):
+    if addon == 'wants_self':
+        pytest.skip()
+
+    smam.exec('install --no-deps ' + addon)
+    smam.check_installed(INSTALL_DATA[addon])
+
+    for dep in DEPENDENCY_DATA[addon]:
+        smam.check_not_installed(INSTALL_DATA[dep])

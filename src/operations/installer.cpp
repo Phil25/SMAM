@@ -102,8 +102,8 @@ void CheckInstalled::Run() noexcept
 
 InstallDependencies::InstallDependencies(
     const LoggerPtr& logger, InstallerContext& context,
-    const ScraperArrayPtr& scrapers) noexcept
-    : Operation(logger, context), scrapers(scrapers)
+    const ScraperArrayPtr& scrapers, bool noDeps) noexcept
+    : Operation(logger, context), scrapers(scrapers), noDeps(noDeps)
 {
 }
 
@@ -122,6 +122,14 @@ void InstallDependencies::Run() noexcept
             }
 
             GetContext().pendingToBeInstalled.insert(dep);
+
+            if (noDeps)
+            {
+                GetLogger()->Warning()
+                    << "Dependency " << Col::green << dep << Col::reset
+                    << " required but not installed!" << cr;
+                continue;
+            }
 
             if (!GetContext().cache->count(dep))
             {

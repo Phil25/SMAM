@@ -74,8 +74,9 @@ void RemoveAddon::Run() noexcept
 }
 
 RemoveDependencies::RemoveDependencies(const LoggerPtr& logger,
-                                       RemoverContext& context) noexcept
-    : Operation(logger, context)
+                                       RemoverContext&  context,
+                                       bool             noDeps) noexcept
+    : Operation(logger, context), noDeps(noDeps)
 {
 }
 
@@ -91,6 +92,15 @@ void RemoveDependencies::Run() noexcept
             {
                 const auto dependency = depOpt.value();
                 if (dependency->IsExplicit()) continue;
+
+                if (noDeps)
+                {
+                    GetLogger()->Warning()
+                        << "Loose dependency " << Col::green
+                        << dependency->ID() << Col::reset
+                        << " not removed!" << cr;
+                    continue;
+                }
 
                 GetLogger()->Info()
                     << "Removing loose dependency: " << Col::green

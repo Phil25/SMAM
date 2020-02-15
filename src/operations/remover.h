@@ -32,8 +32,11 @@ public:
 
 class RemoveDependencies final : public Operation<RemoverContext>
 {
+    bool noDeps;
+
 public:
-    RemoveDependencies(const LoggerPtr&, RemoverContext&) noexcept;
+    RemoveDependencies(const LoggerPtr&, RemoverContext&,
+                       bool noDeps) noexcept;
 
     void Run() noexcept override;
 };

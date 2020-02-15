@@ -60,10 +60,11 @@ public:
 class InstallDependencies final : public Operation<InstallerContext>
 {
     ScraperArrayPtr scrapers;
+    bool            noDeps;
 
 public:
     InstallDependencies(const LoggerPtr&, InstallerContext&,
-                        const ScraperArrayPtr&) noexcept;
+                        const ScraperArrayPtr&, bool noDeps) noexcept;
 
     void Run() noexcept override;
 };

@@ -36,16 +36,17 @@ auto command::Install(const LoggerPtr&  logger,
 
     for (const auto& id : ids)
     {
-        error = Executor<InstallerContext>(logger, id, cache)
-                    .Run<CheckPending>()
-                    .Run<ParseCache>()
-                    .Run<MarkExplicit>()
-                    .Run<CheckInstalled>(options->Force())
-                    .Run<BeginTransaction>()
-                    .Run<InstallDependencies>(scrapers)
-                    .Run<InstallAddon>(scrapers)
-                    .Run<CommitTransaction>()
-                    .GetError();
+        error =
+            Executor<InstallerContext>(logger, id, cache)
+                .Run<CheckPending>()
+                .Run<ParseCache>()
+                .Run<MarkExplicit>()
+                .Run<CheckInstalled>(options->Force())
+                .Run<BeginTransaction>()
+                .Run<InstallDependencies>(scrapers, options->NoDeps())
+                .Run<InstallAddon>(scrapers)
+                .Run<CommitTransaction>()
+                .GetError();
 
         if (error)
         {

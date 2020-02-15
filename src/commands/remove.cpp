@@ -25,7 +25,7 @@ auto command::Remove(const LoggerPtr&  logger,
         error = Executor<RemoverContext>(logger, id)
                     .Run<CheckNotInstalled>()
                     .Run<RemoveAddon>()
-                    .Run<RemoveDependencies>()
+                    .Run<RemoveDependencies>(options->NoDeps())
                     .GetError();
 
         if (error)

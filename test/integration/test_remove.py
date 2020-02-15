@@ -51,3 +51,20 @@ def test_not_remove_explicit_dependency_after_install(smam):
     smam.exec('remove rtd')
     smam.check_not_installed(INSTALL_DATA['rtd'])
     smam.check_installed(INSTALL_DATA['tf2attributes'])
+
+@pytest.mark.parametrize('addon', DEPENDENCY_DATA)
+def test_remove_no_dependencies(smam, addon):
+    if addon == 'wants_self':
+        pytest.skip()
+
+    smam.exec('install ' + addon)
+    smam.check_installed(INSTALL_DATA[addon])
+
+    for dep in DEPENDENCY_DATA[addon]:
+        smam.check_installed(INSTALL_DATA[dep])
+
+    smam.exec('remove --no-deps ' + addon)
+    smam.check_not_installed(INSTALL_DATA[addon])
+
+    for dep in DEPENDENCY_DATA[addon]:
+        smam.check_installed(INSTALL_DATA[dep])
