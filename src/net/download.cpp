@@ -48,7 +48,7 @@ auto download::Raw(const std::string& url, std::ostream& os) noexcept
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &os);
 
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 4L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
 
     auto code = curl_easy_perform(curl);
     if (code != CURLE_OK)
