@@ -34,9 +34,9 @@ inline bool IsUrlReplaceable(const std::string& url) noexcept
  */
 class AMNode final
 {
-    const pugi::xml_node& node;
+    pugi::xml_node node;
 
-    AMNode(const pugi::xml_node& node) noexcept : node(node)
+    AMNode(pugi::xml_node node) noexcept : node(std::move(node))
     {
     }
 
