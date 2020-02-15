@@ -1,16 +1,17 @@
 #include "archive.h"
 
+#include <zip.h>
 #include <fstream>
 
-#include <zip.h>
-
-bool Archive::valid(const fs::path& file) noexcept
+namespace smam
+{
+bool archive::IsValidArchive(const std::filesystem::path& file) noexcept
 {
     return file.extension() == ".zip";
 }
 
-bool Archive::extract(const fs::path& zipFile,
-                      const FileCb&   cb) noexcept
+bool archive::Extract(const std::filesystem::path& zipFile,
+                      const EachFile&              callback) noexcept
 {
     struct zip*     z;
     struct zip_stat s;
@@ -29,7 +30,7 @@ bool Archive::extract(const fs::path& zipFile,
 
         if (file.filename().empty()) continue;
 
-        if (!cb(file)) continue;
+        callback(file);
 
         zip_file* f = zip_fopen(z, s.name, 0);
 
@@ -43,3 +44,4 @@ bool Archive::extract(const fs::path& zipFile,
     zip_close(z);
     return true;
 }
+}  // namespace smam

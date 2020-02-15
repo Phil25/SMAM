@@ -1,21 +1,31 @@
 #include "common.h"
 
-#include <smfs/addon.h>
+#include <operations/common.h>
+#include <data/addon.h>
 
-auto Command::info(const Opts& opts) noexcept -> ExitCode
+namespace smam
 {
-    if (Common::noSMRoot(opts)) return ExitCode::NoSMRoot;
-    if (auto ret = Common::load(); ret) return ret;
+auto command::Info(const LoggerPtr&  logger,
+                   const OptionsPtr& options) noexcept -> ExitCode
+{
+    auto error = Executor<CommonContext>(logger, options)
+                     .Run<GoToSMRoot>()
+                     .Run<LoadAddons>(".smamdata.json")
+                     .GetError();
 
-    const auto& filter = opts.getAddons();
+    if (error)
+    {
+        logger->Error() << error.message << cr;
+        return error.code;
+    }
+
+    const auto& filter = options->Addons();
 
     if (filter.empty())
     {
-        out(Ch::Info) << "Installed addons:" << cr;
-
-        Addon::forEach([](const auto& addon) {
-            out() << addon << " (" << addon->fileCount() << " file(s))"
-                  << cr;
+        logger->Out() << "Installed addons:" << cr;
+        Addon::ForEach([&logger](AddonPtr addon) {
+            logger->Out() << addon->ID() << cr;
         });
 
         return ExitCode::OK;
@@ -23,24 +33,36 @@ auto Command::info(const Opts& opts) noexcept -> ExitCode
 
     for (const auto& id : filter)
     {
-        auto addonOpt = Addon::get(id);
-
-        if (!addonOpt)
+        if (!Addon::IsInstalled(id))
         {
-            out(Ch::Warn) << "Not installed: " << id << cr;
+            logger->Warning()
+                << "Addon " << Col::green << id << Col::reset
+                << " is not installed." << cr;
             continue;
         }
 
-        auto addon = addonOpt.value();
+        const auto addon = Addon::Get(id).value();
 
-        out(Ch::Info) << Col::green << id << Col::reset << " ("
-                      << addon->fileCount() << ')' << cr;
+        logger->Out() << "ID: " << Col::green << id << Col::reset << cr;
+        logger->Out() << "Author: " << addon->Author() << cr;
+        logger->Out() << "Description: " << addon->Description() << cr;
 
-        addon->forEachFile([](const auto& file) {
-            out() << file->raw() << cr;
-            return true;
-        });
+        logger->Out() << "Files: [" << cr;
+        for (const auto& file : addon->Files())
+        {
+            logger->Out() << '\t' << file->Path() << '/' << file->Name()
+                          << ',' << cr;
+        }
+        logger->Out() << "]" << cr;
+
+        logger->Out() << "Dependencies: [" << cr;
+        for (const auto& dep : addon->Dependencies())
+        {
+            logger->Out() << '\t' << dep << ',' << cr;
+        }
+        logger->Out() << "]" << cr;
     }
 
     return ExitCode::OK;
 }
+}  // namespace smam

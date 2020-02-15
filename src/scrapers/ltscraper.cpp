@@ -1,7 +1,7 @@
 #include "ltscraper.h"
 
-#include <download.h>
-#include <utils/printer.h>
+#include <net/download.h>
+#include <utils/common.h>
 
 #include <pugixml.hpp>
 
@@ -9,11 +9,12 @@ namespace
 {
 constexpr std::string_view URL = "https://builds.limetech.io/";
 
-auto parseData(const std::string& doc) noexcept
+auto ParseData(const std::string& doc) noexcept
 {
-    pugi::xml_document root;
-    Scraper::Data      data;
-    std::string        name, url;
+    auto root = pugi::xml_document{};
+    auto data = smam::Scraper::Data{};
+    auto name = std::string{};
+    auto url  = std::string{};
 
     root.load_string(doc.c_str());
 
@@ -34,21 +35,27 @@ auto parseData(const std::string& doc) noexcept
         name = url.substr(++pos);
     }
 
-    data.emplace(name, url);
+    data.nameToLink.emplace(name, url);
     return data;
 }
 }  // namespace
 
-LTScraper::LTScraper() noexcept : Scraper(URL, "<tbody>", "</tbody>") {}
+namespace smam
+{
+LTScraper::LTScraper() noexcept : Scraper(URL, "<tbody>", "</tbody>")
+{
+}
 
 LTScraper::~LTScraper() noexcept = default;
 
-auto LTScraper::fetch(const std::string& url) noexcept -> Data
+auto LTScraper::Parse(const std::string& url) noexcept -> Data
 {
-    auto doc  = Download::page(url, dataFrom, dataTo);
-    auto data = parseData(doc);
+    auto doc  = download::Html(url).str();
+    auto data = ParseData(utils::ExtractString(doc, from, to));
 
     data.website = Data::Website::Limetech;
+    data.url     = url;
 
     return data;
 }
+}  // namespace smam

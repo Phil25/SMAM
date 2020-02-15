@@ -1,40 +1,22 @@
 #pragma once
 
-#include <opts.h>
+#include <utils/options.h>
+#include <utils/codes.hpp>
 
-enum ExitCode
+namespace smam::command
 {
-    OK        = 0,
-    RunAsRoot = 1,
-    NoPermissions,
-    WriteError,
-    NoCommand,
-    UnknownCommand,
-    NoAddons,
-    NoSMRoot,
-    CorruptedCache,
-};
+using CommandPtr = ExitCode (*)(const LoggerPtr&,
+                                const OptionsPtr&) noexcept;
 
-namespace Command
-{
-using fptr = ExitCode (*)(const Opts&) noexcept;
-extern const std::map<std::string_view, fptr> map;
+using CommandMap = std::map<std::string_view, CommandPtr>;
+extern const CommandMap map;
 
-auto install(const Opts&) noexcept -> ExitCode;
-auto remove(const Opts&) noexcept -> ExitCode;
-auto info(const Opts&) noexcept -> ExitCode;
-auto search(const Opts&) noexcept -> ExitCode;
+auto Install(const LoggerPtr&, const OptionsPtr&) noexcept -> ExitCode;
+auto Remove(const LoggerPtr&, const OptionsPtr&) noexcept -> ExitCode;
+auto Info(const LoggerPtr&, const OptionsPtr&) noexcept -> ExitCode;
+auto Search(const LoggerPtr&, const OptionsPtr&) noexcept -> ExitCode;
 
-bool exists(const std::string& command) noexcept;
-auto run(const std::string& command, const Opts& opts) noexcept
-    -> ExitCode;
-
-}  // namespace Command
-
-namespace Common
-{
-[[nodiscard]] bool noAddons(const std::vector<std::string>&) noexcept;
-[[nodiscard]] bool noSMRoot(const Opts& opts) noexcept;
-[[nodiscard]] auto load() noexcept -> ExitCode;
-[[nodiscard]] bool save() noexcept;
-}  // namespace Common
+bool Exists(const std::string& command) noexcept;
+auto Run(const LoggerPtr&, const std::string& command,
+         const OptionsPtr&) noexcept -> ExitCode;
+}  // namespace smam::command

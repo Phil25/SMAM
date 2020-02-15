@@ -1,7 +1,6 @@
 #include "ghscraper.h"
 
-#include <download.h>
-#include <utils/printer.h>
+#include <net/download.h>
 
 #include <nlohmann/json.hpp>
 
@@ -17,7 +16,7 @@ constexpr std::string_view RELEASES = "releases/latest";
  * Get GitHub repository address from a full link.
  * https://github.com/user/repo/ -> user/repo/
  */
-inline auto getRepoUrl(const std::string& url) -> std::string
+inline auto GetRepoUrl(const std::string& url) -> std::string
 {
     std::string repoUrl = url.substr(URL.size());
 
@@ -34,39 +33,46 @@ inline auto getRepoUrl(const std::string& url) -> std::string
  * repository address.
  * user/repo -> https://api.github.com/repos/user/repo/releases/latest
  */
-inline auto getReleasesUrl(const std::string& repoUrl) -> std::string
+inline auto GetReleasesUrl(const std::string& repoUrl) -> std::string
 {
     return std::string(URL_API).append(repoUrl).append(RELEASES);
 }
 }  // namespace
 
-GHScraper::GHScraper() noexcept : Scraper(URL) {}
+namespace smam
+{
+GHScraper::GHScraper() noexcept : Scraper(URL)
+{
+}
 
 GHScraper::~GHScraper() noexcept = default;
 
-auto GHScraper::fetch(const std::string& url) noexcept -> Data
+auto GHScraper::Parse(const std::string& url) noexcept -> Data
 {
-    auto release = getReleasesUrl(getRepoUrl(url));
-    auto page    = Download::page(release);
+    auto release = GetReleasesUrl(GetRepoUrl(url));
+    auto doc     = download::Html(release);
 
     Data data;
     data.website = Data::Website::GitHub;
+    data.url     = url;
 
     try
     {
-        json root = json::parse(page);
+        json root = json::parse(doc);
 
         std::string name, url;
 
         for (const auto& asset : root.at("assets"))
         {
-            data[asset.at("name")] = asset.at("browser_download_url");
+            data.nameToLink.emplace(
+                std::move(asset.at("name")),
+                std::move(asset.at("browser_download_url")));
         }
     }
-    catch (const json::exception& e)
+    catch (const json::exception&)
     {
-        out(Ch::Error) << e.what() << cr;
     }
 
     return data;
 }
+}  // namespace smam

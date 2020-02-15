@@ -3,14 +3,11 @@
 #include <filesystem>
 #include <functional>
 
-namespace Archive
+namespace smam::archive
 {
-namespace fs = std::filesystem;
-using FileCb = std::function<bool(const fs::path&)>;
+using EachFile = std::function<void(const std::filesystem::path&)>;
 
-// Check whether extension is an archive
-bool valid(const fs::path&) noexcept;
+bool IsValidArchive(const std::filesystem::path&) noexcept;
 
-// Extract archive at `path` in the same directory
-bool extract(const fs::path&, const FileCb& cb) noexcept;
-}  // namespace Archive
+bool Extract(const std::filesystem::path&, const EachFile&) noexcept;
+}  // namespace smam::archive

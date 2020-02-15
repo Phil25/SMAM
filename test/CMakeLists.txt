@@ -1,19 +1,22 @@
-add_library(curlmock curlmock.cpp)
-target_include_directories(curlmock PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
+add_library(mock_curl mock/curl.cpp)
+target_include_directories(mock_curl PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 
 add_executable(tests
-  unit/curlmocktest.cpp
-  unit/optstest.cpp
-  unit/filetest.cpp
-  unit/pathtest.cpp
-  unit/addontest.cpp
-  unit/utilstest.cpp
-  unit/downloadtest.cpp
-  unit/databasetest.cpp
-  unit/scrapertest.cpp
-  unit/amscrapertest.cpp
-  unit/ltscrapertest.cpp
-  unit/ghscrapertest.cpp
+  unit/mock/curl.cpp
+  unit/net/download.cpp
+  unit/net/database.cpp
+  unit/data/file.cpp
+  unit/data/addon.cpp
+  unit/utils/options.cpp
+  unit/utils/path.cpp
+  unit/scrapers/amscraper.cpp
+  unit/scrapers/ltscraper.cpp
+  unit/scrapers/ghscraper.cpp
+  unit/operations/core.cpp
+  unit/operations/common.cpp
+  unit/operations/addon.cpp
+  unit/operations/installer.cpp
+  # unit/operations/remover.cpp (fully integration tested)
 )
 
 target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
@@ -21,33 +24,31 @@ target_include_directories(tests PRIVATE ${CONAN_INCLUDE_DIRS_JSONFORMODERNCPP})
 target_link_libraries(tests
   CONAN_PKG::gtest
 
-# General
-  opts
-  download
-  database
-  addon
-  file
-  path
-  curlmock
+  # Utilities
+  utils_logger
+  utils_common
+  utils_path
+  utils_options
 
-# Commands
-  cmd_install
-  cmd_remove
-  cmd_info
-  cmd_search
+  # Operations
+  op_common
+  op_addon
+  op_installer
+  op_remover
 
-# Scrapers
-  amscraper
-  ltscraper
-  ghscraper
+  # Data
+  data_file
+  data_addon
 
-# Utilities
-  utils_misc
-  utils_printer
-  utils_version
-)
+  # Network
+  net_download
+  net_database
 
-add_test(
-  NAME unit_tests
-  COMMAND ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/tests
+  # Scrapers
+  scraper_am
+  scraper_lt
+  scraper_gh
+
+  # Other
+  mock_curl
 )

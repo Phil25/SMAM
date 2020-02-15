@@ -1,18 +1,12 @@
-project(SMAM_src_utils)
+add_library(utils_common common.cpp)
 
-# Archive
+add_library(utils_options options.cpp)
+target_link_libraries(utils_options PRIVATE CONAN_PKG::boost)
+
+add_library(utils_logger logger.cpp)
+
+add_library(utils_path path.cpp)
+target_link_libraries(utils_path PRIVATE CONAN_PKG::OpenSSL)
+
 add_library(utils_archive archive.cpp)
 target_link_libraries(utils_archive PRIVATE CONAN_PKG::libzip)
-
-# Misc
-add_library(utils_misc misc.cpp)
-
-# Printer
-add_library(utils_printer printer.cpp)
-
-# Report
-add_library(utils_report report.cpp)
-
-# Version
-add_library(utils_version version.cpp)
-target_link_libraries(utils_version PRIVATE utils_misc)

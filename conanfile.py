@@ -6,7 +6,7 @@ class SourceModAddonManager(ConanFile):
     requires = (
         "cmake_installer/3.14.5@conan/stable",
         ("zlib/1.2.9@conan/stable", "override"),
-        "boost/1.70.0@conan/stable",
+        "boost/1.71.0@conan/stable",
         "gtest/1.8.1@bincrafters/stable",
         "pugixml/1.9@bincrafters/stable",
         "libzip/1.2.0@bincrafters/stable",

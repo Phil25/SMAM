@@ -4,15 +4,12 @@
 #include <memory>
 #include <vector>
 
+namespace smam
+{
 class Scraper
 {
-    using ScraperPtr = std::unique_ptr<Scraper>;
-    using Vector     = std::vector<ScraperPtr>;
-
-    static Vector scrapers;
-
 public:
-    struct Data : std::map<std::string, std::string>
+    struct Data final
     {
         enum class Website
         {
@@ -22,36 +19,26 @@ public:
             Unknown
         };
 
-        std::string url     = {};
-        Website     website = Website::Unknown;
+        std::map<std::string, std::string> nameToLink;
+        std::string                        url{};
+        Website                            website{Website::Unknown};
     };
 
 protected:
-    const std::string aptUrl, dataFrom, dataTo;
+    const std::string url, from, to;
 
-    Scraper(std::string_view url, const std::string& from = "",
-            const std::string& to = "") noexcept;
+    Scraper(std::string_view url, std::string from = "",
+            std::string to = "") noexcept;
 
 public:
     virtual ~Scraper() noexcept;
 
-    /*
-     * Fetch file download urls.
-     */
-    virtual auto fetch(const std::string& url) noexcept -> Data = 0;
+    auto Url() const noexcept -> const std::string&;
 
-    /*
-     * Return whether this scraper is applicable for given url.
-     */
-    bool match(const std::string& url) const noexcept;
-
-    /*
-     * Add an instance of a scraper to the static list
-     */
-    static void add(ScraperPtr scraper) noexcept;
-
-    /*
-     * Return appropriate Scraper for given URL or null.
-     */
-    static auto getData(const std::string& url) noexcept -> Data;
+    virtual auto Parse(const std::string& url) noexcept -> Data = 0;
 };
+
+using ScraperPtr      = std::unique_ptr<Scraper>;
+using ScraperArray    = std::array<ScraperPtr, 3>;
+using ScraperArrayPtr = std::shared_ptr<ScraperArray>;
+}  // namespace smam

@@ -1,50 +1,52 @@
-#include "version.hpp"
+#include <commands/common.h>  // ExitCode
+#include <utils/options.h>
+#include <version.hpp>
 
 #include <unistd.h>  // getuid
 
-#include <commands/common.h>  // ExitCode
-#include <utils/printer.h>
-
 int main(int argc, const char* argv[])
 {
-    const Opts opts(argc, argv);
+    using namespace smam;
 
-    if (opts.help())
+    const auto logger  = std::make_shared<Logger>();
+    const auto options = std::make_shared<Options>(argc, argv, logger);
+
+    if (options->Help())
     {
-        opts.printHelp(argv[0], out);
+        logger->Out() << options->GenHelp(argv[0]);
         return ExitCode::OK;
     }
 
-    if (opts.version())
+    if (options->Version())
     {
-        out << Version::full() << cr;
+        logger->Out() << version::Full() << cr;
         return ExitCode::OK;
     }
 
-    if (!getuid() && !opts.allowRoot())
+    logger->SetPrefix(!options->NoPrefix());
+    logger->SetColor(!options->NoColor());
+    logger->SetOutput(!options->Quiet());
+
+    if (!getuid() && !options->AllowRoot())
     {
-        out(Ch::Error) << "SMAM should not be ran as root." << cr;
+        logger->Error() << "SMAM should not be run as root." << cr;
         return ExitCode::RunAsRoot;
     }
 
-    out.setPrefix(!opts.noPrefix());
-    out.setColor(!opts.noColor());
-    out.setOutput(!opts.quiet());
-
-    const auto& command = opts.getCommand();
+    const auto& command = options->Command();
 
     if (command.empty())
     {
-        out(Ch::Error) << "No command provided." << cr;
+        logger->Error() << "No command provided." << cr;
         return ExitCode::NoCommand;
     }
 
-    if (!Command::exists(command))
+    if (!command::Exists(command))
     {
-        out(Ch::Error) << "Unknown command: \"" << command << '\"'
-                       << cr;
+        logger->Error() << "Unknown command: \"" << command << "\""
+                        << cr;
         return ExitCode::UnknownCommand;
     }
 
-    return Command::run(command, opts);
+    return command::Run(logger, command, options);
 }

@@ -1,6 +1,10 @@
 #include "common.h"
 
-auto Command::search(const Opts& /*opts*/) noexcept -> ExitCode
+namespace smam
+{
+auto command::Search(const LoggerPtr&  logger,
+                     const OptionsPtr& options) noexcept -> ExitCode
 {
     return ExitCode::OK;
 }
+}  // namespace smam

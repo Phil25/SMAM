@@ -1,14 +1,8 @@
-project(SMAM_src_scrapers)
+add_library(scraper_main scraper.cpp)
 
-# Scraper base
-add_library(scraper scraper.cpp)
+add_library(scraper_am amscraper.cpp)
+target_link_libraries(scraper_am PRIVATE scraper_main CONAN_PKG::pugixml utils_common)
 
-# AlliedModders scraper
-add_library(amscraper amscraper.cpp)
+add_library(scraper_lt ltscraper.cpp)
 
-# LimeTech scraper
-add_library(ltscraper ltscraper.cpp)
-target_link_libraries(ltscraper PRIVATE CONAN_PKG::pugixml)
-
-# GitHub scraper
-add_library(ghscraper ghscraper.cpp)
+add_library(scraper_gh ghscraper.cpp)

@@ -1,13 +1,11 @@
 #include "amscraper.h"
 
-#include <cassert>
-
-#include <download.h>
-#include <utils/misc.h>
-#include <utils/printer.h>
-#include <utils/version.h>
+#include <net/download.h>
+#include <utils/common.h>
 
 #include <pugixml.hpp>
+
+#include <cassert>
 
 namespace
 {
@@ -25,7 +23,7 @@ constexpr std::string_view URL_ALT = "http://www.sourcemod.net/";
  * that the one with NONREPLACABLE URL is the precompiled one, taking
  * priority over the REPLACABLE one.
  */
-inline bool isUrlReplaceable(const std::string& url)
+inline bool IsUrlReplaceable(const std::string& url) noexcept
 {
     return url.compare(0, URL_ALT.size(), URL_ALT) == 0;
 }
@@ -38,12 +36,16 @@ class AMNode final
 {
     const pugi::xml_node& node;
 
-    AMNode(const pugi::xml_node& node) noexcept : node(node) {}
-
-    auto name() const noexcept -> std::string
+    AMNode(const pugi::xml_node& node) noexcept : node(node)
     {
-        std::string name;
-        auto        src = node.first_child();
+    }
+
+    auto Name() const noexcept -> std::string
+    {
+        namespace utils = smam::utils;
+
+        auto name = std::string{};
+        auto src  = node.first_child();
 
         if (!node.text())
         {
@@ -58,7 +60,7 @@ class AMNode final
 
             assert(src.text() && "Node should be text");
 
-            name = Utils::extract(src.value(), " (", ".sp - ");
+            name = utils::ExtractString(src.value(), " (", ".sp - ");
             name.append(".smx");
         }
         else if (std::string{src.value()} == "Get Source")
@@ -73,7 +75,7 @@ class AMNode final
 
             assert(src.text() && "Node should be text");
 
-            name = Utils::extract(src.value(), " (", " - ");
+            name = utils::ExtractString(src.value(), " (", " - ");
         }
         else
         {
@@ -87,41 +89,43 @@ class AMNode final
         return name;
     }
 
-    auto url() const noexcept -> std::string
+    auto Url() const noexcept -> std::string
     {
+        namespace utils = smam::utils;
+
         auto href = node.attribute("href");
         if (!href) return "";
 
         std::string url = href.as_string();
 
-        if (!Utils::isLink(url)) url.insert(0, URL);
+        if (!utils::IsLink(url)) url.insert(0, URL);
 
         return url;
     }
 
 public:
-    static auto parseData(const std::string& doc) noexcept;
+    static auto ParseData(const std::string& doc) noexcept;
 };
 
-auto AMNode::parseData(const std::string& doc) noexcept
+auto AMNode::ParseData(const std::string& doc) noexcept
 {
-    pugi::xml_document root;
-    Scraper::Data      data;
+    auto root = pugi::xml_document{};
+    auto data = smam::Scraper::Data{};
 
     root.load_string(doc.c_str());
 
     for (const auto& anchor : root.select_nodes("//a"))
     {
         auto node  = AMNode(anchor.node());
-        auto name  = node.name();
-        auto url   = node.url();
-        auto entry = data.find(name);
+        auto name  = node.Name();
+        auto url   = node.Url();
+        auto entry = data.nameToLink.find(name);
 
-        if (entry == data.end())
+        if (entry == data.nameToLink.end())
         {
-            data.emplace(name, url);
+            data.nameToLink.emplace(name, url);
         }
-        else if (isUrlReplaceable(entry->second))
+        else if (IsUrlReplaceable(entry->second))
         {
             entry->second = url;
         }
@@ -131,6 +135,8 @@ auto AMNode::parseData(const std::string& doc) noexcept
 }
 }  // namespace
 
+namespace smam
+{
 AMScraper::AMScraper() noexcept
     : Scraper(URL, "<!-- attachments -->", "<!-- / attachments -->")
 {
@@ -138,12 +144,14 @@ AMScraper::AMScraper() noexcept
 
 AMScraper::~AMScraper() noexcept = default;
 
-auto AMScraper::fetch(const std::string& url) noexcept -> Data
+auto AMScraper::Parse(const std::string& url) noexcept -> Data
 {
-    auto doc  = Download::page(url, dataFrom, dataTo);
-    auto data = AMNode::parseData(doc);
+    auto doc  = download::Html(url).str();
+    auto data = AMNode::ParseData(utils::ExtractString(doc, from, to));
 
     data.website = Data::Website::AlliedModders;
+    data.url     = url;
 
     return data;
 }
+}  // namespace smam
