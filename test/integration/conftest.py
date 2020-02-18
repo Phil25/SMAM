@@ -2,8 +2,10 @@ import os
 import pytest
 import shutil
 from subprocess import Popen, PIPE
+from data import INSTALL_DATA, BAD_INSTALL_DATA
 
 BINARY = './bin/smam'
+FILES = {**INSTALL_DATA, **BAD_INSTALL_DATA}
 
 class SMAM:
 
@@ -32,22 +34,18 @@ class SMAM:
     def getsize(self, f):
         return os.path.getsize(self.smroot + f)
 
-    def check_installed(self, files):
-        for (filename, size) in files:
+    def check_installed(self, addon):
+        for (filename, size) in FILES[addon]:
             assert self.exists(filename)
             assert self.isfile(filename)
             assert size == self.getsize(filename)
 
-    def check_not_installed(self, files):
-        if not files:
+    def check_not_installed(self, addon):
+        if not FILES[addon]:
             return
 
-        if isinstance(files[0], list):
-            for (filename, size) in files:
-                assert not self.exists(filename)
-        else:
-            for filename in files:
-                assert not self.exists(filename)
+        for (filename, size) in FILES[addon]:
+            assert not self.exists(filename)
 
 @pytest.fixture(scope="function")
 def smam():
