@@ -34,7 +34,7 @@ auto db::Fetch(const LoggerPtr& logger, std::string url,
     auto root = json::parse(download::Html(url), nullptr, false);
     if (root.is_discarded())
     {
-        logger->Error() << "Query result parsing failed.";
+        logger->Error() << "Database query error." << cr;
         return {};
     }
 

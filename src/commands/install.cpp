@@ -28,6 +28,8 @@ auto command::Install(const LoggerPtr&  logger,
     const auto& url   = options->DatabaseUrl();
     const auto  cache = db::Fetch(logger, url, ids);
 
+    if (!cache) return ExitCode::NoAddons;
+
     static_assert(std::tuple_size<ScraperArray>::value == 3);
     auto scrapers   = std::make_shared<ScraperArray>();
     scrapers->at(0) = std::make_unique<AMScraper>();
