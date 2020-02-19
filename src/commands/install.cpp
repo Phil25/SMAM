@@ -28,7 +28,7 @@ auto command::Install(const LoggerPtr&  logger,
     const auto& url   = options->DatabaseUrl();
     const auto  cache = db::Fetch(logger, url, ids);
 
-    if (!cache) return ExitCode::NoAddons;
+    if (!cache) return ExitCode::DatabaseFailure;
 
     static_assert(std::tuple_size<ScraperArray>::value == 3);
     auto scrapers   = std::make_shared<ScraperArray>();

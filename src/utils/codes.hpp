@@ -13,5 +13,6 @@ enum ExitCode
     NoAddons,
     NoSMRoot,
     BadCache,
+    DatabaseFailure,
 };
 }
