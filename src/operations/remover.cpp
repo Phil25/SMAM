@@ -21,7 +21,7 @@ void RemoveAddon(smam::AddonPtr addon, smam::LoggerPtr logger) noexcept
             continue;
         }
 
-        logger->Info() << path << cr;
+        logger->Print() << path << cr;
         fs::remove(path);
         path::RemoveEmptyDirectories(path);
     }

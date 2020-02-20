@@ -27,7 +27,7 @@ class Logger final
 public:
     Logger() noexcept;
 
-    auto operator()() noexcept -> Logger&;
+    auto Print() noexcept -> Logger&;
     auto Info() noexcept -> Logger&;
     auto Warning() noexcept -> Logger&;
     auto Error() noexcept -> Logger&;

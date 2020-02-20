@@ -54,7 +54,7 @@ bool ExamineFilePath(const LoggerPtr&             logger,
     }
     else
     {
-        logger->Info() << path << cr;
+        logger->Print() << path << cr;
     }
 
     return true;

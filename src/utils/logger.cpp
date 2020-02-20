@@ -20,7 +20,7 @@ Logger::Logger() noexcept : os(&std::cout)
 {
 }
 
-auto Logger::operator()() noexcept -> Logger&
+auto Logger::Print() noexcept -> Logger&
 {
     if (prefix) *this << "    ";
     return *this;
