@@ -8,3 +8,6 @@ src/version.hpp
 
 # pytest stuff
 __pycache__
+
+# ccls cache directory
+.ccls-cache/
