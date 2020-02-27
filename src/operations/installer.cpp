@@ -9,8 +9,8 @@ constexpr std::string_view tempdir  = "/tmp/smam/addons/sourcemod/";
 constexpr std::string_view tempcore = "/tmp/smam/";
 
 InstallerContext::InstallerContext(std::string        id,
-                                   const AddonMapPtr& cache) noexcept
-    : id(std::move(id)), cache(cache)
+                                   const AddonMapPtr& metadata) noexcept
+    : id(std::move(id)), metadata(metadata)
 {
 }
 
@@ -22,30 +22,37 @@ CheckPending::CheckPending(const LoggerPtr&  l,
 
 void CheckPending::Run() noexcept
 {
-    if (GetContext().pendingToBeInstalled.count(GetContext().id))
+    const auto& id = GetContext().id;
+
+    if (GetContext().pendingToBeInstalled.count(id))
     {
+        GetLogger()->Debug("Addon already pending. ", VAR(id));
         Stop();
     }
 
-    GetContext().pendingToBeInstalled.insert(GetContext().id);
+    GetLogger()->Debug("Adding addon to pending list. ", VAR(id));
+    GetContext().pendingToBeInstalled.insert(id);
 }
 
-ParseCache::ParseCache(const LoggerPtr& l, InstallerContext& c) noexcept
+ParseMetadata::ParseMetadata(const LoggerPtr&  l,
+                             InstallerContext& c) noexcept
     : Operation(l, c)
 {
 }
 
-void ParseCache::Run() noexcept
+void ParseMetadata::Run() noexcept
 {
-    const auto& cache = GetContext().cache;
+    const auto& metadata = GetContext().metadata;
+    const auto& id       = GetContext().id;
 
-    if (auto it = cache->find(GetContext().id); it != cache->end())
+    if (auto it = metadata->find(id); it != metadata->end())
     {
         GetContext().addon = it->second;
+        GetLogger()->Debug("ID found in metadata. ", VAR(id));
     }
     else
     {
-        Fail("Not found: \"" + GetContext().id + '"');
+        Fail("Not found: \"" + id + '"');
     }
 }
 
@@ -67,12 +74,17 @@ void MarkExplicit::Run() noexcept
      * TODO: Notify the user about marking an addon as explicit.
      */
 
-    if (const auto addonOpt = Addon::Get(GetContext().addon->ID()))
+    const auto& id = GetContext().addon->ID();
+    if (const auto addonOpt = Addon::Get(id))
     {
+        GetLogger()->Debug("Marking installed addon as explicit. ",
+                           VAR(id));
         addonOpt.value()->MarkExplicit();  // mark installed addon
     }
     else
     {
+        GetLogger()->Debug(
+            "Marking yet to be installed addon as explicit. ", VAR(id));
         GetContext().addon->MarkExplicit();  // mark new addon
     }
 }
@@ -85,7 +97,11 @@ CheckInstalled::CheckInstalled(const LoggerPtr& l, InstallerContext& c,
 
 void CheckInstalled::Run() noexcept
 {
-    if (force) return;  // skip this check
+    if (force)
+    {
+        GetLogger()->Debug("Skipping CheckInstalled due to --force");
+        return;  // skip this check
+    }
 
     const auto& addon = GetContext().addon;
     assert(addon);
@@ -110,14 +126,20 @@ InstallDependencies::InstallDependencies(
 void InstallDependencies::Run() noexcept
 {
     assert(GetContext().addon);
-    assert(GetContext().cache);
+    assert(GetContext().metadata);
 
     // waiting until Y combinators are added to the standard in 10 years
     const auto install = [&](const auto install, const auto addon) {
-        for (const auto& dep : addon->Dependencies())
+        const auto& addonId = addon->ID();
+        const auto& deps    = addon->Dependencies();
+        GetLogger()->Debug("Installing addon dependencies. ",
+                           VAR(addonId), ", ", VAR(deps));
+
+        for (const auto& dep : deps)
         {
             if (GetContext().pendingToBeInstalled.count(dep))
             {
+                GetLogger()->Debug("Skipping circular dependency...");
                 continue;  // circular dependency prevention
             }
 
@@ -131,19 +153,19 @@ void InstallDependencies::Run() noexcept
                 continue;
             }
 
-            if (!GetContext().cache->count(dep))
+            if (!GetContext().metadata->count(dep))
             {
                 return Error{"Dependency " + dep + " not found."};
             }
 
-            const auto dependency = GetContext().cache->at(dep);
+            const auto id = GetContext().metadata->at(dep);
 
             //  recursively install its own dependencies
-            auto error = install(install, dependency);
+            auto error = install(install, id);
 
             if (error) return error;
 
-            error = Executor<AddonContext>(GetLogger(), dependency)
+            error = Executor<AddonContext>(GetLogger(), id)
                         .Run<CheckSatisfied>()
                         .Run<FindData>(scrapers)
                         .Run<EvaluateFiles>()

@@ -15,6 +15,7 @@ bool command::Exists(const std::string& command) noexcept
 auto command::Run(const LoggerPtr& logger, const std::string& command,
                   const OptionsPtr& options) noexcept -> ExitCode
 {
+    logger->Debug("Running ", command, " command...");
     return map.at(command)(logger, options);
 }
 }  // namespace smam

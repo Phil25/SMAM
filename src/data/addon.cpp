@@ -223,4 +223,22 @@ void to_json(nlohmann::json& json, const AddonPtr& addon) noexcept
     json.emplace("files", addon->Files());
     json.emplace("deps", addon->Dependencies());
 }
+
+#ifndef NDEBUG  // overloads for easy debug message printing
+auto operator<<(Logger& logger, const Addon& addon) -> Logger&
+{
+    logger << '{' << cr;  // no Indent() because same line
+    logger.IncIndent();
+    logger.Indent() << "name: " << addon.ID() << cr;
+    logger.Indent() << "description: " << addon.Description() << cr;
+    logger.Indent() << "author: " << addon.Author() << cr;
+    logger.Indent() << "baseURL: \"" << addon.BaseURL() << '\"' << cr;
+    logger.Indent() << "files: " << addon.Files() << cr;
+    logger.Indent() << "dependencies: " << addon.Dependencies() << cr;
+    logger.Indent() << "explicit: " << addon.IsExplicit() << cr;
+    logger.Indent() << "installed: " << addon.IsInstalled() << cr;
+    logger.DecIndent();
+    return logger.Indent() << '}';
+}
+#endif
 }  // namespace smam

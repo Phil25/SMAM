@@ -24,11 +24,12 @@ auto command::Install(const LoggerPtr&  logger,
         return error.code;
     }
 
-    const auto& ids   = options->Addons();
-    const auto& url   = options->DatabaseUrl();
-    const auto  cache = db::Fetch(logger, url, ids);
+    const auto& ids  = options->Addons();
+    const auto& url  = options->DatabaseUrl();
+    const auto  meta = db::Fetch(logger, url, ids);
 
-    if (!cache) return ExitCode::DatabaseFailure;
+    logger->Debug("Fetched metadata: ", meta);
+    if (!meta) return ExitCode::DatabaseFailure;
 
     static_assert(std::tuple_size<ScraperArray>::value == 3);
     auto scrapers   = std::make_shared<ScraperArray>();
@@ -39,9 +40,9 @@ auto command::Install(const LoggerPtr&  logger,
     for (const auto& id : ids)
     {
         error =
-            Executor<InstallerContext>(logger, id, cache)
+            Executor<InstallerContext>(logger, id, meta)
                 .Run<CheckPending>()
-                .Run<ParseCache>()
+                .Run<ParseMetadata>()
                 .Run<MarkExplicit>()
                 .Run<CheckInstalled>(options->Force())
                 .Run<BeginTransaction>()

@@ -78,13 +78,16 @@ void FindData::Run() noexcept
 
     for (const auto& scraper : *scrapers)
     {
-        if (Match(baseUrl, scraper->Url()))
+        const auto& url = scraper->Url();
+        if (Match(baseUrl, url))
         {
+            GetLogger()->Debug("Matched scraper. ", VAR(url));
             GetContext().data = scraper->Parse(baseUrl);
             return;
         }
     }
 
+    GetLogger()->Debug("Scraper not matched. ", VAR(baseUrl));
     GetContext().data.url = baseUrl;
 }
 
@@ -99,18 +102,25 @@ void EvaluateFiles::Run() noexcept
     const auto& data = GetContext().data;
     assert(GetContext().addon);
 
-    for (auto& file : GetContext().addon->Files())
-    {
-        auto attachment = data.nameToLink.find(file->Name());
+    auto& files = GetContext().addon->Files();
 
+    for (auto& file : files)
+    {
+        GetLogger()->Debug("Evaluating file. ", VAR(file));
+
+        auto attachment = data.nameToLink.find(file->Name());
         if (attachment != data.nameToLink.end())  // found
         {
             file->Link(attachment->second);
+            GetLogger()->Debug("Link found and set. ",
+                               VAR(attachment->second));
             continue;
         }
 
         if (utils::IsLink(file->Name()))  // specified file is a link
         {
+            GetLogger()->Debug("Is a link, splitting...");
+
             size_t pos = file->Name().rfind('/');
             if (pos != std::string::npos)
             {
@@ -125,8 +135,12 @@ void EvaluateFiles::Run() noexcept
 
         if (!names.empty())
         {
+            GetLogger()->Debug("Found wildcard name(s). ", VAR(names));
+
             std::string best = utils::BiggestVersion(names);
             attachment       = data.nameToLink.find(best);
+
+            GetLogger()->Debug("Found best name. ", VAR(best));
 
             if (attachment != data.nameToLink.end())
             {
@@ -144,6 +158,8 @@ void EvaluateFiles::Run() noexcept
             return;
         }
 
+        GetLogger()->Debug("Fallthrough method...");
+
         if (data.url[data.url.size() - 1] != '/')
         {
             file->Link(data.url + '/' + file->Name());
@@ -153,6 +169,8 @@ void EvaluateFiles::Run() noexcept
             file->Link(data.url + file->Name());
         }
     }
+
+    GetLogger()->Debug("Evaluated files. ", VAR(files));
 }
 
 DownloadFiles::DownloadFiles(const LoggerPtr& logger,
@@ -169,6 +187,8 @@ void DownloadFiles::Run() noexcept
 
     for (const auto& file : GetContext().addon->Files())
     {
+        GetLogger()->Debug("Downloading file. ", VAR(file));
+
         auto path = std::filesystem::path{file->Raw()};
         if (!ExamineFilePath(GetLogger(), path))
         {

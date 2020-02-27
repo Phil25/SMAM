@@ -86,12 +86,22 @@ void RemoveDependencies::Run() noexcept
 
     const auto remove = [&](const auto remove,
                             const auto addon) -> void {
-        for (const auto& dep : addon->Dependencies())
+        const auto& addonId = addon->ID();
+        const auto& deps    = addon->Dependencies();
+        GetLogger()->Debug("Removing addon dependencies. ",
+                           VAR(addonId), ", ", VAR(deps));
+
+        for (const auto& dep : deps)
         {
             if (const auto depOpt = Addon::Get(dep))
             {
                 const auto dependency = depOpt.value();
-                if (dependency->IsExplicit()) continue;
+                if (dependency->IsExplicit())
+                {
+                    GetLogger()->Debug("Omitting dependency. ",
+                                       VAR(dependency));
+                    continue;
+                }
 
                 if (noDeps)
                 {

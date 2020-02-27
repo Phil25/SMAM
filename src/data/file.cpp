@@ -83,4 +83,17 @@ void to_json(nlohmann::json& json, const FilePtr& file) noexcept
 {
     json = file->Raw();
 }
+
+#ifndef NDEBUG  // overloads for easy debug message printing
+auto operator<<(Logger& logger, const File& file) -> Logger&
+{
+    logger << '{' << cr;
+    logger.IncIndent();
+    logger.Indent() << "path: \"" << file.Path() << "\"," << cr;
+    logger.Indent() << "name: \"" << file.Name() << "\"," << cr;
+    logger.Indent() << "link: \"" << file.Link() << '\"' << cr;
+    logger.DecIndent();
+    return logger.Indent() << '}';
+}
+#endif
 }  // namespace smam

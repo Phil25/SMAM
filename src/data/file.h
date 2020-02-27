@@ -4,6 +4,10 @@
 
 #include <string>
 
+#ifndef NDEBUG
+#include <utils/logger.h>
+#endif
+
 namespace smam
 {
 class File final
@@ -32,4 +36,8 @@ bool operator!=(const FilePtr&, const FilePtr&) noexcept;
 
 void from_json(const nlohmann::json&, FilePtr&);
 void to_json(nlohmann::json&, const FilePtr&) noexcept;
+
+#ifndef NDEBUG  // overloads for easy debug message printing
+auto operator<<(Logger&, const File&) -> Logger&;
+#endif
 }  // namespace smam

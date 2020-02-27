@@ -5,8 +5,6 @@
 
 namespace smam
 {
-constexpr std::string_view cache = ".smamdata.json";
-
 CommonContext::CommonContext(const OptionsPtr& options) noexcept
     : options(options)
 {
@@ -20,7 +18,10 @@ CheckAddons::CheckAddons(const LoggerPtr& logger,
 
 void CheckAddons::Run() noexcept
 {
-    if (GetContext().options->Addons().empty())
+    const auto& addons = GetContext().options->Addons();
+    GetLogger()->Debug("Checking user addons. ", VAR(addons));
+
+    if (addons.empty())
     {
         Fail("No addons specified.", ExitCode::NoAddons);
     }
@@ -35,7 +36,10 @@ GoToSMRoot::GoToSMRoot(const LoggerPtr& logger,
 void GoToSMRoot::Run() noexcept
 {
     auto dest = GetContext().options->Destination().value_or("");
+    GetLogger()->Debug("Got lookup destination. ", VAR(dest));
+
     auto root = path::FindSMRoot(dest);
+    GetLogger()->Debug("Got SourceMod root. ", VAR(root));
 
     if (root)
     {
@@ -58,6 +62,8 @@ void LoadAddons::Run() noexcept
 {
     assert(path.parent_path().empty() &&
            "LoadAddons path parameter must be in current directory");
+
+    GetLogger()->Debug("Loading from cache. ", VAR(path));
 
     if (!path::HasReadAndWritePermissions(path))
     {
@@ -98,6 +104,8 @@ SaveAddons::SaveAddons(const LoggerPtr& logger, CommonContext& context,
 
 void SaveAddons::Run() noexcept
 {
+    GetLogger()->Debug("Saving to cache. ", VAR(path));
+
     if (!path::HasReadAndWritePermissions(path))
     {
         Fail("No read or write permissions.", ExitCode::NoPermissions);

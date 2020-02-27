@@ -77,4 +77,23 @@ auto Logger::operator<<(const Col& c) -> Logger&
 {
     return *this << Parse(c);
 }
+
+#ifndef NDEBUG
+void Logger::IncIndent() noexcept
+{
+    ++indent;
+}
+
+void Logger::DecIndent() noexcept
+{
+    --indent;
+}
+
+auto Logger::Indent() noexcept -> Logger&
+{
+    short i = indent;
+    while (--i >= 0) *this << tab;
+    return *this;
+}
+#endif
 }  // namespace smam

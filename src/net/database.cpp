@@ -28,8 +28,10 @@ auto db::Fetch(const LoggerPtr& logger, std::string url,
     -> AddonMapPtr
 {
     using json = nlohmann::json;
+    logger->Debug("Fetching addon metadata. ", VAR(url));
 
     url = BuildQueryURL(std::move(url), ids);
+    logger->Debug("Built query URL. ", VAR(url));
 
     auto root = json::parse(download::Html(url), nullptr, false);
     if (root.is_discarded())
@@ -38,19 +40,25 @@ auto db::Fetch(const LoggerPtr& logger, std::string url,
         return {};
     }
 
-    auto cache = std::make_shared<AddonMap>();
+    auto metadata = std::make_shared<AddonMap>();
 
     for (const auto& entry : root)
     {
         auto id = entry.value("id", "");
-        if (id.empty()) continue;
+
+        if (id.empty())
+        {
+            logger->Warning() << "Found empty ID, skipping..." << cr;
+            continue;
+        }
 
         try
         {
             auto addon = entry.get<AddonPtr>();
             addon->BaseURL(entry.at("url"));
 
-            cache->emplace(std::move(id), addon);
+            logger->Debug("Fetched addon metadata. ", VAR(id));
+            metadata->emplace(std::move(id), addon);
         }
         catch (const json::exception& e)
         {
@@ -62,6 +70,6 @@ auto db::Fetch(const LoggerPtr& logger, std::string url,
         }
     }
 
-    return cache;
+    return metadata;
 }
 }  // namespace smam

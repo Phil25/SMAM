@@ -39,12 +39,12 @@ protected:
 
 TEST_F(DatabaseTest, PositiveSingle)
 {
-    auto cache = Fetch(addon::acce);
+    auto metadata = Fetch(addon::acce);
 
-    ASSERT_EQ(1, cache->size());
-    ASSERT_TRUE(cache->count(addon::acce));
+    ASSERT_EQ(1, metadata->size());
+    ASSERT_TRUE(metadata->count(addon::acce));
 
-    const auto& addon = cache->at(addon::acce);
+    const auto& addon = metadata->at(addon::acce);
 
     ASSERT_FALSE(addon->BaseURL().empty());
     EXPECT_EQ("https://builds.limetech.io/?p=accelerator",
@@ -58,17 +58,17 @@ TEST_F(DatabaseTest, PositiveSingle)
 
 TEST_F(DatabaseTest, PositiveMultiple)
 {
-    auto cache = Fetch(addon::acce, addon::thri);
+    auto metadata = Fetch(addon::acce, addon::thri);
 
-    ASSERT_EQ(2, cache->size());
-    ASSERT_TRUE(cache->count(addon::acce));
-    ASSERT_TRUE(cache->count(addon::thri));
+    ASSERT_EQ(2, metadata->size());
+    ASSERT_TRUE(metadata->count(addon::acce));
+    ASSERT_TRUE(metadata->count(addon::thri));
 
-    EXPECT_FALSE(cache->at(addon::acce)->BaseURL().empty());
-    EXPECT_FALSE(cache->at(addon::acce)->Files().empty());
+    EXPECT_FALSE(metadata->at(addon::acce)->BaseURL().empty());
+    EXPECT_FALSE(metadata->at(addon::acce)->Files().empty());
 
-    EXPECT_FALSE(cache->at(addon::thri)->BaseURL().empty());
-    EXPECT_FALSE(cache->at(addon::thri)->Files().empty());
+    EXPECT_FALSE(metadata->at(addon::thri)->BaseURL().empty());
+    EXPECT_FALSE(metadata->at(addon::thri)->Files().empty());
 }
 
 TEST_F(DatabaseTest, NegativeSingle)
@@ -83,36 +83,36 @@ TEST_F(DatabaseTest, NegativeMultiple)
 
 TEST_F(DatabaseTest, PositiveNegativeMix)
 {
-    auto cache = Fetch(addon::bad1, addon::acce, addon::bad2);
+    auto metadata = Fetch(addon::bad1, addon::acce, addon::bad2);
 
-    ASSERT_EQ(1, cache->size());
-    ASSERT_FALSE(cache->count(addon::bad1));
-    ASSERT_TRUE(cache->count(addon::acce));
-    ASSERT_FALSE(cache->count(addon::bad2));
+    ASSERT_EQ(1, metadata->size());
+    ASSERT_FALSE(metadata->count(addon::bad1));
+    ASSERT_TRUE(metadata->count(addon::acce));
+    ASSERT_FALSE(metadata->count(addon::bad2));
 
-    EXPECT_FALSE(cache->at(addon::acce)->BaseURL().empty());
-    EXPECT_FALSE(cache->at(addon::acce)->Files().empty());
+    EXPECT_FALSE(metadata->at(addon::acce)->BaseURL().empty());
+    EXPECT_FALSE(metadata->at(addon::acce)->Files().empty());
 }
 
 TEST_F(DatabaseTest, Dependencies)
 {
-    auto cache = Fetch(addon::rtd);
+    auto metadata = Fetch(addon::rtd);
 
-    ASSERT_EQ(2, cache->size());
-    ASSERT_TRUE(cache->count(addon::rtd));
-    ASSERT_TRUE(cache->count(addon::tf2a));
+    ASSERT_EQ(2, metadata->size());
+    ASSERT_TRUE(metadata->count(addon::rtd));
+    ASSERT_TRUE(metadata->count(addon::tf2a));
 
-    EXPECT_FALSE(cache->at(addon::rtd)->BaseURL().empty());
-    EXPECT_FALSE(cache->at(addon::tf2a)->Files().empty());
+    EXPECT_FALSE(metadata->at(addon::rtd)->BaseURL().empty());
+    EXPECT_FALSE(metadata->at(addon::tf2a)->Files().empty());
 }
 
-TEST_F(DatabaseTest, NotPrecached)
+TEST_F(DatabaseTest, NotInMetadata)
 {
-    auto cache = Fetch(addon::acce);
+    auto metadata = Fetch(addon::acce);
 
-    ASSERT_EQ(1, cache->size());
-    ASSERT_TRUE(cache->count(addon::acce));
-    ASSERT_FALSE(cache->count(addon::thri));
+    ASSERT_EQ(1, metadata->size());
+    ASSERT_TRUE(metadata->count(addon::acce));
+    ASSERT_FALSE(metadata->count(addon::thri));
 }
 
 TEST_F(DatabaseTest, BadFileAddon)

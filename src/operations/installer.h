@@ -11,7 +11,7 @@ namespace smam
 struct InstallerContext final
 {
     std::string id;
-    AddonMapPtr cache;
+    AddonMapPtr metadata;
 
     AddonPtr addon;
 
@@ -19,7 +19,7 @@ struct InstallerContext final
     std::filesystem::path root;
 
     explicit InstallerContext(std::string        id,
-                              const AddonMapPtr& cache) noexcept;
+                              const AddonMapPtr& metadata) noexcept;
 };
 
 class CheckPending final : public Operation<InstallerContext>
@@ -30,10 +30,10 @@ public:
     void Run() noexcept override;
 };
 
-class ParseCache final : public Operation<InstallerContext>
+class ParseMetadata final : public Operation<InstallerContext>
 {
 public:
-    ParseCache(const LoggerPtr&, InstallerContext&) noexcept;
+    ParseMetadata(const LoggerPtr&, InstallerContext&) noexcept;
 
     void Run() noexcept override;
 };

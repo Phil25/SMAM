@@ -4,6 +4,10 @@
 
 #include <set>
 
+#ifndef NDEBUG
+#include <utils/logger.h>
+#endif
+
 namespace smam
 {
 class Addon;
@@ -72,4 +76,8 @@ void to_json(nlohmann::json&, const AddonPtr&) noexcept;
 
 using AddonMap    = std::map<std::string, AddonPtr>;
 using AddonMapPtr = std::shared_ptr<AddonMap>;
+
+#ifndef NDEBUG  // overloads for easy debug message printing
+auto operator<<(Logger&, const Addon&) -> Logger&;
+#endif
 }  // namespace smam

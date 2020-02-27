@@ -14,18 +14,18 @@ class OperarationInstallerTest : public ::testing::Test
 {
 protected:
     LoggerPtr   logger = std::make_shared<Logger>();
-    AddonMapPtr cache;
+    AddonMapPtr metadata;
 
     void SetUp() override
     {
         logger->SetOutput(false);
-        cache = db::Fetch(logger, url, {"rtd", "tf2items"});
+        metadata = db::Fetch(logger, url, {"rtd", "tf2items"});
     }
 };
 
 TEST_F(OperarationInstallerTest, CheckPending)
 {
-    auto exec  = Executor<InstallerContext>(logger, "rtd", cache);
+    auto exec  = Executor<InstallerContext>(logger, "rtd", metadata);
     auto error = exec.Run<CheckPending>().GetError();
 
     ASSERT_FALSE(error) << error.message;
@@ -36,10 +36,10 @@ TEST_F(OperarationInstallerTest, CheckPending)
     EXPECT_EQ("_", error.message);
 }
 
-TEST_F(OperarationInstallerTest, ParseCacheSuccess)
+TEST_F(OperarationInstallerTest, ParseMetadataSuccess)
 {
-    auto exec  = Executor<InstallerContext>(logger, "rtd", cache);
-    auto error = exec.Run<ParseCache>().GetError();
+    auto exec  = Executor<InstallerContext>(logger, "rtd", metadata);
+    auto error = exec.Run<ParseMetadata>().GetError();
 
     ASSERT_FALSE(error) << error.message;
 
@@ -51,20 +51,20 @@ TEST_F(OperarationInstallerTest, ParseCacheSuccess)
     EXPECT_FALSE(addon->IsExplicit());  // not just yet
 }
 
-TEST_F(OperarationInstallerTest, ParseCacheFail)
+TEST_F(OperarationInstallerTest, ParseMetadataFail)
 {
-    auto exec  = Executor<InstallerContext>(logger, "uncached", cache);
-    auto error = exec.Run<ParseCache>().GetError();
+    auto exec  = Executor<InstallerContext>(logger, "abc", metadata);
+    auto error = exec.Run<ParseMetadata>().GetError();
 
     ASSERT_TRUE(error);
-    EXPECT_EQ("Not found: \"uncached\"", error.message);
+    EXPECT_EQ("Not found: \"abc\"", error.message);
 }
 
 TEST_F(OperarationInstallerTest, CheckInstalled)
 {
-    auto exec = Executor<InstallerContext>(logger, "rtd", cache);
+    auto exec = Executor<InstallerContext>(logger, "rtd", metadata);
     auto error =
-        exec.Run<ParseCache>().Run<CheckInstalled>(false).GetError();
+        exec.Run<ParseMetadata>().Run<CheckInstalled>(false).GetError();
 
     ASSERT_FALSE(error) << error.message;
 
@@ -77,9 +77,10 @@ TEST_F(OperarationInstallerTest, CheckInstalled)
 
 TEST_F(OperarationInstallerTest, CheckInstalledForce)
 {
-    auto exec = Executor<InstallerContext>(logger, "tf2items", cache);
+    auto exec =
+        Executor<InstallerContext>(logger, "tf2items", metadata);
     auto error =
-        exec.Run<ParseCache>().Run<CheckInstalled>(false).GetError();
+        exec.Run<ParseMetadata>().Run<CheckInstalled>(false).GetError();
 
     ASSERT_FALSE(error) << error.message;
 
@@ -95,7 +96,7 @@ TEST_F(OperarationInstallerTest, Transaction)
 
     auto root = fs::current_path();
 
-    auto exec  = Executor<InstallerContext>(logger, "rtd", cache);
+    auto exec  = Executor<InstallerContext>(logger, "rtd", metadata);
     auto error = exec.Run<BeginTransaction>().GetError();
 
     ASSERT_FALSE(error) << error.message;
