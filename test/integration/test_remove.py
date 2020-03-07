@@ -53,6 +53,25 @@ def test_not_remove_explicit_dependency_after_install(smam):
     smam.check_not_installed('rtd')
     smam.check_installed('tf2attributes')
 
+def test_not_remove_shared_dependencies(smam):
+    smam.exec('install wants_multiple')
+    smam.check_installed('wants_multiple')
+
+    smam.check_installed('afk_manager') # wants_multiple's deps
+    smam.check_installed('tf2attributes')
+
+    smam.exec('install rtd')
+    smam.check_installed('rtd')
+
+    smam.check_installed('afk_manager') # still installed
+    smam.check_installed('tf2attributes')
+
+    smam.exec('remove rtd')
+    smam.check_not_installed('rtd')
+
+    smam.check_installed('afk_manager') # still installed
+    smam.check_installed('tf2attributes')
+
 @pytest.mark.parametrize('addon', DEPENDENCY_DATA)
 def test_remove_no_dependencies(smam, addon):
     if addon == 'wants_self':

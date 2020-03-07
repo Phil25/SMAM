@@ -92,7 +92,7 @@ DEPENDENCY_DATA = {
     'wants_rtd': ['rtd', 'tf2attributes'],
     'rtd': ['tf2attributes'],
     'wants_circular': ['a_wants_b'],
-    'wants_multiple': ['afk_manager', 'tf2items'],
+    'wants_multiple': ['afk_manager', 'tf2attributes'],
     'wants_self': ['wants_self'],
     'a_wants_b': ['b_wants_a'],
     'b_wants_a': ['a_wants_b']

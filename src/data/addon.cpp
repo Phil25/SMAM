@@ -8,6 +8,7 @@
 namespace smam
 {
 Addon::InstalledMap Addon::installed;
+DependencySet       Addon::markedForRemoval;
 
 Addon::Addon(std::string id, std::string author,
              std::string description) noexcept
@@ -85,6 +86,16 @@ void Addon::MarkUninstalled() noexcept
     installed.erase(id);
 }
 
+bool Addon::IsMarkedForRemoval() const noexcept
+{
+    return markedForRemoval.count(this->id);
+}
+
+void Addon::MarkForRemoval() noexcept
+{
+    markedForRemoval.insert(this->id);
+}
+
 void Addon::AddFiles(FileVector toAdd) noexcept
 {
     files.insert(files.end(), std::make_move_iterator(toAdd.begin()),
@@ -137,6 +148,19 @@ void Addon::EraseNonExitentFiles() noexcept
         installed.begin(), installed.end(), [&file](const auto& entry) {
             const auto& f = entry.second->Files();
             return std::find(f.begin(), f.end(), file) != f.end();
+        });
+}
+
+/*static*/ int Addon::CountByDependency(const std::string& id) noexcept
+{
+    return std::count_if(
+        installed.begin(), installed.end(), [&id](const auto& entry) {
+            for (const auto& dep : entry.second->Dependencies())
+            {
+                if (dep == id)
+                    return !markedForRemoval.count(entry.first);
+            }
+            return false;
         });
 }
 

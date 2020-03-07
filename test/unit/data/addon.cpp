@@ -41,7 +41,7 @@ protected:
             {"description", "Test addon2"},
             {"explicit", false},
             {"files", {"plugins/bin.smx", "translations/tr.txt"}},
-            {"deps", {"plugin2", "plugin3"}},
+            {"deps", {"plugin1", "plugin2", "plugin3"}},
         }.get<AddonPtr>()->MarkInstalled();
         // clang-format on
     }
@@ -257,6 +257,23 @@ TEST_F(AddonTestPreinstalled, CountByOwnedFile)
     EXPECT_EQ(1, Addon::CountByOwnedFile(get("translations/tr.txt")));
 }
 
+TEST_F(AddonTestPreinstalled, CountByDependency)
+{
+    EXPECT_EQ(2, Addon::CountByDependency("plugin1"));
+    EXPECT_EQ(1, Addon::CountByDependency("plugin2"));
+    EXPECT_EQ(1, Addon::CountByDependency("plugin3"));
+}
+
+TEST_F(AddonTestPreinstalled, CountByDependencyMarkedForRemoval)
+{
+    ASSERT_TRUE(Addon::Get("test").has_value());
+    EXPECT_EQ(1, Addon::CountByDependency("test2"));
+
+    // mark test2's depent, test, to be for removal
+    Addon::Get("test").value()->MarkForRemoval();
+    EXPECT_EQ(0, Addon::CountByDependency("test2"));
+}
+
 TEST_F(AddonTestPreinstalled, Save)
 {
     ASSERT_TRUE(Addon::Save(dataFile));
@@ -270,7 +287,7 @@ TEST_F(AddonTestPreinstalled, Save)
     ASSERT_TRUE(json.count("data"));
     ASSERT_TRUE(json.count("hash"));
 
-    ASSERT_EQ(7755100675613232546u, json.at("hash").get<size_t>());
+    ASSERT_EQ(5401668825887964206u, json.at("hash").get<size_t>());
     ASSERT_EQ(2, json.at("data").size());
 
     const auto& a1 = json["data"][0];
@@ -296,7 +313,7 @@ TEST_F(AddonTestPreinstalled, Save)
                 ElementsAre("plugins/bin.smx", "translations/tr.txt"));
 
     EXPECT_THAT(a2["deps"].get<std::vector<std::string>>(),
-                ElementsAre("plugin2", "plugin3"));
+                ElementsAre("plugin1", "plugin2", "plugin3"));
 }
 
 TEST_F(AddonTest, LoadCreate)

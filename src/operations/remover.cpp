@@ -86,39 +86,49 @@ void RemoveDependencies::Run() noexcept
 
     const auto remove = [&](const auto remove,
                             const auto addon) -> void {
-        const auto& addonId = addon->ID();
-        const auto& deps    = addon->Dependencies();
         GetLogger()->Debug("Removing addon dependencies. ",
-                           VAR(addonId), ", ", VAR(deps));
+                           VAR(addon->ID()), ", ",
+                           VAR(addon->Dependencies()));
 
-        for (const auto& dep : deps)
+        for (const auto& id : addon->Dependencies())
         {
-            if (const auto depOpt = Addon::Get(dep))
+            if (!Addon::Get(id).has_value()) continue;
+            const auto dependency = Addon::Get(id).value();
+
+            GetLogger()->Debug("Checking dependency... ", VAR(id));
+
+            if (dependency->IsExplicit())
             {
-                const auto dependency = depOpt.value();
-                if (dependency->IsExplicit())
-                {
-                    GetLogger()->Debug("Omitting dependency. ",
-                                       VAR(dependency));
-                    continue;
-                }
-
-                if (noDeps)
-                {
-                    GetLogger()->Warning()
-                        << "Loose dependency " << Col::green
-                        << dependency->ID() << Col::reset
-                        << " not removed!" << cr;
-                    continue;
-                }
-
-                GetLogger()->Info()
-                    << "Removing loose dependency: " << Col::green
-                    << dependency->ID() << Col::reset << "..." << cr;
-
-                ::RemoveAddon(dependency, GetLogger());
-                remove(remove, dependency);
+                GetLogger()->Debug("Omitting explicit dependency.");
+                continue;
             }
+
+            dependency->MarkForRemoval();
+            GetLogger()->Debug("Marking dependency for removal");
+
+            GetLogger()->Debug(VAR(Addon::CountByDependency(id)));
+            if (Addon::CountByDependency(id) > 0)  // addons left
+            {
+                GetLogger()->Debug("Omitting shared dependency.");
+                remove(remove, dependency);  // still continue
+                continue;
+            }
+
+            if (noDeps)
+            {
+                GetLogger()->Warning()
+                    << "Loose dependency " << Col::green
+                    << dependency->ID() << Col::reset << " not removed!"
+                    << cr;
+                continue;
+            }
+
+            GetLogger()->Info()
+                << "Removing loose dependency: " << Col::green
+                << dependency->ID() << Col::reset << "..." << cr;
+
+            ::RemoveAddon(dependency, GetLogger());
+            remove(remove, dependency);
         }
     };
 

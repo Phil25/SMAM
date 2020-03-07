@@ -24,6 +24,8 @@ class Addon final : public std::enable_shared_from_this<Addon>
     using InstalledMap = std::map<std::string, AddonPtr>;
     static InstalledMap installed;
 
+    static DependencySet markedForRemoval;
+
     const std::string id, author, description;
 
     std::string   baseUrl;
@@ -57,6 +59,9 @@ public:
     void MarkInstalled() noexcept;
     void MarkUninstalled() noexcept;
 
+    bool IsMarkedForRemoval() const noexcept;
+    void MarkForRemoval() noexcept;
+
     void AddFiles(FileVector) noexcept;
     void EraseNonExitentFiles() noexcept;
 
@@ -66,6 +71,7 @@ public:
     static void EraseAll() noexcept;
 
     static int CountByOwnedFile(const FilePtr&) noexcept;
+    static int CountByDependency(const std::string& id) noexcept;
 
     [[nodiscard]] static bool Load(const std::string& file) noexcept;
     [[nodiscard]] static bool Save(const std::string& file) noexcept;

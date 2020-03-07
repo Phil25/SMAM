@@ -8,6 +8,6 @@
 	],
 	"deps": [
 		"afk_manager",
-		"tf2items"
+		"tf2attributes"
 	]
 }
