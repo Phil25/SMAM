@@ -11,7 +11,7 @@ int main(int argc, const char* argv[])
     const auto logger  = std::make_shared<Logger>();
     const auto options = std::make_shared<Options>(argc, argv, logger);
 
-    if (options->Help())
+    if (options->Help() || options->InFailedState())
     {
         logger->Out() << options->GenHelp(argv[0]);
         return ExitCode::OK;

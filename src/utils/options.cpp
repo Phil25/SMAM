@@ -51,7 +51,13 @@ Options::Options(int argc, const char* argv[],
     catch (const po::error& e)
     {
         logger->Error() << e.what() << cr;
+        failed = true;
     }
+}
+
+bool Options::InFailedState() const
+{
+    return this->failed;
 }
 
 auto Options::GenHelp(const char* binary) const noexcept -> std::string
@@ -132,7 +138,7 @@ auto Options::Addons() const noexcept -> const std::vector<std::string>&
     return vm["addons"].as<std::vector<std::string>>();
 }
 
-auto Options::DatabaseUrl() const noexcept -> const std::string&
+auto Options::DatabaseUrl() const noexcept -> std::string
 {
     return vm["db-url"].as<std::string>();
 }
