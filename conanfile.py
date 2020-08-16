@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 
 class SourceModAddonManager(ConanFile):
     generators = "cmake"
@@ -16,6 +16,10 @@ class SourceModAddonManager(ConanFile):
 
     def build(self):
         cmake = CMake(self)
+
+        if tools.get_env("ISOLATED", False):
+            cmake.definitions["ISOLATED"] = 1
+
         cmake.definitions["CMAKE_BUILD_TYPE"] = str(self.settings.build_type)
         cmake.configure()
         cmake.build()

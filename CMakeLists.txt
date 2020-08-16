@@ -31,7 +31,9 @@ set(VERSION_PATCH 2a)
 set(VERSION_REVISION ${GIT_REVISION})
 set(AGENT ${PROJECT_AGENT})
 
-add_definitions(-D_PROJECT_ROOT=\"${PROJECT_SOURCE_DIR}\")
+if(DEFINED ISOLATED)
+  add_definitions(-DISOLATED)
+endif()
 
 configure_file("${PROJECT_SOURCE_DIR}/src/version.hpp.in" "${PROJECT_SOURCE_DIR}/src/version.hpp" @ONLY)
 

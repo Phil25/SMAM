@@ -1,9 +1,0 @@
-{
-	"id": "funcommandsx",
-	"author": "Spazman0&Arg!",
-	"description": "Extension of SourceMod fun commands.",
-	"url": "https://forums.alliedmods.net/showpost.php?p=665771",
-	"files": [
-		"./;funcommandsX_.*.zip"
-	]
-}

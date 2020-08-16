@@ -1,9 +1,0 @@
-{
-	"id": "steamtools",
-	"author": "asherkin",
-	"description": "Gives access to a select few SteamWorks functions for SourceMod plugins.",
-	"url": "https://builds.limetech.io/?p=steamtools",
-	"files": [
-		"../../;.*"
-	]
-}

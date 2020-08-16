@@ -28,5 +28,5 @@ script:
     - sudo ln -s /usr/bin/gcc-9 /usr/local/bin/gcc
     - sudo ln -s /usr/bin/g++-9 /usr/local/bin/g++
     - gcc -v && g++ -v
-    - mkdir build && cd build && conan install .. --build missing -s build_type=Debug && conan build ..
-    - ./bin/tests && python -m pytest -v ..
+    - mkdir build && cd build && conan install .. --build missing -s build_type=Debug -e ISOLATED=1 && conan build ..
+    - ./bin/tests && python -m pytest -vvv ..

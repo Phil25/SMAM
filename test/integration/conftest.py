@@ -1,25 +1,26 @@
 import os
 import pytest
 import shutil
+from smamdb import server, validate_server, smamdb
 from subprocess import Popen, PIPE
 from data import INSTALL_DATA, BAD_INSTALL_DATA
 
-BINARY = './bin/smam'
+BINARY = "./bin/smam"
 FILES = {**INSTALL_DATA, **BAD_INSTALL_DATA}
 
 class SMAM:
-
-    def __init__(self, binary = BINARY, destination = './mod/'):
+    def __init__(self, binary = BINARY, destination = "./mod/"):
         self.binary = binary
         self.destination = destination
-        self.smroot = destination + 'addons/sourcemod/'
+        self.smroot = destination + "addons/sourcemod/"
 
     def exec(self, cmd):
-        cmds = [self.binary] + cmd.split() + ['-d', self.destination]
-        columns = shutil.get_terminal_size().columns
-        print('\n\033[95m\033[1m' + ' '.join(cmds).center(columns, '-') + '\033[0m')
+        cmds = [self.binary] + cmd.split() + ["-d", self.destination]
+        print("\n\033[95m\033[1mExecuting command: '" + " ".join(cmds) + "'\033[0m")
+
         process = Popen(cmds)
         process.communicate() # wait for finish
+
         return process.returncode
 
     def exists(self, f):
@@ -51,15 +52,12 @@ class SMAM:
 def smam():
     smam = SMAM()
 
-    os.makedirs(smam.smroot + 'configs/')
-    os.makedirs(smam.smroot + 'data/')
-    os.makedirs(smam.smroot + 'gamedata/')
-    os.makedirs(smam.smroot + 'plugins/')
-    os.makedirs(smam.smroot + 'scripting/')
-    os.makedirs(smam.smroot + 'translations/')
-
-    columns = shutil.get_terminal_size().columns
-    print('\n\033[95m\033[1m' + ''.center(columns, '=') + '\033[0m')
+    os.makedirs(smam.smroot + "configs/")
+    os.makedirs(smam.smroot + "data/")
+    os.makedirs(smam.smroot + "gamedata/")
+    os.makedirs(smam.smroot + "plugins/")
+    os.makedirs(smam.smroot + "scripting/")
+    os.makedirs(smam.smroot + "translations/")
 
     yield smam
 

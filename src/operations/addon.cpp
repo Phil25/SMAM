@@ -75,6 +75,7 @@ FindData::FindData(const LoggerPtr& logger, AddonContext& context,
 void FindData::Run() noexcept
 {
     const auto& baseUrl = GetContext().addon->BaseURL();
+    GetLogger()->Debug("Finding scraper for baseUrl. ", VAR(baseUrl));
 
     for (const auto& scraper : *scrapers)
     {
@@ -83,6 +84,7 @@ void FindData::Run() noexcept
         {
             GetLogger()->Debug("Matched scraper. ", VAR(url));
             GetContext().data = scraper->Parse(baseUrl);
+
             return;
         }
     }

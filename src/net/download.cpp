@@ -3,12 +3,11 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef NDEBUG
-#include <curl/curl.h>
-#else
-#include <mock/curl.h>
+#ifdef ISOLATED
+#include <algorithm>
 #endif
 
+#include <curl/curl.h>
 #include <utils/common.h>
 #include <version.hpp>
 
@@ -23,6 +22,18 @@ size_t Write(const char* data, size_t sz, size_t n, void* out) noexcept
     static_cast<std::ostream*>(out)->write(data, trueSize);
     return trueSize;
 }
+
+#ifdef ISOLATED
+/*
+ * When isolated, a call to url X is forwarded to localhost/?external=X
+ * X must contain no '&' chars to not confuse the GET param list
+ */
+auto SanitizeParam(std::string param) noexcept
+{
+    std::replace(param.begin(), param.end(), '&', '-');
+    return param;
+}
+#endif  // ISOLATED
 }  // namespace
 
 namespace smam
@@ -41,7 +52,14 @@ auto download::Raw(const std::string& url, std::ostream& os) noexcept
         return {"Download initialization failed."};
     }
 
+#ifdef ISOLATED
+    auto prefix = std::string{"http://localhost:2333/?external="};
+    prefix.append(SanitizeParam(url));
+    curl_easy_setopt(curl, CURLOPT_URL, prefix.c_str());
+#else
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+#endif  // ISOLATED
+
     curl_easy_setopt(curl, CURLOPT_USERAGENT, version::FullAgent());
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Write);
