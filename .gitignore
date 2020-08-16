@@ -11,3 +11,6 @@ __pycache__
 
 # ccls cache directory
 .ccls-cache/
+
+# python virtual environment
+env
