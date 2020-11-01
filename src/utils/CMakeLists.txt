@@ -1,12 +1,17 @@
-add_library(utils_common common.cpp)
+target_sources(smamlib
+  PRIVATE
+    "archive.cpp"
+    "archive.h"
+    "codes.hpp"
+    "common.cpp"
+    "common.h"
+    "error.hpp"
+    "logger.cpp"
+    "logger.h"
+    "options.cpp"
+    "options.h"
+    "path.cpp"
+    "path.h"
+)
 
-add_library(utils_options options.cpp)
-target_link_libraries(utils_options PRIVATE CONAN_PKG::boost)
-
-add_library(utils_logger logger.cpp)
-
-add_library(utils_path path.cpp)
-target_link_libraries(utils_path PRIVATE CONAN_PKG::OpenSSL)
-
-add_library(utils_archive archive.cpp)
-target_link_libraries(utils_archive PRIVATE CONAN_PKG::libzip)
+target_include_directories(smamlib PRIVATE ${CMAKE_CURRENT_LIST_DIR})

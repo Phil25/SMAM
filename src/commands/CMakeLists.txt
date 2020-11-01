@@ -1,12 +1,11 @@
-add_library(cmd_common common.cpp)
-target_link_libraries(cmd_common PRIVATE utils_options cmd_install cmd_remove cmd_info cmd_search)
+target_sources(smamlib
+  PRIVATE
+    "common.cpp"
+    "common.h"
+    "info.cpp"
+    "install.cpp"
+    "remove.cpp"
+    "search.cpp"
+)
 
-add_library(cmd_install install.cpp)
-target_link_libraries(cmd_install op_installer)
-
-add_library(cmd_remove remove.cpp)
-target_link_libraries(cmd_remove op_remover)
-
-add_library(cmd_info info.cpp)
-
-add_library(cmd_search search.cpp)
+target_include_directories(smamlib PRIVATE ${CMAKE_CURRENT_LIST_DIR})

@@ -1,4 +1,9 @@
-add_library(data_file file.cpp)
+target_sources(smamlib
+  PRIVATE
+    "addon.cpp"
+    "addon.h"
+    "file.cpp"
+    "file.h"
+)
 
-add_library(data_addon addon.cpp)
-target_link_libraries(data_addon PRIVATE data_file)
+target_include_directories(smamlib PRIVATE ${CMAKE_CURRENT_LIST_DIR})
